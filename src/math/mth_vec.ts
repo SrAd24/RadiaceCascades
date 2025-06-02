@@ -9,6 +9,7 @@
 
 /** Vector inteface */
 interface vec {
+  /** #public parameters */  
   /**
    * @info Evaluate vector length2 function
    * @returns none

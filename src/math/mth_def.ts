@@ -27,6 +27,7 @@ const r2D: Function = (angle: number) => {
 
 /** Math class */
 class mth {
+  /** #public parameters */  
   public static PI: number = 3.141592;  // Pi definition
   public static INF: number = 999999;   // Infinity definition
   public static MINF: number = -INF;   // Infinity definition

@@ -12,6 +12,7 @@ import { vec } from './mth_vec';
 
 /** Vector 3d class */
 class vec3 implements vec {
+  /** #public parameters */  
   /**
    * @info Class constructor
    * @param x: number
