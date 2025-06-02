@@ -1,0 +1,29 @@
+{
+  "name": "radiacecascades",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "php": "php -S 0.0.0.0:3000",
+    "scss": "node-sass -watch scss -o css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SrAd24/RadiaceCascades.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SrAd24/RadiaceCascades/issues"
+  },
+  "homepage": "https://github.com/SrAd24/RadiaceCascades#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "node-sass": "^9.0.0",
+    "php": "^1.1.0",
+    "php-express": "^0.0.3",
+    "typescript": "^5.8.3"
+  }
+}
