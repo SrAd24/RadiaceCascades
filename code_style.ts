@@ -93,4 +93,6 @@ const testFunctionGeneric: Function = <Type>(x: number, y: Type): void => {
 
 } /** End of 'testFunctionGeneric' function */
 
+/** */
+
 /** END OF 'main.ts' FILE */
