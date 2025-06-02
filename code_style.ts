@@ -1,4 +1,4 @@
-// todo @GR1-g write some things about header
+// todo #2 #1 @GR1-g write some things about header
 
 /* FILE NAME   : main.ts
  * PURPOSE     : Cascade radiance implementation project.
@@ -10,7 +10,7 @@
  */
 
 /**
- * Compile string and number
+ * @info Compile string and number function
  * @param x: string
  * @param y: number 
  * @returns result string
@@ -20,7 +20,7 @@ export const a: Function = (x: String, y: number): String => {
 } /** End of 'a' function */
 
 /** 
- * Test funciton
+ * @info Test funciton
  * @param abc: String
  * @param bca: number
  * @param kal: boolean
@@ -32,40 +32,41 @@ const b: Funciton = (abc: String, bca: number, kal: boolean): void => {
 
 /** Interface name */
 interface firstInterface {
-    /**
-     * Smb function
-     * @param x: number
-     * @param y: String
-     * @returns none
-     */
-    expampleFunc (x: number, y: String): void;
+  /**
+   * @info Smb function
+   * @param x: number
+   * @param y: String
+   * @returns none
+   */
+  expampleFunc (x: number, y: String): void;
 
-    a: number; // a number
+  a: number; // a number
 } /** End of 'firstInterface' interface */
 
 /** Interface name */
 interface secondInterface extends firstInterface {
   // . . .
-}
+} /** End of 'secondInterface' interface */ 
 
 // first interface variable
 let a: firstInterface = {
-    /**
-     * Smb function
-     * @param x: number
-     * @param y: String
-     */
-    func: Function = (x: number, y: String): void => {
-    }
+  /**
+   * @info Smb function
+   * @param x: number
+   * @param y: String
+   * @returns none
+   */
+  func: Function = (x: number, y: String): void => {
+  }
 } /** End of 'a' function */
 
 /** Class name */
-class apiVulkan {
+class apiVulkan implements firstInterface {
   /**
-   * Class constructor
-   * @param x 
-   * @param y 
-   * @param z 
+   * @info Class constructor
+   * @param x: number
+   * @param y: String
+   * @param z: boolean
    */
   constructor(
     x: number,
@@ -73,8 +74,18 @@ class apiVulkan {
     z: boolean
   ) {} /** End of constructor */  
 
+  /**
+   * @info Smb function
+   * @param x: number
+   * @param y: String
+   * @returns none
+   */
+  func: Function = (x: number, y: String): void =>  {
+
+  } /** End of 'func' function */  
+
   /** #readonly parameters */  
-  readonly a;  // Parameter description@
+  readonly a;  // Parameter description
   readonly b;  // Parameter description
   /** #public parameters */
   public c;  // Parameter description
@@ -84,7 +95,7 @@ class apiVulkan {
 } /** End of 'apiVulkan' class */
 
 /**
- * Smb generic function
+ * @info Smb generic function
  * @param x: number
  * @param y: Type
  * @returns none
@@ -93,6 +104,12 @@ const testFunctionGeneric: Function = <Type>(x: number, y: Type): void => {
 
 } /** End of 'testFunctionGeneric' function */
 
-/** */
+/** Enum name */
+enum enumerate {
+  BOOK = 1,   // 
+  SOVAR = 2,  // 
+  BC,         //
+  A           //
+} /** End of 'enumerate' enum */
 
 /** END OF 'main.ts' FILE */
