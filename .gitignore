@@ -22,8 +22,6 @@ jspm_packages/
 
 *.tsbuildinfo
 
-package-lock.json
-yarn.lock
 
 *.swp
 *.swo
