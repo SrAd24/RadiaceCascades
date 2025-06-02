@@ -23,6 +23,6 @@ interface vec {
 } /** End of 'vec' inteface */
 
 /** EXPORTS */
-export {vec} ;
+export { vec } ;
 
 /** END OF 'mth.ts' FILE */

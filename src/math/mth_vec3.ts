@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import {vec} from './mth_vec'
+import { vec } from './mth_vec';
 
 /** Vector 3d class */
 class vec3 implements vec {
@@ -134,6 +134,6 @@ class vec3 implements vec {
 } /** End of 'vec3' class */ 
 
 /** EXPORTS */
-export {vec3}
+export { vec3 } ;
 
 /** END OF 'mth_vec3.ts' FILE */
