@@ -109,7 +109,7 @@ class vec3 implements vec {
   } /** End of 'cross' function */
 
   /**
-   * @info normilize vector
+   * @info Normilize vector
    * @returns new vector
    */
   public normilize(): vec3 {
@@ -120,7 +120,7 @@ class vec3 implements vec {
   } /** End of 'normilize' function */
 
   /**
-   * @info normilizing vector
+   * @info Normilizing vector
    * @returns none
    */
   public normilizing(): void {

@@ -39,7 +39,7 @@ class vec2 implements vec {
   } /** End of 'length' function */  
 
   /**
-   * @info Vector addiction
+   * @info Vector addiction function
    * @param vector: vec2
    * @returns new vec2
    */
@@ -48,7 +48,7 @@ class vec2 implements vec {
   } /** End of 'add' function */
 
   /**
-   * @info Vector subtracting
+   * @info Vector subtracting function
    * @param vector: vec2
    * @returns new vec2
    */
@@ -57,7 +57,7 @@ class vec2 implements vec {
   } /** End of 'sub' function */
 
   /**
-   * @info Vector multipling by coordinates
+   * @info Vector multipling by coordinates fucntion
    * @param vector: vec2
    * @returns new vec2
    */
@@ -66,7 +66,7 @@ class vec2 implements vec {
   } /** End of 'mul' function */
 
   /**
-   * @info Vector dividing by coordinates
+   * @info Vector dividing by coordinates function
    * @param num: number
    * @returns new vec2
    */
@@ -78,7 +78,7 @@ class vec2 implements vec {
   } /** End of 'mul' function */
   
   /**
-   * @info Vector multipling by number
+   * @info Vector multipling by number function
    * @param num: number
    * @returns new vec2
    */
@@ -87,7 +87,7 @@ class vec2 implements vec {
   } /** End of 'mul' function */
 
   /**
-   * @info normilize vector
+   * @info Normilize vector function
    * @returns new vector
    */
   public normilize(): vec2 {
@@ -101,7 +101,7 @@ class vec2 implements vec {
   } /** End of 'normilize' function */
 
   /**
-   * @info normilizing vector
+   * @info normilizing vector function
    * @returns none
    */
   public normilizing(): void {   

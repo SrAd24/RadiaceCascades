@@ -8,7 +8,6 @@
  */
 
 // TODO #3 @CGSG220AI3 MAKE #PUBLIC IN ALL MTH CLASS
-// TODO #4 @CGSG220AI3 FIX WORD IN @INFO 
 
 /** EXPORTS */
 export { vec3}  from './mth_vec3'
