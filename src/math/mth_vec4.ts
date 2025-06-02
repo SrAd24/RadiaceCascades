@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import {vec} from './mth_vec'
+import {vec} from './mth_vec';
 
 /** Vector 4d class */
 class vec4 implements vec {
@@ -119,5 +119,8 @@ class vec4 implements vec {
     this = newVec4;
   } /** End of 'normilize' function */
 } /** End of 'vec4' class */ 
+
+/** EXPORTS */
+export {vec4} ;
 
 /** END OF 'mth_vec4.ts' FILE */
