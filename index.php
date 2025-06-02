@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="./styles/style.css">
 </head>
 <body>
+    <?php
+      echo 52
+    ?>
     <canvas>
 
     </canvas>
