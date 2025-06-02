@@ -9,13 +9,16 @@
  * LAST UPDATE : 02.06.2025
  */
 
+/** IMPORTS */
+// import {. . .} from '. . .'
+
 /**
  * @info Compile string and number function
  * @param x: string
  * @param y: number 
  * @returns result string
  */
-export const a: Function = (x: String, y: number): String => {
+const a: Function = (x: String, y: number): String => {
   return x + y;
 } /** End of 'a' function */
 
@@ -38,7 +41,7 @@ interface firstInterface {
    * @param y: String
    * @returns none
    */
-  expampleFunc (x: number, y: String): void;
+  expampleFunc(x: number, y: String): void;
 
   a: number; // a number
 } /** End of 'firstInterface' interface */
@@ -56,7 +59,7 @@ let a: firstInterface = {
    * @param y: String
    * @returns none
    */
-  func: Function = (x: number, y: String): void => {
+  func(x: number, y: String): void {
   }
 } /** End of 'a' function */
 
@@ -69,9 +72,9 @@ class apiVulkan implements firstInterface {
    * @param z: boolean
    */
   constructor(
-    x: number,
-    y: String,
-    z: boolean
+    public x: number,
+    public y: String,
+    public z: boolean
   ) {} /** End of constructor */  
 
   /**
@@ -80,7 +83,7 @@ class apiVulkan implements firstInterface {
    * @param y: String
    * @returns none
    */
-  func: Function = (x: number, y: String): void =>  {
+  func(x: number, y: String): void {
 
   } /** End of 'func' function */  
 
@@ -111,5 +114,8 @@ enum enumerate {
   BC,         //
   A           //
 } /** End of 'enumerate' enum */
+
+/** EXPORTS */
+export {a, b} ;
 
 /** END OF 'main.ts' FILE */
