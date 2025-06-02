@@ -14,6 +14,7 @@ import { vec4 } from './mth_vec4';
 
 /** Matrix 4x4 class */
 class mat4 {
+  /** #public parameters */  
   public m: number[4][4]; // Matrix info
 
   /**
