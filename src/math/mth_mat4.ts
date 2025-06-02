@@ -80,7 +80,7 @@ class mat4 {
 
   /**
    * @info Rotate matrix by x axis function
-   * @param Angle in degree
+   * @param angle in degree
    * @return result matrix
    */
   public static rotateX(angle: number): mat4 {   
@@ -96,7 +96,7 @@ class mat4 {
 
   /**
    * @info Rotate matrix by y axis function
-   * @param Angle in degree
+   * @param angle in degree
    * @return result matrix
    */
   public static rotateY(angle: number): mat4 {   
@@ -112,7 +112,7 @@ class mat4 {
 
   /**
    * @info Rotate matrix by z axis function
-   * @param Angle in degree
+   * @param angle in degree
    * @return result matrix
    */
   public static rotateZ(angle: number): mat4 {   
@@ -156,7 +156,7 @@ class mat4 {
   } /* End of 'rotate' function */
   
   /**
-   * @info matrix multipling function
+   * @info Matrix multipling function
    * @param matrix: mat4
    * @returns result matrix
    */
@@ -254,6 +254,16 @@ class mat4 {
             -(loc.dot(right)), -(loc.dot(up)), (loc.dot(dir)), 1);
   } /* End of 'view' function */
 
+  /**
+   * @info Evaluate frustrum matrix function
+   * @param l: number 
+   * @param r: number 
+   * @param b: number  
+   * @param t: number  
+   * @param n: number  
+   * @param f: number  
+   * @returns frustrum matrix
+   */
   public static Frustum(l: number, r: number, b: number, t: number, n: number, f: number): mat4
   {
     return matr(2 * n / (r - l), 0, 0, 0,

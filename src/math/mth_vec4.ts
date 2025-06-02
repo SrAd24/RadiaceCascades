@@ -91,7 +91,7 @@ class vec4 implements vec {
   } /** End of 'mul' function */
 
   /**
-   * @info normilize vector
+   * @info Normilize vector
    * @returns new vector
    */
   public normilize(): vec4 {
@@ -105,7 +105,7 @@ class vec4 implements vec {
   } /** End of 'normilize' function */
 
   /**
-   * @info normilizing vector
+   * @info Normilizing vector
    * @returns none
    */
   public normilizing(): void {   
