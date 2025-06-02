@@ -1,13 +1,2 @@
-const express = require('express');
-const { phpExpress } = require('php-express');
-const app = express();
-
-const php = phpExpress({
-  binPath: 'php'
-});
-
-app.all(/.+\.php$/, php.router);
-
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+const php = require('php')
+const output = await php.run('some_php_script.php')
