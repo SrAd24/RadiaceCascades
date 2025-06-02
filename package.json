@@ -3,18 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "php": "php -S 0.0.0.0:3000"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
     "php-express": "^1.0.0"
   }
-  "scripts": {
-    "start": "node server.js",
-    "php": "php -S 0.0.0.0:3000"
-  },
 }
