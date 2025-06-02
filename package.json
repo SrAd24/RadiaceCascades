@@ -1,8 +1,10 @@
 {
-  "name": "radiacecascades",
+  "name": "z",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "scss": "node-sass -watch scss -o css", 
+    "sass": "node-sass -watch scss -o css", 
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "php": "php -S 0.0.0.0:3000"
@@ -12,6 +14,7 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
+    "node-sass": "^9.0.0",
     "php": "^1.1.0",
     "php-express": "^0.0.3",
     "typescript": "^5.8.3"
