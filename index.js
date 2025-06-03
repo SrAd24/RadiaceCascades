@@ -8,7 +8,11 @@
  */
 
 // Start php
-const php = require('php');
-const output = await php.run('index.php');
+async function runPHP() {
+    const php = require('php');
+    const output = await php.run('index.php');
+    console.log(output);
+}
+runPHP();
 
 /** END OF 'index.js' FILE */
