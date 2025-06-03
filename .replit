@@ -1,0 +1,16 @@
+modules = ["nodejs-20", "php-8.2"]
+run = "php -S 0.0.0.0:$PORT"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run start"]
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[[ports]]
+localPort = 37557
+externalPort = 3000

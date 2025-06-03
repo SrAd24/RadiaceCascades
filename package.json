@@ -24,6 +24,7 @@
     "node-sass": "^9.0.0",
     "php": "^1.1.0",
     "php-express": "^0.0.3",
+    "sass": "^1.89.1",
     "typescript": "^5.8.3"
   }
 }
