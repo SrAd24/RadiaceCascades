@@ -10,12 +10,34 @@
 /** IMPORTS */
 import { shader } from "./shaders.js";
 
+// Vertex attributes
+const vertexAttributes = [
+  {
+    attributes:[
+      {
+        shaderLocation: 0,
+        offset: 0,
+        format: "float32x4"
+      },
+      {
+        shaderLocation: 1,
+        offset: 16,
+        format: "float32x4"
+      }
+    ],
+    arrayStride: 32,
+    stepMode: "vertex"
+  }
+];
+
 /** Gpu class */
 class gpu {
   /** #public parameters */
-  public adapter: any;
-  public device: any;
-  public shader1: any;
+  public adapter: any;         // GPUAdepter
+  public device: any;          // GPUDevice
+  public shader1: any;         // GPUShaderModule
+  public descriptor: object;   // Pipeline descriptor
+  public renderPipeline: any;  // Render pipline
 
   /**
    * @info Initialize webGPU function
@@ -42,6 +64,31 @@ class gpu {
     // create shader
     this.shader1 = new shader();
     this.shader1.createShader("main", this.device);
+
+    // set pipeline descriptor
+    this.decriptor = {
+      vertex: {
+        shaderModule: this.shader1,
+        entryPoint: "vertex_main",
+        buffers: vertexAttributes
+      },
+      fragment: {
+        shaderModule: this.shader1,
+        entryPoint: "fragment_main",
+        targets: [
+          {
+            format: navigator.gpu.getPreferredCanvasFormat()
+          }
+        ]
+      },
+      primitive: {
+        topology: "triangle-list"
+      },
+      layout: "auto"
+    };
+    
+    // create render pipeline
+    this.renderPipeline = this.device.createRenderPipeline(descriptor);
   } /** End of 'Initialize' function */
 } /** End of 'gpu' class */
 

@@ -13,6 +13,12 @@ import { vec } from "./mth_vec";
 /** Vector 4d class */
 class vec4 implements vec {
   /** #public parameters */
+  /** vector coordinates */
+  public x: number;
+  public y: number;
+  public z: number;
+  public w: number;
+
   /**
    * @info Class constructor
    * @param x: number
@@ -21,11 +27,29 @@ class vec4 implements vec {
    * @param w: number
    */
   public constructor(
-    public x: number,
-    public y: number,
-    public z: number,
-    public w: number,
-  ) {} /** End of constructor */
+    x: number,
+    y: number,
+    z: number,
+    w: number
+  ) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.w = w;
+  } /** End of constructor */
+  
+  /**
+   * @info Class constructor by 1 coordinate
+   * @param x: number
+   */
+  public constructor(
+    x: number
+  ) {
+    this.x = x;
+    this.y = x;
+    this.z = x;
+    this.w = x;
+  } /** End of constructor */
 
   /**
    * @info Evaluate vector length function
