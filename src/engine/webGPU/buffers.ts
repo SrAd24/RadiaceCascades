@@ -22,7 +22,7 @@ class buffer {
    * @returns none
    */
   public writeBuffer(verteces: Float32Array, device: any): void {
-    device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length());
+    device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length);
   } /** End of 'writeBuffer' function */
 
   /**
@@ -33,7 +33,7 @@ class buffer {
    */
   public createBuffer(device: any, verteces: Float32Array): void {
     this.gpuBuffer = device.createBuffer({
-      size: verteces.byteLength(),
+      size: verteces.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
 

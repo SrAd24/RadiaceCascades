@@ -102,7 +102,7 @@ class render {
     this.command.beginRenderPass(
       this.context,
       this.core.renderPipeline,
-      this.gpuBuffer,
+      this.gpuBuffer.gpuBuffer,
     );
 
     // end render pass
