@@ -9,8 +9,7 @@
     <?php
       echo 52
     ?>
-    <canvas>
-
+    <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG">
     </canvas>
 
     <script>      
@@ -22,7 +21,7 @@
         return data;
       }
       let data = getData();
-        console.log(data);
+      console.log(data);
     </script>
 </body>
 </html>
