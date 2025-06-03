@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { shader } from "./shaders";
+import { shader } from "./shaders.js";
 
 /** Gpu class */
 class gpu {

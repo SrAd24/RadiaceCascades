@@ -12,15 +12,19 @@
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG">
     </canvas>
 
-    <script type="module" async src="./src/math/mth_def.js">
-//        console.log("Start render initializing");
-//        (async () => {
-//            consolle.log("Start render initializing 2");
-//            const rnd = new gpu();
-//            await rnd.initialize();
-//            console.log("End render initalizing");
-//        })();
-        console.log(2);
-    </script>
+    <script>
+      console.log(2);
+    </script>     
+  
+    <script type="module">
+      import { gpu } from "./src/engine/webGPU/gpu.js";
+      
+      console.log("Render init started");
+      const rnd = new gpu();
+      (async () => {
+        await rnd.initialize();
+      })();
+     console.log("Render init ended");
+</script>
 </body>
 </html>

@@ -18,9 +18,11 @@ class shader {
    * @returns info in string
    */
   private async readShader(shaderName: String): Promise<any> {
-    const response = fetch(
-      "shaders/" + shaderName + "/" + shaderName + ".wgsl",
-    );
+    // const response = fetch(
+    //   "./shaders/" + shaderName + "/" + shaderName + ".wgsl",
+    // );
+
+    const response = await fetch("./shds/main/main.wgsl");
     if (!(await response).ok) {
       throw Error("can`t read shader");
     }

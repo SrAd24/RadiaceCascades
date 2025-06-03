@@ -3,7 +3,7 @@ run = "php -S 0.0.0.0:$PORT"
 
 [nix]
 channel = "stable-24_05"
-packages = ["tcpcrypt"]
+packages = ["tcpcrypt", "snicat"]
 
 [deployment]
 run = ["sh", "-c", "npm run start"]

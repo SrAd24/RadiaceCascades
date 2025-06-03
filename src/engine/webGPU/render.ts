@@ -8,14 +8,12 @@
  */
 
 /** IMPORTS */
-import { gpu } from "./gpu";
+import { gpu } from "./gpu.js";
 
 /** Render class */
 class render {
-  /** #private parameters */
-  private core: gpu; // TODO @CGSG220AI3 rewrite comm
-  
-  /** #private parameters */
+  /** #public parameters */
+
   /**
    * @info Class constructor
    * @param core: gpu
@@ -28,7 +26,6 @@ class render {
    * @returns none
    */
   public async initialize() {
-    
     await this.core.initialize();
   } /** End of 'initialize' function */
 } /** End of 'Render' class */
