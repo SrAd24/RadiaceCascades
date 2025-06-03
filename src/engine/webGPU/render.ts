@@ -10,7 +10,7 @@
 /** IMPORTS */
 import { gpu } from "./gpu.js";
 import { buffer } from "./buffers.js";
-import { encoder } from './encoder.ts'
+import { encoder } from "./encoder.js";
 
 // Vertex attributes
 const vertexAttributes = [
@@ -83,8 +83,9 @@ class render {
     } else throw Error("Core is undefined");
 
     this.command = new encoder();
-    if (this.command != undefined) this.command.createEncoder(core.device, this.context);
-    else console.log("command buffer ready");    
+    if (this.command != undefined)
+      this.command.createEncoder(this.core.device, this.context);
+    else console.log("command buffer ready");
 
     this.gpuBuffer = new buffer();
     this.gpuBuffer.createBuffer(this.core.device, vertices);
@@ -98,7 +99,11 @@ class render {
    */
   public render(): void {
     // begin render pass
-    this.command.beginRenderPass(this.context, this.core.renderPipeline, this.gpuBuffer);  
+    this.command.beginRenderPass(
+      this.context,
+      this.core.renderPipeline,
+      this.gpuBuffer,
+    );
 
     // end render pass
     this.command.endRenderPass(this.core.device);
