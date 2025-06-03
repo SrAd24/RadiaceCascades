@@ -98,12 +98,10 @@ class render {
    */
   public render(): void {
     // begin render pass
-    command.beginRenderPass(this.context);
-
-    
+    this.command.beginRenderPass(this.context, this.core.renderPipeline, this.gpuBuffer);  
 
     // end render pass
-    command.endRenderPass();
+    this.command.endRenderPass(this.core.device);
   } /** End of 'render' function */
 } /** End of 'Render' class */
 
