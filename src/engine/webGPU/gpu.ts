@@ -13,31 +13,30 @@ import { shader } from "./shaders.js";
 // Vertex attributes
 const vertexAttributes = [
   {
-    attributes:[
+    attributes: [
       {
         shaderLocation: 0,
         offset: 0,
-        format: "float32x4"
+        format: "float32x4",
       },
       {
         shaderLocation: 1,
         offset: 16,
-        format: "float32x4"
-      }
+        format: "float32x4",
+      },
     ],
     arrayStride: 32,
-    stepMode: "vertex"
-  }
+    stepMode: "vertex",
+  },
 ];
 
 /** Gpu class */
 class gpu {
   /** #public parameters */
-  public adapter: any;         // GPUAdepter
-  public device: any;          // GPUDevice
-  public shader1: any;         // GPUShaderModule
-  public descriptor: object;   // Pipeline descriptor
-  public renderPipeline: any;  // Render pipline
+  public adapter: any; // GPUAdepter
+  public device: any; // GPUDevice
+  public shader1: any; // GPUShaderModule
+  public renderPipeline: any; // Render pipline
 
   /**
    * @info Initialize webGPU function
@@ -63,30 +62,39 @@ class gpu {
 
     // create shader
     this.shader1 = new shader();
-    this.shader1.createShader("main", this.device);
+    await this.shader1.createShader("main", this.device);
+
+    if (this.shader1.shaderModule == undefined)
+      throw Error("Shader is undefined");
+
+    // set descrptor parameters
+    const layout = "auto"; // todo @th4: change to manual
+    const primitive: GPUPrimitivesState = {
+      topology: "triangle-list",
+    };
+    const fragment: GPUFragmentState = {
+      module: this.shader1.shaderModule,
+      entryPoint: "fragment_main",
+      targets: [
+        {
+          format: "bgra8unorm",
+        },
+      ],
+    };
+    const vertex: GPUVertexState = {
+      module: this.shader1.shaderModule,
+      entryPoint: "vertex_main",
+      buffers: vertexAttributes,
+    };
 
     // set pipeline descriptor
-    this.decriptor = {
-      vertex: {
-        shaderModule: this.shader1,
-        entryPoint: "vertex_main",
-        buffers: vertexAttributes
-      },
-      fragment: {
-        shaderModule: this.shader1,
-        entryPoint: "fragment_main",
-        targets: [
-          {
-            format: navigator.gpu.getPreferredCanvasFormat()
-          }
-        ]
-      },
-      primitive: {
-        topology: "triangle-list"
-      },
-      layout: "auto"
+    const descriptor = {
+      vertex,
+      fragment,
+      primitive,
+      layout,
     };
-    
+
     // create render pipeline
     this.renderPipeline = this.device.createRenderPipeline(descriptor);
   } /** End of 'Initialize' function */

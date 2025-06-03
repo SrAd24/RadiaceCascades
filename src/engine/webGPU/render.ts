@@ -9,34 +9,33 @@
 
 /** IMPORTS */
 import { gpu } from "./gpu.js";
-import {buffer} from './buffers.js'
+import { buffer } from "./buffers.js";
 
 // Vertex attributes
 const vertexAttributes = [
   {
-    attributes:[
+    attributes: [
       {
         shaderLocation: 0,
         offset: 0,
-        format: "float32x4"
+        format: "float32x4",
       },
       {
         shaderLocation: 1,
         offset: 16,
-        format: "float32x4"
-      }
+        format: "float32x4",
+      },
     ],
     arrayStride: 32,
-    stepMode: "vertex"
-  }
+    stepMode: "vertex",
+  },
 ];
 
 /** Render class */
 class render {
   /** #private parameters */
   private core: gpu | undefined;
-  private context: any;
-  private decriptor: object;
+  private context: Element | undefined;
 
   /** #public parameters */
   /**
@@ -56,16 +55,20 @@ class render {
     if (this.core != undefined) {
       await this.core.initialize();
       /** Get canvas ID */
-      const canvasID = document.getElementById("#The_only_normal_group_for_the_entire_time_at_the_CGSG");
+      const canvasID = document.querySelector(
+        "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
+      );
       /** Get context */
-      this.context = canvasID.getContext("webgpu");
+      if (canvasID == null) throw Error("Canvas is undefined");
 
-      this.context.configure({
-        this.core.device,
-        format: navigator.gpu.getPreferredCanvasFormat()
-      });    
+      if (this.context == undefined)
+        this.context = canvasID.getContext("webgpu");
 
-
+      if (this.context == undefined) throw Error("Context is undefined");
+      this.context?.configure({
+        device: this.core?.device,
+        format: navigator.gpu.getPreferredCanvasFormat(),
+      });
     } else throw Error("Core is undefined");
   } /** End of 'initialize' function */
 } /** End of 'Render' class */

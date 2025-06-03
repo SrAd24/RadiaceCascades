@@ -26,29 +26,17 @@ class vec4 implements vec {
    * @param z: number
    * @param w: number
    */
-  public constructor(
-    x: number,
-    y: number,
-    z: number,
-    w: number
-  ) {
+  public constructor(x: number, y?: number, z?: number, w?: number) {
     this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = w;
-  } /** End of constructor */
-  
-  /**
-   * @info Class constructor by 1 coordinate
-   * @param x: number
-   */
-  public constructor(
-    x: number
-  ) {
-    this.x = x;
-    this.y = x;
-    this.z = x;
-    this.w = x;
+    if (y != undefined && z != undefined && w != undefined) {
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    } else {
+      this.y = x;
+      this.z = x;
+      this.w = x;
+    }
   } /** End of constructor */
 
   /**

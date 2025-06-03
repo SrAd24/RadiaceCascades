@@ -10,15 +10,15 @@
 /** Shader class */
 class shader {
   /** #private parameters */
-  private shaderModule: any; // Shader module variable
+  private shaderModule: GPUShaderModule | undefined; // Shader module variable
 
   /**
    * @info Read shader info function
    * @param shaderName: String
    * @returns info in string
    */
-  private async readShader(shaderName: String): Promise<any> {
-    const response = fetch(
+  private async readShader(shaderName: String): Promise<string> {
+    const response = await fetch(
       "src/engine/webGPU/shds/" + shaderName + "/" + shaderName + ".wgsl",
     );
 
@@ -27,8 +27,6 @@ class shader {
       throw Error("can`t read shader");
     }
     const data = (await response).text();
-
-    console.log(data);
 
     return data;
   } /** End of 'readShader' function */
@@ -43,12 +41,13 @@ class shader {
     // get shader data
     const shaderData = await this.readShader(shaderName);
 
+    console.log(shaderData.toString());
     // create shader module
     this.shaderModule = device.createShaderModule({
-      code: shaderData,
+      code: shaderData.toString(),
     });
-
-    console.log("shader created successfully: " + shaderName);
+    if (this.shaderModule == undefined) throw Error("Shader is undefined");
+    else console.log("shader created successfully: " + shaderName);
   } /** End of 'createShader' function */
 } /** End of 'shader' class */
 
