@@ -10,37 +10,47 @@
 /** Shader class */
 class shader {
   /** #private parameters */
-  readonly shaderModule; // Shader module variable
+  private shaderModule: any; // Shader module variable
 
   /**
    * @info Read shader info function
    * @param shaderName: String
    * @returns info in string
    */
-  private async readShader(shaderName: String): String {
-    const response = fetch("shaders/" + shaderName + "/" + shaderName + ".wgsl");
+  private async readShader(shaderName: String): Promise<any> {
+    const response = fetch(
+      "shaders/" + shaderName + "/" + shaderName + ".wgsl",
+    );
     if (!(await response).ok) {
-        throw Error("can`t read shader");        
+      throw Error("can`t read shader");
     }
     const data = (await response).text();
+
+    console.log(data);
+
     return data;
   } /** End of 'readShader' function */
-    
+
   /** #public parameters */
   /**
    * @info Create shader function
    * @param shaderName: String
    * @returns ready shader
    */
-  public async createShader(shaderName: String, device: Promise): void {
+  public async createShader(shaderName: String, device: any): Promise<any> {
     // get shader data
     const shaderData = await this.readShader(shaderName);
 
     // create shader module
     this.shaderModule = device.createShaderModule({
-        code: shaderData
-    });   
+      code: shaderData,
+    });
+
+    console.log("shader created successfully: " + shaderName);
   } /** End of 'createShader' function */
 } /** End of 'shader' class */
+
+/** EXPORTS */
+export { shader };
 
 /** END OF 'shaders.ts' FILE */

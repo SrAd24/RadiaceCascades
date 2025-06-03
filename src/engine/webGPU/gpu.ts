@@ -7,34 +7,45 @@
  * LAST UPDATE : 03.06.2025
  */
 
+/** IMPORTS */
+import { shader } from "./shaders";
+
 /** Gpu class */
 class gpu {
-  /** #readonly parameters */
-  readonly adapter: Promise;
-  readonly device: Promise;
+  /** #public parameters */
+  public adapter: any;
+  public device: any;
+  public shader1: any;
 
   /**
    * @info Initialize webGPU function
    * @returns none
    */
-  async public initialize(): void {
+  public async initialize(): Promise<any> {
+    // check webGPU support
     if (!navigator.gpu) {
       alert("Web gpu not supported");
       throw Error("Web gpu not supported");
     }
 
-    adapter = await navigator.gpu.requestAdapter();
+    // get adapter
+    this.adapter = await navigator.gpu.requestAdapter();
 
-    if (adapter == null) {
+    if (this.adapter == null) {
       alert("Can`t get adapter");
       throw Error("Can`t get adapter");
     }
 
-    device = await this.adapter.requestDevice();
+    // get device
+    this.device = await this.adapter.requestDevice();
+
+    // create shader
+    this.shader1 = new shader();
+    this.shader1.createShader("main", this.device);
   } /** End of 'Initialize' function */
 } /** End of 'gpu' class */
 
 /** EXPORTS */
 export { gpu };
 
-/** END OF 'shaders.ts' FILE */
+/** END OF 'gpu.ts' FILE */

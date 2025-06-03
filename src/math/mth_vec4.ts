@@ -8,48 +8,55 @@
  */
 
 /** IMPORTS */
-import { vec } from './mth_vec';
+import { vec } from "./mth_vec";
 
 /** Vector 4d class */
 class vec4 implements vec {
-  /** #public parameters */  
+  /** #public parameters */
   /**
    * @info Class constructor
    * @param x: number
-   * @param y: number 
-   * @param z: number 
-   * @param w: number 
+   * @param y: number
+   * @param z: number
+   * @param w: number
    */
   public constructor(
     public x: number,
     public y: number,
     public z: number,
-    public w: number
+    public w: number,
   ) {} /** End of constructor */
 
   /**
    * @info Evaluate vector length function
    * @returns none
    */
-  public length2 (): void {
-    return x * x + y * y + z * z + w * w;
+  public length2(): number {
+    return (
+      this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w
+    );
   } /** End of 'length2' function */
 
   /**
    * @info Evaluate vector length function
    * @returns none
    */
-  public length (): void {
-    return Math.sqrt(length2());
-  } /** End of 'length' function */  
+  public length(): number {
+    return Math.sqrt(this.length2());
+  } /** End of 'length' function */
 
   /**
    * @info Vector addiction
    * @param vector: vec4
    * @returns new vec4
    */
-  public add (vector: vec4): vec4 {
-    return new vec4(vector.x + this.x, vector.y + this.y, vector.z + this.z, vector.w + this.w);
+  public add(vector: vec4): vec4 {
+    return new vec4(
+      vector.x + this.x,
+      vector.y + this.y,
+      vector.z + this.z,
+      vector.w + this.w,
+    );
   } /** End of 'add' function */
 
   /**
@@ -57,8 +64,13 @@ class vec4 implements vec {
    * @param vector: vec4
    * @returns new vec4
    */
-  public sub (vector: vec4): vec4 {
-    return new vec4(this.x - vector.x, this.y - vector.y, this.z - vector.z, this.w - vector.w);
+  public sub(vector: vec4): vec4 {
+    return new vec4(
+      this.x - vector.x,
+      this.y - vector.y,
+      this.z - vector.z,
+      this.w - vector.w,
+    );
   } /** End of 'sub' function */
 
   /**
@@ -66,8 +78,13 @@ class vec4 implements vec {
    * @param vector: vec4
    * @returns new vec4
    */
-  public mul(vector: vec4): vec4 {
-    return new vec4(this.x * vector.x, this.y * vector.y, this.z * vector.z, this.w * vector.w);
+  public mulVec(vector: vec4): vec4 {
+    return new vec4(
+      this.x * vector.x,
+      this.y * vector.y,
+      this.z * vector.z,
+      this.w * vector.w,
+    );
   } /** End of 'mul' function */
 
   /**
@@ -76,19 +93,18 @@ class vec4 implements vec {
    * @returns new vec4
    */
   public div(num: number): vec4 {
-    if (num == 0)
-        return this;
+    if (num == 0) return this;
 
-    return new vec4(this.x / number, this.y / number, this.z / number, this.w / number);
+    return new vec4(this.x / num, this.y / num, this.z / num, this.w / num);
   } /** End of 'mul' function */
-  
+
   /**
    * @info Vector multipling by number
    * @param num: number
    * @returns new vec4
    */
-  public mul(num: number): vec4 {
-    return new vec4(this.x * number, this.y * number, this.z * number, this.w * number);
+  public mulNum(num: number): vec4 {
+    return new vec4(this.x * num, this.y * num, this.z * num, this.w * num);
   } /** End of 'mul' function */
 
   /**
@@ -98,8 +114,7 @@ class vec4 implements vec {
   public normilize(): vec4 {
     let len2: number = this.length2();
 
-    if (len2 == 0)
-        return this;
+    if (len2 == 0) return this;
     let newVec4: vec4 = this.div(Math.sqrt(len2));
 
     return newVec4;
@@ -109,19 +124,21 @@ class vec4 implements vec {
    * @info Normilizing vector
    * @returns none
    */
-  public normilizing(): void {   
+  public normilizing(): void {
     let len2: number = this.length2();
 
-    if (len2 == 0)
-        return;
+    if (len2 == 0) return;
 
     let newVec4: vec4 = this.div(Math.sqrt(len2));
 
-    this = newVec4;
+    this.x = newVec4.x;
+    this.y = newVec4.y;
+    this.z = newVec4.z;
+    this.w = newVec4.w;
   } /** End of 'normilize' function */
-} /** End of 'vec4' class */ 
+} /** End of 'vec4' class */
 
 /** EXPORTS */
-export { vec4 } ;
+export { vec4 };
 
 /** END OF 'mth_vec4.ts' FILE */

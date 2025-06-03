@@ -8,22 +8,32 @@
  */
 
 /** IMPORTS */
-import { gpu } from 'gpu.ts';
+import { gpu } from "./gpu";
 
 /** Render class */
 class render {
+<<<<<<< HEAD
   /** #private parameters */
   private core: gpu; // TODO @CGSG220AI3 rewrite comm
   
+=======
+  /** #private parameters */
+  /**
+   * @info Class constructor
+   * @param core: gpu
+   */
+  public constructor(private core: gpu) {}
+
+>>>>>>> 38cdc64 (gitignore commit)
   /** #public parameters */
   /**
    * @info Initialize render function
    * @returns none
    */
-  async public initialize() {
-    await gpu.initialize();    
+  public async initialize() {
+    
+    await this.core.initialize();
   } /** End of 'initialize' function */
-
 } /** End of 'Render' class */
 
 /** EXPORTS */

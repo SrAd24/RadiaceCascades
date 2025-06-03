@@ -9,21 +9,21 @@
 
 /** Vector inteface */
 interface vec {
-  /** #public parameters */  
+  /** #public parameters */
   /**
    * @info Evaluate vector length2 function
    * @returns none
    */
-  public length2(): void;
+  length2(): number;
 
   /**
    * @info Evaluate vector length function
    * @returns none
    */
-  public length(): void;
+  length(): number;
 } /** End of 'vec' inteface */
 
 /** EXPORTS */
-export { vec } ;
+export { vec };
 
 /** END OF 'mth.ts' FILE */

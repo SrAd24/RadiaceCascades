@@ -8,36 +8,36 @@
  */
 
 /** IMPORTS */
-import { vec } from './mth_vec';
+import { vec } from "./mth_vec";
 
 /** Vector 2d class */
 class vec2 implements vec {
-  /** #public parameters */  
+  /** #public parameters */
   /**
    * @info Class constructor
    * @param x: number
-   * @param y: number 
+   * @param y: number
    */
   public constructor(
     public x: number,
-    public y: number
+    public y: number,
   ) {} /** End of constructor */
 
   /**
    * @info Evaluate vector length function
    * @returns none
    */
-  public length2(): void {
-    return x * x + y * y;
+  public length2(): number {
+    return this.x * this.x + this.y * this.y;
   } /** End of 'length2' function */
 
   /**
    * @info Evaluate vector length function
    * @returns none
    */
-  public length(): void {
-    return Math.sqrt(length2());
-  } /** End of 'length' function */  
+  public length(): number {
+    return Math.sqrt(this.length2());
+  } /** End of 'length' function */
 
   /**
    * @info Vector addiction function
@@ -62,7 +62,7 @@ class vec2 implements vec {
    * @param vector: vec2
    * @returns new vec2
    */
-  public mul(vector: vec2): vec2 {
+  public mulVec(vector: vec2): vec2 {
     return new vec2(this.x * vector.x, this.y * vector.y);
   } /** End of 'mul' function */
 
@@ -72,19 +72,18 @@ class vec2 implements vec {
    * @returns new vec2
    */
   public div(num: number): vec2 {
-    if (num == 0)
-        return this;
+    if (num == 0) return this;
 
-    return new vec2(this.x / number, this.y / number);
+    return new vec2(this.x / num, this.y / num);
   } /** End of 'mul' function */
-  
+
   /**
    * @info Vector multipling by number function
    * @param num: number
    * @returns new vec2
    */
-  public mul(num: number): vec2 {
-    return new vec2(this.x * number, this.y * number);
+  public mulNum(num: number): vec2 {
+    return new vec2(this.x * num, this.y * num);
   } /** End of 'mul' function */
 
   /**
@@ -94,8 +93,7 @@ class vec2 implements vec {
   public normilize(): vec2 {
     let len2: number = this.length2();
 
-    if (len2 == 0)
-        return this;
+    if (len2 == 0) return this;
     let newVec2: vec2 = this.div(Math.sqrt(len2));
 
     return newVec2;
@@ -105,11 +103,10 @@ class vec2 implements vec {
    * @info normilizing vector function
    * @returns none
    */
-  public normilizing(): void {   
+  public normilizing(): void {
     let len2: number = this.length2();
 
-    if (len2 == 0)
-        return;
+    if (len2 == 0) return;
 
     let newVec2: vec2 = this.div(Math.sqrt(len2));
 

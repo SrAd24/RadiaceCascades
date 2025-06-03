@@ -12,16 +12,15 @@
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG">
     </canvas>
 
-    <script>      
-      async function getData() {
-        const res = await fetch("./.gitignore");
-        if (!res.ok)
-            return "23";
-        const data = await res.text();
-        return data;
-      }
-      let data = getData();
-      console.log(data);
+    <script type="module" async src="./src/math/mth_def.js">
+//        console.log("Start render initializing");
+//        (async () => {
+//            consolle.log("Start render initializing 2");
+//            const rnd = new gpu();
+//            await rnd.initialize();
+//            console.log("End render initalizing");
+//        })();
+        console.log(2);
     </script>
 </body>
 </html>
