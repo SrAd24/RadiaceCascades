@@ -21,7 +21,7 @@ class buffer {
    * @param device: any 
    * @returns none
    */
-  public writeBuffer(verteces: vertex[], device: any): void {
+  public writeBuffer(verteces: any[], device: any): void {
     device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length());    
   } /** End of 'writeBuffer' function */
 
@@ -31,7 +31,7 @@ class buffer {
    * @param verteces: vertex[]
    * @returns none
    */
-  public createBuffer(device: any, verteces: vertex[]): void {
+  public createBuffer(device: any, verteces: any[]): void {
     this.gpuBuffer = device.createBuffer({
         size: verteces.byteLength(),
         usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST

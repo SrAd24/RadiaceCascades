@@ -10,6 +10,7 @@
 /** IMPORTS */
 import { gpu } from "./gpu.js";
 import { buffer } from "./buffers.js";
+import { encoder } from './encoder.ts'
 
 // Vertex attributes
 const vertexAttributes = [
@@ -31,11 +32,19 @@ const vertexAttributes = [
   },
 ];
 
+/** triangle verteces */
+const vertices = new Float32Array([
+  0.0, 0.6, 0, 1, 1, 0, 0, 1, -0.5, -0.6, 0, 1, 0, 1, 0, 1, 0.5, -0.6, 0, 1, 0,
+  0, 1, 1,
+]);
+
 /** Render class */
 class render {
   /** #private parameters */
   private core: gpu | undefined;
   private context: Element | undefined;
+  private command: encoder | undefined;
+  private gpuBuffer: buffer | undefined;
 
   /** #public parameters */
   /**
@@ -52,6 +61,8 @@ class render {
    * @returns none
    */
   public async initialize() {
+    console.log("Render initialization started");
+
     if (this.core != undefined) {
       await this.core.initialize();
       /** Get canvas ID */
@@ -70,7 +81,30 @@ class render {
         format: navigator.gpu.getPreferredCanvasFormat(),
       });
     } else throw Error("Core is undefined");
+
+    this.command = new encoder();
+    if (this.command != undefined) this.command.createEncoder(core.device, this.context);
+    else console.log("command buffer ready");    
+
+    this.gpuBuffer = new buffer();
+    this.gpuBuffer.createBuffer(this.core.device, vertices);
+
+    console.log("Render initialization ended");
   } /** End of 'initialize' function */
+
+  /**
+   * @info Render function
+   * @returns none
+   */
+  public render(): void {
+    // begin render pass
+    command.beginRenderPass(this.context);
+
+    
+
+    // end render pass
+    command.endRenderPass();
+  } /** End of 'render' function */
 } /** End of 'Render' class */
 
 /** EXPORTS */
