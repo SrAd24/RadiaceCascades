@@ -13,5 +13,6 @@
 export { vec3}  from './mth_vec3'
 export { vec4 } from './mth_vec4'
 export { vec2 } from './mth_vec2'
+export { mat4 } from './mth_mat4'
 
 /** END OF 'mth.ts' FILE */
