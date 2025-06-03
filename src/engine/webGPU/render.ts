@@ -13,7 +13,7 @@ import { gpu } from 'gpu.ts';
 /** Render class */
 class render {
   /** #private parameters */
-  private core: gpu;
+  private core: gpu; // TODO @CGSG220AI3 rewrite comm
   
   /** #public parameters */
   /**
