@@ -12,13 +12,17 @@ import { gpu } from "./gpu.js";
 
 /** Render class */
 class render {
-  /** #public parameters */
+  /** #private parameters */
+  private core: gpu | undefined;
 
+  /** #public parameters */
   /**
    * @info Class constructor
    * @param core: gpu
    */
-  public constructor(private core: gpu) {}
+  public constructor() {
+    this.core = new gpu();
+  } /** End of 'constructor' function */
 
   /** #public parameters */
   /**

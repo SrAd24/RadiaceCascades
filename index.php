@@ -17,14 +17,12 @@
     </script>     
   
     <script type="module">
-      import { gpu } from "./src/engine/webGPU/gpu.js";
+      import { render } from "./src/engine/webGPU/render.js";
       
-      console.log("Render init started");
-      const rnd = new gpu();
+      const rnd = new render();
       (async () => {
         await rnd.initialize();
       })();
-     console.log("Render init ended");
 </script>
 </body>
 </html>
