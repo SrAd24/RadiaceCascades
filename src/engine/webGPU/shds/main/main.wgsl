@@ -9,8 +9,8 @@
  
 /** Vertex out struct*/
 struct vertexOut {
-    @builtin(position) position: vec4f;
-    @location(0) color: vec4f;
+    @builtin(position) position: vec4f,
+    @location(0) color: vec4f
 } /** End of 'vertexOut' struct */
 
 /** Vertex shader **/
