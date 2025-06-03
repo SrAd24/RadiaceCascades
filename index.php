@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,5 +12,17 @@
     <canvas>
 
     </canvas>
+
+    <script>      
+      async function getData() {
+        const res = await fetch("./.gitignore");
+        if (!res.ok)
+            return "23";
+        const data = await res.text();
+        return data;
+      }
+      let data = getData();
+        console.log(data);
+    </script>
 </body>
 </html>
