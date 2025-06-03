@@ -30,7 +30,8 @@ class render {
    * @returns none
    */
   public async initialize() {
-    await this.core.initialize();
+    if (this.core != undefined) await this.core.initialize();
+    else throw Error("Core is undefined");
   } /** End of 'initialize' function */
 } /** End of 'Render' class */
 
