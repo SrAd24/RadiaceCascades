@@ -7,12 +7,16 @@
  * LAST UPDATE : 02.06.2025
  */
 
-// Start php
+/**
+ * @info run PHP fucntion
+ * @returns none
+ */
 async function runPHP() {
     const php = require('php');
     const output = await php.run('index.php');
     console.log(output);
 }
+/** Run php */
 runPHP();
 
 /** END OF 'index.js' FILE */
