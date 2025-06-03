@@ -28,3 +28,6 @@ jspm_packages/
 *.swo
 
 *.js
+
+todo.ts
+todo.js
