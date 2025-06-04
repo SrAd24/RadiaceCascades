@@ -27,6 +27,7 @@ jspm_packages/
 *.swp
 *.swo
 
+*.mjs
 *.js
 
 todo.ts

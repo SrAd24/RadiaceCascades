@@ -17,14 +17,11 @@
     </script>     
   
     <script type="module">
-      import { render } from "./src/engine/webGPU/render.js";
+      import { render } from "./js/engine/webGPU/render.mjs";
       
       const rnd = new render();
-      (async () => {
-        await rnd.initialize();
-        await rnd.render();
-      })();
-     
+      await rnd.initialize();
+      await rnd.render();
 </script>
 </body>
 </html>

@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { shader } from "./shaders.js";
+import { shader } from "./shaders.ts";
 
 /** Compute class */
 class compute {

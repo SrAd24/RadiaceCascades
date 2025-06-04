@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { vertex } from "./vertex.js";
+import { vertex } from "./vertex.ts";
 
 /** Buffer class */
 class buffer {

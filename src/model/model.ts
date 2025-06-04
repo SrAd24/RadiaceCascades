@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { vertex } from '../src/engine/webGPU/vertex.js'
+import { vertex } from '../engine/webGPU/vertex.ts'
 
 /**
  * @info load obj verteces from file function

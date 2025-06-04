@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import * as mth from "../../math/mth.js";
+import * as mth from "../../math/mth.ts";
 
 /** Vertex class */
 class vertex {

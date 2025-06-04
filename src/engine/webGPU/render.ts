@@ -8,11 +8,11 @@
  */
 
 /** IMPORTS */
-import { gpu } from "./gpu.js";
-import { buffer } from "./buffers.js";
-import { encoder } from "./encoder.js";
-import { vertex } from "./vertex.js";
-import * as mth from "../../math/mth.js";
+import { gpu } from "./gpu.ts";
+import { buffer } from "./buffers.ts";
+import { encoder } from "./encoder.ts";
+import { vertex } from "./vertex.ts";
+import * as mth from "../../math/mth.ts";
 
 /** triangle verteces */
 const vertices: vertex[] = [
