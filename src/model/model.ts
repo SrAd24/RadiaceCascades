@@ -49,6 +49,7 @@ const loadObj: Function = async (fileName: String): vertex[] => {
         vertex[vertexCount].x = parseFloat(x);
         vertex[vertexCount].y = parseFloat(y);
         vertex[vertexCount].z = parseFloat(z);
+        vertex[vertexCount].w = 0.0;
       }
     }
   }
