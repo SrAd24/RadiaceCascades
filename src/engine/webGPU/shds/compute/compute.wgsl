@@ -29,7 +29,7 @@ const frameSize: f32 = 512;
  **/
 fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
   const interval: f32 = 1;
-  const pos: vec2f = textCoord * frameSize;
+  const pos: vec2f = textCoords * frameSize;
   const probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
 
   const probeX: f32 = floor(pos.x / probeSize);
@@ -48,7 +48,7 @@ fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
     origin += dir * dist / vec2f(frameSize);
     count++;
   }
-  textureStore(resultTexture, textCoord, cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
+  textureStore(resultTexture, textCoords, cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
 } /** End of 'rayMarch' function */
 
 /**
