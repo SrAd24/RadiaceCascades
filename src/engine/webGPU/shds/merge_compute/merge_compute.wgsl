@@ -17,9 +17,6 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 
 const frameSize: f32 = 512;
 
-/** Ray color of nearest probes */
-var colors: array<vec3f, 4> = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
-
 /**
  * @info Count color of ray nearest probe function
  * @param cascadeIndex: f32
@@ -97,11 +94,79 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
     indexY2 = 2;
   }
 
-  colors = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
-  colorCount(cascadeIndex, indexY1, indexX1, 0, pos, probe1Size);
-  colorCount(cascadeIndex, indexY1, indexX2, 1, pos, probe1Size);
-  colorCount(cascadeIndex, indexY2, indexX1, 2, pos, probe1Size);
-  colorCount(cascadeIndex, indexY2, indexX2, 3, pos, probe1Size);
+  var colors: array<vec3f, 4> = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
+  // colorCount(cascadeIndex, indexY1, indexX1, 0, pos, probe1Size);
+  // colorCount(cascadeIndex, indexY1, indexX2, 1, pos, probe1Size);
+  // colorCount(cascadeIndex, indexY2, indexX1, 2, pos, probe1Size);
+  // colorCount(cascadeIndex, indexY2, indexX2, 3, pos, probe1Size);
+
+  var count: u32 = 0;
+
+  for (var j: u32 = 0; j < 2; j++) {
+    for (var k: u32 = 0; k < 2; k++) {
+      var data: vec4f = textureLoad(resultTexture,
+                                    vec2u(u32(indexX1), u32(indexY1)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+      if (data.w != 0) {
+        colors[0] += data.xyz;
+        count++;
+      }
+    }
+  }
+  if (count != 0) {
+    colors[0] /= f32(count);
+  }
+
+  count = 0;
+
+  for (var j: u32 = 0; j < 2; j++) {
+    for (var k: u32 = 0; k < 2; k++) {
+      var data: vec4f = textureLoad(resultTexture,
+                                    vec2u(u32(indexX2), u32(indexY1)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+      if (data.w != 0) {
+        colors[1] += data.xyz;
+        count++;
+      }
+    }
+  }
+  if (count != 0) {
+    colors[1] /= f32(count);
+  }
+
+  count = 0;
+
+  for (var j: u32 = 0; j < 2; j++) {
+    for (var k: u32 = 0; k < 2; k++) {
+      var data: vec4f = textureLoad(resultTexture,
+                                    vec2u(u32(indexX1), u32(indexY2)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+      if (data.w != 0) {
+        colors[2] += data.xyz;
+        count++;
+      }
+    }
+  }
+  if (count != 0) {
+    colors[2] /= f32(count);
+  }
+
+  count = 0;
+
+  for (var j: u32 = 0; j < 2; j++) {
+    for (var k: u32 = 0; k < 2; k++) {
+      var data: vec4f = textureLoad(resultTexture,
+                                    vec2u(u32(indexX2), u32(indexY2)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+      if (data.w != 0) {
+        colors[3] += data.xyz;
+        count++;
+      }
+    }
+  }
+  if (count != 0) {
+    colors[3] /= f32(count);
+  }
 
   var intX: f32 = (probePos.x - (indexX1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
   var intY: f32 = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
