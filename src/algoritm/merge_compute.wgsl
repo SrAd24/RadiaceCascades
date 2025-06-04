@@ -16,7 +16,7 @@ const cascadeMaxIndex: number = 3;  // Temporary
 
 @compute @workgroup_size(16, 16)
 
-let colors: number[4];
+let colors: number[];
 
 /**
  * @info Count color of ray nearest probe function

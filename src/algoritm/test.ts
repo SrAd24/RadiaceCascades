@@ -111,15 +111,15 @@ const createProbe: Function = (size: number, pos: vec2): probe => {
  * @returns none
  **/
 const rayMarch: Function = (): void => {
-  cascades.forEach((cscd: cascade) => {
+  cascades.forEach((cscd: cascade, cascadeIndex: number) => {
     cscd.probeArray.forEach((probeArray: probe[]) => {
       probeArray.forEach((prb: probe) => {
         prb.array.forEach((pixelArray: pixel[], i: number) => {
           pixelArray.forEach((P: pixel, j: number) => {
 
             let interval: number = 1;
-            const dir: vec2 = new vec2(Math.sin(probeObject.pixelArray[i][j].angle),
-                                       Math.cos(probeObject.pixelArray[i][j].angle));
+            const dir: vec2 = new vec2(Math.sin(prb.pixelArray[i][j].angle),
+                                       Math.cos(prb.pixelArray[i][j].angle));
             let origin: vec2 = prb.pos;
             origin = origin.add(dir.mul((interval * (1 - Math.pow(4, cascadeIndex))) / (1 - 4)));
             const first: vec2 = origin;
@@ -132,7 +132,7 @@ const rayMarch: Function = (): void => {
               origin = origin.add(dir.mul(dist));
               count++;
             }
-            probeObject.pixelArray[i][j].IsIntersect = dist <= 0.1;
+            prb.pixelArray[i][j].IsIntersect = dist <= 0.1;
             // Color
           });
         });
@@ -150,14 +150,14 @@ const merge: Function = (): void => {
     return;
 
   for (let i: number = cascades.length - 2; i >= 0; i--)
-    cascades[i].probeArray.array.forEach((probeArray: probe[], probeX: number) => {
+    cascades[i].probeArray.forEach((probeArray: probe[], probeX: number) => {
       probeArray.forEach((prb: probe, probeY: number) => {
         const nearPrb: nearProbe = searchNearProbes(i, probeX, probeY);
 
-        for (let x: number; x < prb.size; x++)
-          for (let y: number; y < prb.size; y++)
+        for (let x: number = 0; x < prb.size; x++)
+          for (let y: number = 0; y < prb.size; y++)
           {
-            let colors: number[4];
+            let colors: number[];
 
             const Count: Function = (indexX: number, indexY: number, index: number) => {
               let count: number = 0;
@@ -252,7 +252,7 @@ const sphereDistance: Function = (currentPos: number, sph: sphere): number => {
  * @returns none
  **/
 const searchSmallest: Function = (): void => {
-  for (let i: number = 0; i < spheres.length(); i++)
+  for (let i: number = 0; i < spheres.length; i++)
     smallestSize = Math.min(smallestSize, spheres[i].radius);
 } /** End of 'searchSmallest' function */
 
@@ -277,7 +277,7 @@ const searchNear: Function = (pos: vec2): number => {
 const searchFar: Function = (pos: vec2): number => {
   let dist: number = 0;
 
-  for (let i: number = 0; i < spheres.length(); i++)
+  for (let i: number = 0; i < spheres.length; i++)
     dist = Math.max(dist, spheres[i].position.sub(pos).length() - spheres[i].radius);
   return dist;
 } /** End of 'searchFar' function */
