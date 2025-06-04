@@ -17,7 +17,7 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @compute @workgroup_size(16, 16)
 
 /** Ray color of nearest probes */
-let colors: vec3f[];
+var colors: vec3f[];
 
 /**
  * @info Count color of ray nearest probe function
@@ -28,7 +28,7 @@ let colors: vec3f[];
  * @returns none
  **/
 fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32) {
-  let count: f32 = 0;
+  var count: f32 = 0;
 
   for (let j: f32 = 0; j < 2; j++)
     for (let k: f32 = 0; k < 2; k++) {
@@ -52,20 +52,20 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   if (cascadeMaxIndex == 1)
     return;
 
-  const pos: vec2f = textCoords * frameSize;
-  const probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
-  const probe1Size: f32 = 2 * probe1Size;
-  const probeX: f32 = floor(pos.x / probeSize), probeY: f32 = floor(pos.y / probeSize);
-  const probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+  var pos: vec2f = textCoords * frameSize;
+  var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
+  var probe1Size: f32 = 2 * probe1Size;
+  var probeX: f32 = floor(pos.x / probeSize), probeY: f32 = floor(pos.y / probeSize);
+  var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
-  const sizeN: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 1);
-  const sizeN1: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 2);
+  var sizeN: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 1);
+  var sizeN1: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 2);
   
-  const posX: f32 = (0.5 + probeX) * frameSize / sizeN;
-  const posY: f32 = (0.5 + probeY) * frameSize / sizeN;
+  var posX: f32 = (0.5 + probeX) * frameSize / sizeN;
+  var posY: f32 = (0.5 + probeY) * frameSize / sizeN;
   
-  const indexX: f32 = posX / sizeN1;
-  const indexX1: f32 = floor(indexX);
+  var indexX: f32 = posX / sizeN1;
+  var indexX1: f32 = floor(indexX);
   var indexX2: f32;
   if (indexX > indexX1 + 0.5 && indexX1 != sizeN1 - 1)
     indexX2 = indexX1 + 1;
@@ -74,8 +74,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   if (indexX2 == -1)
     indexX2 = 2
 
-  const indexY: f32 = posY / sizeN1;
-  const indexY1: f32 = floor(indexY);
+  var indexY: f32 = posY / sizeN1;
+  var indexY1: f32 = floor(indexY);
   var indexY2: f32;
   if (indexY > indexY1 + 0.5 && indexY1 != sizeN1 - 1)
     indexY2 = indexY1 + 1;
@@ -90,8 +90,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   colorCount(cascadeIndex, indexY2, indexX1, 2);
   colorCount(cascadeIndex, indexY2, indexX2, 3);
 
-  const intX: f32 = (probePos.x - (indexX1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
-  const intY: f32 = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
+  var intX: f32 = (probePos.x - (indexX1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
+  var intY: f32 = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
 
   textureStore(resultTexture, textCoords, cascadeMaxIndex - cascadeIndex,
                (colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +

@@ -29,19 +29,19 @@ const frameSize: f32 = 512;
  **/
 fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
   const interval: f32 = 1;
-  const pos: vec2f = textCoords * frameSize;
-  const probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
+  var pos: vec2f = textCoords * frameSize;
+  var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
 
-  const probeX: f32 = floor(pos.x / probeSize);
-  const probeY: f32 = floor(pos.y / probeSize);
-  const probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+  var probeX: f32 = floor(pos.x / probeSize);
+  var probeY: f32 = floor(pos.y / probeSize);
+  var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
-  const angle: f32 = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
-  const dir: vec2f = vec2(sin(angle), cos(angle));
+  var angle: f32 = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
+  var dir: vec2f = vec2(sin(angle), cos(angle));
 
   var origin: vec2f = probePos;
   origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
-  const first: vec2f = origin;
+  var first: vec2f = origin;
   var count: f32 = 0;
   while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
     dist = textureLoad(depthTexture, origin / vec2f(frameSize));
