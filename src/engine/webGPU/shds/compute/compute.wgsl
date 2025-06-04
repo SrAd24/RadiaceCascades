@@ -27,7 +27,7 @@ const frameSize: f32 = 512;
  * @param textCoords: vec2f
  * @returns none
  **/
-fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
+fn rayMarch(@builtin(global_invocation_id) cascadeIndex: f32, @builtin(global_invocation_id) textCoords: vec2f) {
   const interval: f32 = 1;
   var pos: vec2f = textCoords * frameSize;
   var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
