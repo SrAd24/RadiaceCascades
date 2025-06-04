@@ -22,7 +22,7 @@ const frameSize: f32 = 512;
 @compute @workgroup_size(16, 16)
 
 var cascadeIndex: f32 = 0;
-textCoords: vec2f = vec2f(0);
+var textCoords: vec2f = vec2f(0);
 
 /**
  * @info Ray marching function
