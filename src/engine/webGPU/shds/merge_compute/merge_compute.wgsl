@@ -26,10 +26,10 @@ var colors: vec3f[] = [];
  * @param pos: vec2f
  * @returns none
  **/
-fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, var pos: vec2f) {
+fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, pos: vec2f) {
   var count: u32 = 0;
 
-  for (var j: u32 = 0; j < 2; j++)
+  for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + f32(k), 2 * pos.y + f32(j))) /
                                               frameSize, cascadeMaxIndex - cascadeIndex + 1, 0);
@@ -38,8 +38,10 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, var pos: 
         count++;
       }
     }
-  if (count != 0)
+  }
+  if (count != 0) {
     colors[index] /= f32(count);
+  }
 } /** End of 'olorCount' function */
 
 /**
@@ -49,8 +51,9 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, var pos: 
  * @returns none
  **/
 fn merge(cascadeIndex: f32, textCoords: vec2f) {
-  if (cascadeMaxIndex == 1)
+  if (cascadeMaxIndex == 1) {
     return;
+  }
 
   var pos: vec2f = textCoords * frameSize;
   var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
@@ -67,22 +70,26 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   var indexX: f32 = posX / sizeN1;
   var indexX1: f32 = floor(indexX);
   var indexX2: f32;
-  if (indexX > indexX1 + 0.5 && indexX1 != sizeN1 - 1)
+  if (indexX > indexX1 + 0.5 && indexX1 != sizeN1 - 1) {
     indexX2 = indexX1 + 1;
-  else
+  } else {
     indexX2 = indexX1 - 1;
-  if (indexX2 == -1)
+  }
+  if (indexX2 == -1) {
     indexX2 = 2
+  }
 
   var indexY: f32 = posY / sizeN1;
   var indexY1: f32 = floor(indexY);
   var indexY2: f32;
-  if (indexY > indexY1 + 0.5 && indexY1 != sizeN1 - 1)
+  if (indexY > indexY1 + 0.5 && indexY1 != sizeN1 - 1) {
     indexY2 = indexY1 + 1;
-  else
+  } else {
     indexY2 = indexY1 - 1;
-  if (indexY2 == -1)
+  }
+  if (indexY2 == -1) {
     indexY2 = 2;
+  }
 
   colors = {vec3f(0), vec3f(0), vec3f(0), vec3f(0)};
   colorCount(cascadeIndex, indexY1, indexX1, 0, pos);
