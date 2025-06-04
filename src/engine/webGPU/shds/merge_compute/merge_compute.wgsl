@@ -58,17 +58,15 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
   const probeX: number = floor(pos.x / probeSize), probeY: number = floor(pos.y / probeSize);
   const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
-  const
-    sizeN: number = pow(2, cascadeIndex - cascadeMaxIndex + 1);
-    sizeN1: number = pow(2, cascadeIndex - cascadeMaxIndex + 2);
+  const sizeN: number = pow(2, cascadeIndex - cascadeMaxIndex + 1);
+  const sizeN1: number = pow(2, cascadeIndex - cascadeMaxIndex + 2);
   
-  const
-    posX: number = (0.5 + probeX) * frameSize / sizeN,
-    posY: number = (0.5 + probeY) * frameSize / sizeN;
+  const posX: number = (0.5 + probeX) * frameSize / sizeN;
+  const posY: number = (0.5 + probeY) * frameSize / sizeN;
   
   const indexX: number = posX / sizeN1;
   const indexX1: number = floor(indexX);
-  let indexX2: number;
+  var indexX2: number;
   if (indexX > indexX1 + 0.5 && indexX1 != sizeN1 - 1)
     indexX2 = indexX1 + 1;
   else
@@ -78,7 +76,7 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
 
   const indexY: number = posY / sizeN1;
   const indexY1: number = floor(indexY);
-  let indexY2: number;
+  var indexY2: number;
   if (indexY > indexY1 + 0.5 && indexY1 != sizeN1 - 1)
     indexY2 = indexY1 + 1;
   else
@@ -110,8 +108,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
     return;
   }
 
-  for (let i = cascadeMaxIndex - 1; i >= 0; i++)
+  for (let i = cascadeMaxIndex - 1; i >= 0; i++) {
     merge(i, vec2(global_id.xy) / frameSize);
+  }
 } /** End of 'main' function */
 
 /** END OF 'compute.wgsl' FILE */

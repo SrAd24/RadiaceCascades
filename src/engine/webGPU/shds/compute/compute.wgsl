@@ -30,7 +30,8 @@ fn rayMarch(cascadeIndex: number, textCoords: vec2) {
   const pos: vec2 = textCoord * frameSize;
   const probeSize: number = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
 
-  const probeX: number = floor(pos.x / probeSize), probeY: number = floor(pos.y / probeSize);
+  const probeX: number = floor(pos.x / probeSize);
+  const probeY: number = floor(pos.y / probeSize);
   const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   const angle: number = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
@@ -58,8 +59,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
     return;
   }
 
-  for (let i: number = 0; i < cascadeMaxIndex; i++)
+  for (let i: number = 0; i < cascadeMaxIndex; i++) {
     rayMarch(i, vec2(global_id.xy) / frameSize);
+  }
 } /** End of 'main' function */
 
 /** END OF 'compute.wgsl' FILE */
