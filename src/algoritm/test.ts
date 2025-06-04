@@ -170,7 +170,7 @@ const merge: Function = (): void => {
                     count++;
                   }
               if (count != 0)
-                colors[0] /= count, count = 0;
+                colors[0].mulNum(1.0 / count), count = 0;
             }
 
             Count(nearPrb.indexY1, nearPrb.indexX1, 0);
@@ -239,11 +239,11 @@ const searchNearProbes: Function = (cascadeIndex: number, probeX: number, probeY
 
 /**
  * @info Count distance for sphere function
- * @param currentPos: number
+ * @param currentPos: mth.vec2
  * @param sph: sphere
  * @returns distance to sphere
  **/
-const sphereDistance: Function = (currentPos: number, sph: sphere): number => {
+const sphereDistance: Function = (currentPos: mth.vec2, sph: sphere): number => {
   return Math.max(0, sph.position.sub(currentPos).length() - sph.radius);
 } /** End of 'sphereDistance' function */
 
