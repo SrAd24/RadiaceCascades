@@ -62,7 +62,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
 
   var pos: vec2f = textCoords * frameSize;
   var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
-  var probe1Size: f32 = 2 * probe1Size;
+  var probe1Size: f32 = 2 * probeSize;
   var probeX: f32 = floor(pos.x / probeSize);
   var probeY: f32 = floor(pos.y / probeSize);
   var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
