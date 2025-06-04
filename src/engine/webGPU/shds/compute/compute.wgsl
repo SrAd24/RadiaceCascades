@@ -49,7 +49,7 @@ fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
     origin += dir * dist;
     count++;
   }
-  textureStore(resultTexture, vec2u(textCoords * frameSize), cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
+  textureStore(resultTexture, vec2u(textCoords * frameSize), u32(cascadeMaxIndex - cascadeIndex), vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
 } /** End of 'rayMarch' function */
 
 /**
