@@ -22,7 +22,13 @@ class vertex {
    */
   public constructor(position: mth.vec4, color?: mth.vec4) {
     this.position = position;
-    if (color == undefined) this.color = new mth.vec4(position.x);
+    if (color == undefined)
+      this.color = new mth.vec4(
+        Math.abs(position.x) > 1 ? 1 : Math.abs(position.x),
+        Math.abs(position.y) > 1 ? 1 : Math.abs(position.y),
+        Math.abs(position.z) > 1 ? 1 : Math.abs(position.z),
+        1.0,
+      );
   } /** End of constructor */
 } /** End of 'vertex' class */
 

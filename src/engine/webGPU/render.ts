@@ -30,6 +30,7 @@ const vertices: vertex[] = [
   },
 ];
 
+
 /** Render class */
 class render {
   /** #private parameters */
@@ -56,6 +57,10 @@ class render {
   public async initialize() {
     console.log("Render initialization started");
 
+    let model1: model = new model();
+    await model1.loadModel("cow.obj");
+    console.log("model loaded");
+    
     if (this.core != undefined) {
       await this.core.initialize();
       /** Get canvas ID */
@@ -77,11 +82,16 @@ class render {
 
     this.command = new encoder();
     if (this.command != undefined)
-      this.command.createEncoder(this.core.device, this.context, this.canvasID);
+      await this.command.createEncoder(
+        this.core.device,
+        this.context,
+        this.canvasID,
+      );
     else console.log("command buffer ready");
 
+    // Load cow model
     this.gpuBuffer = new buffer();
-    this.gpuBuffer.createBuffer(this.core.device, vertices);
+    await this.gpuBuffer.createBuffer(this.core.device, model1.verteces);
 
     console.log("Render initialization ended");
   } /** End of 'initialize' function */
@@ -90,16 +100,17 @@ class render {
    * @info Render function
    * @returns none
    */
-  public render(): void {
+  public async render(): Promise<any> {
     // begin render pass
-    this.command.beginRenderPass(
+    console.log(this.gpuBuffer);
+    await this.command.beginRenderPass(
       this.context,
       this.core.renderPipeline,
-      this.gpuBuffer.gpuBuffer,
+      this.gpuBuffer,
     );
 
     // end render pass
-    this.command.endRenderPass(this.core.device);
+    await this.command.endRenderPass(this.core.device);
   } /** End of 'render' function */
 } /** End of 'Render' class */
 

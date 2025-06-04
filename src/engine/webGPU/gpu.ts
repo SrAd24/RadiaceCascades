@@ -93,7 +93,7 @@ class gpu {
     };
 
     // create depth stencil
-    const depthStencil: any = {
+    const depthStencil: GPUDepthStencilState = {
       format: "depth32float",
       depthWriteEnabled: true,
       depthCompare: "less",
@@ -109,7 +109,10 @@ class gpu {
     };
 
     // create render pipeline
-    this.renderPipeline = this.device.createRenderPipeline(descriptor);
+    this.renderPipeline =
+      await this.device.createRenderPipelineAsync(descriptor);
+
+    console.log(await this.shader1.shaderModule.getCompilationInfo());
   } /** End of 'Initialize' function */
 } /** End of 'gpu' class */
 

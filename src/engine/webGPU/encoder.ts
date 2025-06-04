@@ -29,9 +29,13 @@ class encoder {
    * @param device: any
    * @returns depth info
    */
-  public createDepthTexture(width: number, height: number, device: any): any {
+  public async createDepthTexture(
+    width: number,
+    height: number,
+    device: any,
+  ): Promise<any> {
     // create depth texture
-    const depthTexture: any = device.createTexture({
+    const depthTexture: any = await device.createTexture({
       size: [width, height],
       format: "depth32float",
       mip_level_count: 1,
@@ -40,7 +44,7 @@ class encoder {
     });
 
     // create depth stencil
-    const depthStencil: any = {
+    const depthStencil: GPUDepthStencil = {
       format: "depth32float",
       depthWriteEnabled: true,
       depthCompare: "less",
@@ -56,8 +60,12 @@ class encoder {
    * @param canvasID: any
    * @returns none
    */
-  public createEncoder(device: any, context: any, canvasID: any): void {
-    let depth: any = this.createDepthTexture(
+  public async createEncoder(
+    device: any,
+    context: any,
+    canvasID: any,
+  ): Promise<any> {
+    let depth: any = await this.createDepthTexture(
       canvasID.width,
       canvasID.height,
       device,
@@ -89,18 +97,24 @@ class encoder {
    * @param buffer: any
    * @returns none
    */
-  public beginRenderPass(context: any, pipeline: any, buffer: any): void {
+  public async beginRenderPass(
+    context: any,
+    pipeline: any,
+    buffer: any,
+  ): Promise<any> {
     // begin render pass
-    this.renderPath = this.gpuEncoder.beginRenderPass(
+    this.renderPath = await this.gpuEncoder.beginRenderPass(
       this.renderpathDescription,
     );
 
     // set pipeline
-    this.renderPath.setPipeline(pipeline);
+    await this.renderPath.setPipeline(pipeline);
     // set vertex buffer
-    this.renderPath.setVertexBuffer(0, buffer);
+    console.log("buffer to draw: ", buffer);
+    await this.renderPath.setVertexBuffer(0, buffer.gpuBuffer);
     // draw triangle
-    this.renderPath.draw(3);
+    console.log("vertecesCount to draw: ", buffer.vertecesCount);
+    await this.renderPath.draw(buffer.vertecesCount);
   } /** End of 'beginRenderPass' function */
 
   /**
@@ -108,12 +122,16 @@ class encoder {
    * @param device: any
    * @returns none
    */
-  public endRenderPass(device: any): void {
+  public async endRenderPass(device: any): Promise<any> {
     // end render pass
-    this.renderPath.end();
+    await this.renderPath.end();
 
+    await device.lost.then((info: string) => {
+      console.error(`Device lost: ${info.message}`);
+      throw Error("Device lost");
+    });
     // submit queue
-    device.queue.submit([this.gpuEncoder.finish()]);
+    await device.queue.submit([await this.gpuEncoder.finish()]);
   } /** End of 'endRenderPass' function */
 } /** End of 'encoder' function */
 

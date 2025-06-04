@@ -14,13 +14,15 @@ import { vertex } from "./vertex.ts";
 class buffer {
   /** #public parameters */
   public gpuBuffer: any;
+  public vertecesCount: number = 0;
+  public vertecesFloatArray: Float32Array | null = null;
 
   /**
    * @info Set buffer function
    * @param verteces: vertex[]
    * @returns new buffer
    */
-  public setBuffer(verteces: vertex[]): Float32Array {
+  public async setBuffer(verteces: vertex[]): Promise<any> {
     let bufferData: Float32Array = new Float32Array(verteces.length * 8);
     verteces.forEach((vert, index) => {
       if (vert == undefined) {
@@ -40,18 +42,22 @@ class buffer {
       bufferData[baseIndex + 7] = vert.color.w;
     });
 
+    this.vertecesFloatArray = bufferData;
+
     console.log(
       "bufferData: ",
-      bufferData,
+      this.vertecesFloatArray,
       " verteces: ",
       verteces,
       " verteces.length: ",
       verteces.length,
       " verteces.byteLength: ",
-      bufferData.byteLength,
+      this.vertecesFloatArray,
     );
 
-    return bufferData;
+    this.vertecesCount = verteces.length;
+
+    console.log("vertecesCount: ", this.vertecesCount);
   } /** End of 'setBuffer' function */
 
   /**
@@ -60,8 +66,14 @@ class buffer {
    * @param device: any
    * @returns none
    */
-  public writeBuffer(verteces: Float32Array, device: any): void {
-    device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length);
+  public async writeBuffer(verteces: Float32Array, device: any): Promise<any> {
+    await device.queue.writeBuffer(
+      this.gpuBuffer,
+      0,
+      verteces,
+      0,
+      verteces.length,
+    );
   } /** End of 'writeBuffer' function */
 
   /**
@@ -70,15 +82,26 @@ class buffer {
    * @param verteces: vertex[]
    * @returns none
    */
-  public createBuffer(device: any, verteces: vertex[]): void {
-    let bufferData: Float32Array = this.setBuffer(verteces);
+  public async createBuffer(
+    device: GPUDevice,
+    verteces: vertex[],
+  ): Promise<any> {
+    await this.setBuffer(verteces);
 
-    this.gpuBuffer = device.createBuffer({
-      size: bufferData.byteLength,
+    this.gpuBuffer = await device.createBuffer({
+      size:
+        this.vertecesFloatArray == null
+          ? 0
+          : this.vertecesFloatArray.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
 
-    this.writeBuffer(bufferData, device);
+    await this.writeBuffer(
+      this.vertecesFloatArray == null
+        ? new Float32Array()
+        : this.vertecesFloatArray,
+      device,
+    );
   } /** End of 'createBuffer' function */
 } /** End of 'buffer' class */
 

@@ -43,7 +43,7 @@ class shader {
 
     console.log(shaderData.toString());
     // create shader module
-    this.shaderModule = device.createShaderModule({
+    this.shaderModule = await device.createShaderModule({
       code: shaderData.toString(),
     });
     if (this.shaderModule == undefined) throw Error("Shader is undefined");

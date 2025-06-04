@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 02.06.2025
+ * LAST UPDATE : 04.06.2025
  */
  
 /** Vertex out struct*/
@@ -39,7 +39,8 @@ fn vertex_main(@location(0) position: vec4f,
  * @return point color
  */
 fn fragment_main(data: vertexOut) -> @location(0) vec4f {
-  return data.position;
+  /*return data.color;*/
+  return vec4f(1, 1, 0, 1);
 } /** End of 'fragment_main' function*/
 
 /** END OF 'main.wgsl' FILE */
