@@ -22,8 +22,7 @@
       const rnd = new render();
       (async () => {
         await rnd.initialize();
-        while (1)
-          await rnd.render();
+        await rnd.render();
       })();
      
 </script>
