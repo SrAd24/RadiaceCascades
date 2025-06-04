@@ -19,38 +19,6 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 
 const frameSize: f32 = 512;
 
-var cascadeIndex: f32 = 0;
-var textCoords: vec2f = vec2f(0);
-
-/**
- * @info Ray marching function
- * @returns none
- **/
-fn rayMarch() {
-  const interval: f32 = 1;
-  var pos: vec2f = textCoords * frameSize;
-  var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
-
-  var probeX: f32 = floor(pos.x / probeSize);
-  var probeY: f32 = floor(pos.y / probeSize);
-  var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
-
-  var angle: f32 = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
-  var dir: vec2f = vec2(sin(angle), cos(angle));
-
-  var origin: vec2f = probePos;
-  origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
-  var first: vec2f = origin;
-  var count: u32 = 0;
-  var dist: f32 = textureLoad(depthTexture, vec2u(origin), 0).r;
-  while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
-    dist = textureLoad(depthTexture, vec2u(origin), 0).r;
-    origin += dir * dist;
-    count++;
-  }
-  textureStore(resultTexture, vec2u(textCoords * frameSize), u32(cascadeMaxIndex - cascadeIndex), vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
-} /** End of 'rayMarch' function */
-
 @compute @workgroup_size(16, 16)
 
 /**
@@ -63,10 +31,32 @@ fn rayMarch() {
     return;
   }
 
-  for (let i: f32 = 0; i < cascadeMaxIndex; i++) {
-    cascadeIndex = i;
-    textCoords = vec2f(global_id.xy) / frameSize; 
-    rayMarch();
+  for (var i: f32 = 0; i < cascadeMaxIndex; i++) {
+    var cascadeIndex: f32 = i;
+    var textCoords: vec2f = vec2f(global_id.xy) / frameSize; 
+
+    const interval: f32 = 1;
+    var pos: vec2f = textCoords * frameSize;
+    var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
+
+    var probeX: f32 = floor(pos.x / probeSize);
+    var probeY: f32 = floor(pos.y / probeSize);
+    var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+
+    var angle: f32 = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
+    var dir: vec2f = vec2(sin(angle), cos(angle));
+
+    var origin: vec2f = probePos;
+    origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
+    var first: vec2f = origin;
+    var count: u32 = 0;
+    var dist: f32 = textureLoad(depthTexture, vec2u(origin), 0).r;
+    while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
+      dist = textureLoad(depthTexture, vec2u(origin), 0).r;
+      origin += dir * dist;
+      count++;
+    }
+    textureStore(resultTexture, vec2u(textCoords * frameSize), u32(cascadeMaxIndex - cascadeIndex), vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
   }
 } /** End of 'main' function */
 
