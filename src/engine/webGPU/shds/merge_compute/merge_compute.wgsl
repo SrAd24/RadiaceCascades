@@ -15,7 +15,7 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(1) var frameSize : f32;
 
 /** Ray color of nearest probes */
-var colors: array<vec3f, 4> = [];
+var colors: array<vec3f, 4> = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
 
 /**
  * @info Count color of ray nearest probe function
