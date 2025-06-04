@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import {vec2} from 'mth';
+import {vec2} from './math/mth.js';
 
 /** Pixel interface */
 interface pixel {
@@ -71,9 +71,9 @@ const interval0: number = 1;
  **/
 const cascadesCount: Function = (weight: number, height: number): number => {
   const diagonal: number = Math.sqrt(weight * weight + height * height);
-  const factor: number = Math.ceil(Math.log(4, diagonal / interval0));
+  const factor: number = Math.ceil(Math.log(diagonal / interval0) / Math.log(4));
   const intervalStart: number = (interval0 * (1 - Math.pow(4, factor))) / (1 - 4);
-  return Math.ceil(Math.log(4, intervalStart)) - 1;
+  return Math.ceil(Math.log(intervalStart) / Math.log(4)) - 1;
 } /** End of 'cascadesCount' function */
 
 /**
@@ -86,7 +86,7 @@ const createProbe: Function = (size: number, pos: vec2): probe => {
   const distanceFarObject: number = searchFar(pos);
   const distanceNearObject: number = searchNear(pos);
 
-  let probeObject: probe;
+  let probeObject: probe = {};
 
   probeObject.distanceFarObject = distanceFarObject;
   probeObject.distanceNearObject = distanceNearObject;
