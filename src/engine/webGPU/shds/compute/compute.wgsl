@@ -42,7 +42,7 @@ fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
   var origin: vec2f = probePos;
   origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
   var first: vec2f = origin;
-  var count: f32 = 0;
+  var count: u32 = 0;
   var dist: f32 = textureLoad(depthTexture, vec2u(origin), 0).r;
   while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
     dist = textureLoad(depthTexture, vec2u(origin), 0).r;
