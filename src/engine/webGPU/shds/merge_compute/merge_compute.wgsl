@@ -27,6 +27,7 @@ const frameSize: f32 = 512;
  * @param probe1Size: f32
  * @returns none
  **/
+/*
 fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, pos: vec2f, probe1Size: f32) {
   var count: u32 = 0;
 
@@ -44,7 +45,9 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, pos: vec2
   if (count != 0) {
     colors[index] /= f32(count);
   }
-} /** End of 'olorCount' function */
+}
+*/
+/** End of 'olorCount' function */
 
 /**
  * @info Merge cascades function
