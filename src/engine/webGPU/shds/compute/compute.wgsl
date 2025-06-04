@@ -15,7 +15,10 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(1) var baseColorTexture : texture_2d<f32>;
 @group(0) @binding(2) var depthTexture : texture_2d<f32>;
 @group(0) @binding(3) var resultTexture : texture_2d_array<f32>;
-@group(0) @binding(4) var frameSize : f32;
+
+// @group(0) @binding(4) var frameSize : f32;
+
+const frameSize: f32 = 512;
 
 @compute @workgroup_size(16, 16)
 
