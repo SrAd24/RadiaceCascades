@@ -30,17 +30,17 @@ fn rayMarch(cascadeIndex: number, textCoords: vec2) {
   const pos: vec2 = textCoord * frameSize;
   const probeSize: number = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
 
-  const probeX: number = ceil(pos.x / probeSize), probeY: number = ceil(pos.y / probeSize);
+  const probeX: number = floor(pos.x / probeSize), probeY: number = floor(pos.y / probeSize);
   const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   const angle: number = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
   const dir: vec2 = vec2(sin(angle), cos(angle));
 
   var origin: vec2 = probePos;
-  origin = origin + dir * interval * (1 - Math.pow(4, cascadeIndex)) / (1 - 4);
+  origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
   const first: vec2 = origin;
   var count: number = 0;
-  while (dist > 0.1 && count < 1000 && (first - origin).length() < interval * pow(4, cascadeIndex)) {
+  while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
     dist = textureLoad(depthTexture, origin / vec2(frameSize));
     origin += dir * dist / vec2(frameSize);
     count++;
@@ -54,8 +54,9 @@ fn rayMarch(cascadeIndex: number, textCoords: vec2) {
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
-  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize))
+  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize)) {
     return;
+  }
 
   for (let i: number = 0; i < cascadeMaxIndex; i++)
     rayMarch(i, vec2(global_id.xy) / frameSize);

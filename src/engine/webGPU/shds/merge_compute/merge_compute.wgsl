@@ -55,7 +55,7 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
   const pos: vec2 = textCoord * frameSize;
   const probeSize: number = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
   const probe1Size: number = 2 * probe1Size;
-  const probeX: number = ceil(pos.x / probeSize), probeY: number = ceil(pos.y / probeSize);
+  const probeX: number = floor(pos.x / probeSize), probeY: number = floor(pos.y / probeSize);
   const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   const
@@ -67,7 +67,7 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
     posY: number = (0.5 + probeY) * frameSize / sizeN;
   
   const indexX: number = posX / sizeN1;
-  const indexX1: number = ceil(indexX);
+  const indexX1: number = floor(indexX);
   let indexX2: number;
   if (indexX > indexX1 + 0.5 && indexX1 != sizeN1 - 1)
     indexX2 = indexX1 + 1;
@@ -77,7 +77,7 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
     indexX2 = 2
 
   const indexY: number = posY / sizeN1;
-  const indexY1: number = ceil(indexY);
+  const indexY1: number = floor(indexY);
   let indexY2: number;
   if (indexY > indexY1 + 0.5 && indexY1 != sizeN1 - 1)
     indexY2 = indexY1 + 1;
@@ -106,8 +106,9 @@ fn merge(cascadeIndex: number, textCoords: vec2) {
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
-  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize))
+  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize)) {
     return;
+  }
 
   for (let i = cascadeMaxIndex - 1; i >= 0; i++)
     merge(i, vec2(global_id.xy) / frameSize);
