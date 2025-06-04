@@ -51,7 +51,7 @@ fn rayMarch() {
   textureStore(resultTexture, vec2u(textCoords * frameSize), u32(cascadeMaxIndex - cascadeIndex), vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
 } /** End of 'rayMarch' function */
 
-@compute @workgroup_size(16, 16);
+@compute @workgroup_size(16, 16)
 
 /**
  * @info Compute main function
