@@ -32,7 +32,7 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32) {
 
   for (let j: f32 = 0; j < 2; j++)
     for (let k: f32 = 0; k < 2; k++) {
-      vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1);
+      vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1, 0);
       if (data.w != 0) {
         colors[index] += data.xyz;
         count++;
