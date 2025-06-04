@@ -43,13 +43,13 @@ fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
   origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
   var first: vec2f = origin;
   var count: f32 = 0;
-  var dist: f32 = textureLoad(depthTexture, origin / vec2f(frameSize), 0);
+  var dist: f32 = textureLoad(depthTexture, vec2u(origin), 0);
   while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
-    dist = textureLoad(depthTexture, origin / vec2f(frameSize), 0);
-    origin += dir * dist / vec2f(frameSize);
+    dist = textureLoad(depthTexture, vec2u(origin), 0);
+    origin += dir * dist;
     count++;
   }
-  textureStore(resultTexture, textCoords, cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
+  textureStore(resultTexture, textCoords, cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, dist <= 0.1));
 } /** End of 'rayMarch' function */
 
 /**
