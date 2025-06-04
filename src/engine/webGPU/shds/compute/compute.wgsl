@@ -21,13 +21,14 @@ const frameSize: f32 = 512;
 
 @compute @workgroup_size(16, 16)
 
+var cascadeIndex: f32 = 0;
+textCoords: vec2f = vec2f(0);
+
 /**
  * @info Ray marching function
- * @param cascadeIndex: f32
- * @param textCoords: vec2f
  * @returns none
  **/
-fn rayMarch(@builtin(global_invocation_id) cascadeIndex: f32, @builtin(global_invocation_id) textCoords: vec2f) {
+fn rayMarch() {
   const interval: f32 = 1;
   var pos: vec2f = textCoords * frameSize;
   var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
@@ -63,7 +64,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
   }
 
   for (let i: f32 = 0; i < cascadeMaxIndex; i++) {
-    rayMarch(i, vec2f(global_id.xy) / frameSize);
+    cascadeIndex = i;
+    textCoords = vec2f(global_id.xy) / frameSize; 
+    rayMarch();
   }
 } /** End of 'main' function */
 
