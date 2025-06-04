@@ -31,7 +31,7 @@ const frameSize: f32 = 512;
     return;
   }
 
-  for (var i: u32 = 0; i < cascadeMaxIndex; i++) {
+  for (var i: u32 = 0; i < u32(cascadeMaxIndex); i++) {
     var cascadeIndex: f32 = f32(i);
     var textCoords: vec2f = vec2f(global_id.xy) / frameSize; 
 
