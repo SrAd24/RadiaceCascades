@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 03.06.2025
+ * LAST UPDATE : 04.06.2025
  */
 
 /** IMPORTS */
@@ -36,6 +36,7 @@ class gpu {
   public adapter: any; // GPUAdepter
   public device: any; // GPUDevice
   public shader1: any; // GPUShaderModule
+  public computeShader: any;  // Compute shader
   public renderPipeline: any; // Render pipline
 
   /**
@@ -63,9 +64,13 @@ class gpu {
     // create shader
     this.shader1 = new shader();
     await this.shader1.createShader("main", this.device);
+    this.computeShader = new shader();
+    await this.computeShader.createShader("compute", this.device);
 
     if (this.shader1.shaderModule == undefined)
       throw Error("Shader is undefined");
+    if (this.computeShader.shaderModule == undefined)
+      throw Error("Compute shader is undefined");
 
     // set descrptor parameters
     const layout = "auto"; // todo @th4: change to manual
