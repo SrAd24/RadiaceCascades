@@ -11,11 +11,11 @@
 const pi: number = 3.141592653589793238462643383279;
 const cascadeMaxIndex: number = 3;  // Temporary
 
-@group(0) @binding(0) var cascadeTexture : texture_2d<f32>[];
+@group(0) @binding(0) var cascadeTexture : texture_2d_array<f32>;
 @group(0) @binding(1) var baseColorTexture : texture_2d<f32>;
-@group(0) @binding(1) var depthTexture : texture_2d<f32>;
-@group(0) @binding(2) var resultTexture : texture_2d<f32>[];
-@group(0) @binding(2) var frameSize : number;
+@group(0) @binding(2) var depthTexture : texture_2d<f32>;
+@group(0) @binding(3) var resultTexture : texture_2d_array<f32>;
+@group(0) @binding(4) var frameSize : number;
 
 @compute @workgroup_size(16, 16)
 
@@ -25,7 +25,7 @@ const cascadeMaxIndex: number = 3;  // Temporary
  * @param textCoords: vec2
  * @returns none
  **/
-fn rayMarch(cascadeIndex: number, textCoords: vec2): void {
+fn rayMarch(cascadeIndex: number, textCoords: vec2) {
   const interval: number = 1;
   const pos: vec2 = textCoord * frameSize;
   const probeSize: number = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
@@ -45,7 +45,7 @@ fn rayMarch(cascadeIndex: number, textCoords: vec2): void {
     origin += dir * dist / vec2(frameSize);
     count++;
   }
-  textureStore(resultTexture[cascadeMaxIndex - cascadeIndex], textCoord, vec4(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
+  textureStore(resultTexture, textCoord, cascadeMaxIndex - cascadeIndex, vec4(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
 } /** End of 'rayMarch' function */
 
 /**
@@ -54,9 +54,8 @@ fn rayMarch(cascadeIndex: number, textCoords: vec2): void {
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
-  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize)) {
+  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize))
     return;
-  }
 
   for (let i: number = 0; i < cascadeMaxIndex; i++)
     rayMarch(i, vec2(global_id.xy) / frameSize);

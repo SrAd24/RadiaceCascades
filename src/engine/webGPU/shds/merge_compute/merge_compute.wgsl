@@ -11,12 +11,13 @@
 const pi: number = 3.141592653589793238462643383279;
 const cascadeMaxIndex: number = 3;  // Temporary
 
-@group(0) @binding(0) var resultTexture : texture_2d<f32>[];
+@group(0) @binding(0) var resultTexture : texture_2d_array<f32>;
 @group(0) @binding(1) var frameSize : number;
 
 @compute @workgroup_size(16, 16)
 
-let colors: number[];
+/** Ray color of nearest probes */
+let colors: vec3[];
 
 /**
  * @info Count color of ray nearest probe function
@@ -26,12 +27,12 @@ let colors: number[];
  * @param index: number
  * @returns none
  **/
-const colorCount: Function = (cascadeIndex: number, indexX: number, indexY: number, index: number) => {
+fn colorCount(cascadeIndex: number, indexX: number, indexY: number, index: number) {
   let count: number = 0;
 
   for (let j: number = 0; j < 2; j++)
     for (let k: number = 0; k < 2; k++) {
-      vec4 data = textureLoad(resultTexture[cascadeMaxIndex - cascadeIndex + 1], (vec2(indexX, indexY) * probe1Size + vec2(2 * pos.x + k, 2 * pos.y + j)) / frameSize);
+      vec4 data = textureLoad(resultTexture, (vec2(indexX, indexY) * probe1Size + vec2(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1);
       if (data.w != 0) {
         colors[index] += data.xyz;
         count++;
@@ -47,7 +48,7 @@ const colorCount: Function = (cascadeIndex: number, indexX: number, indexY: numb
  * @param textCoords: vec2
  * @returns none
  **/
-const merge: Function = (cascadeIndex: number, textCoords: vec2): void => {
+fn merge(cascadeIndex: number, textCoords: vec2) {
   if (cascadeMaxIndex == 1)
     return;
 
@@ -85,7 +86,7 @@ const merge: Function = (cascadeIndex: number, textCoords: vec2): void => {
   if (indexY2 == -1)
     indexY2 = 2;
 
-  colors = {0, 0, 0, 0};
+  colors = {vec3(0), vec3(0), vec3(0), vec3(0)};
   colorCount(cascadeIndex, indexY1, indexX1, 0);
   colorCount(cascadeIndex, indexY1, indexX2, 1);
   colorCount(cascadeIndex, indexY2, indexX1, 2);
@@ -94,7 +95,7 @@ const merge: Function = (cascadeIndex: number, textCoords: vec2): void => {
   const intX: number = (probePos.x - (indexX1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
   const intY: number = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
 
-  textureStore(resultTexture[cascadeMaxIndex - cascadeIndex], textCoord,
+  textureStore(resultTexture, textCoord, cascadeMaxIndex - cascadeIndex,
                (colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +
                (colors[3] - colors[2]) * intX + (colors[0] - colors[2]) * intY + colors[2]);  // Color of current pixel ???
 } /** End of 'merge' function */
@@ -105,9 +106,8 @@ const merge: Function = (cascadeIndex: number, textCoords: vec2): void => {
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
-  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize)) {
+  if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize))
     return;
-  }
 
   for (let i = cascadeMaxIndex - 1; i >= 0; i++)
     merge(i, vec2(global_id.xy) / frameSize);
