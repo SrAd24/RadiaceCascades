@@ -17,7 +17,7 @@ import * as mth from "../../math/mth.js";
 /** triangle verteces */
 const vertices: vertex[] = [
   {
-    position: new mth.vec4(0.0, 0.6, 0, 1),
+    position: new mth.vec4(0.0, 0.6, 1, 1),
     color: new mth.vec4(1, 0, 0, 1),
   },
   {
@@ -37,6 +37,7 @@ class render {
   private context: Element | undefined;
   private command: encoder | undefined;
   private gpuBuffer: buffer | undefined;
+  private canvasID: any;
 
   /** #public parameters */
   /**
@@ -58,14 +59,14 @@ class render {
     if (this.core != undefined) {
       await this.core.initialize();
       /** Get canvas ID */
-      const canvasID = document.querySelector(
+      this.canvasID = document.querySelector(
         "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
       );
       /** Get context */
-      if (canvasID == null) throw Error("Canvas is undefined");
+      if (this.canvasID == null) throw Error("Canvas is undefined");
 
       if (this.context == undefined)
-        this.context = canvasID.getContext("webgpu");
+        this.context = this.canvasID.getContext("webgpu");
 
       if (this.context == undefined) throw Error("Context is undefined");
       this.context?.configure({
@@ -76,7 +77,7 @@ class render {
 
     this.command = new encoder();
     if (this.command != undefined)
-      this.command.createEncoder(this.core.device, this.context);
+      this.command.createEncoder(this.core.device, this.context, this.canvasID);
     else console.log("command buffer ready");
 
     this.gpuBuffer = new buffer();

@@ -89,18 +89,18 @@ class gpu {
 
     // create depth stencil
     const depthStencil: any = {
-      format: 'depth24plus',
-      depthWriteEnable: true,
-      depthCompare: 'less'
+      format: "depth32float",
+      depthWriteEnabled: true,
+      depthCompare: "less",
     };
-    
+
     // set pipeline descriptor
     const descriptor = {
       vertex,
       fragment,
       primitive,
       layout,
-      depthStencil
+      depthStencil: depthStencil,
     };
 
     // create render pipeline

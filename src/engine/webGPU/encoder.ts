@@ -8,7 +8,7 @@
  */
 
 /** Encoder render path variables */
-const clearColor = {r: 0, g: 1, b: 0.5, a: 1}; // Clear color
+const clearColor = { r: 0, g: 1, b: 0.5, a: 1 }; // Clear color
 
 /** Encoder class */
 class encoder {
@@ -20,8 +20,7 @@ class encoder {
   /**
    * @info Class constructor
    */
-  public constructor() {
-  } /** End of constructor */
+  public constructor() {} /** End of constructor */
 
   /**
    * @info Create depth buffer function
@@ -32,47 +31,54 @@ class encoder {
    */
   public createDepthTexture(width: number, height: number, device: any): any {
     // create depth texture
-    const depthTexture: any = {
+    const depthTexture: any = device.createTexture({
       size: [width, height],
-      format: 'depth24plus',
-      usage: GPUTextureUsage.RENDER_ATTACHMENT
-    };
+      format: "depth32float",
+      mip_level_count: 1,
+      sample_count: 1,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
 
     // create depth stencil
     const depthStencil: any = {
-      format: 'depth24plus',
-      depthWriteEnable: true,
-      depthCompare: 'less'
+      format: "depth32float",
+      depthWriteEnabled: true,
+      depthCompare: "less",
     };
 
-
-    return {tex: depthTexture, sten: depthStencil};
+    return { tex: depthTexture, sten: depthStencil };
   } /** End of 'createDepthTexture' function */
 
   /**
    * @info Craete encoder function
-   * @param device 
+   * @param device: any
+   * @param context: any
+   * @param canvasID: any
    * @returns none
    */
-  public createEncoder(device: any, context: any): void {
-    let depth: any = this.createDepthTexture(context.width, context.height, device)
+  public createEncoder(device: any, context: any, canvasID: any): void {
+    let depth: any = this.createDepthTexture(
+      canvasID.width,
+      canvasID.height,
+      device,
+    );
 
     this.gpuEncoder = device.createCommandEncoder();
     this.renderpathDescription = {
-        colorAttachments: [
-            {
-                clearValue: clearColor,
-                loadOp: "clear",
-                storeOp: "store",
-                view: context.getCurrentTexture().createView()
-            }
-        ],
-        depthStencilAttachment: {
-          view: depth.tex.createView,
-          depthClearValue: 1.0,
-          depthLoadOp: 'clear',
-          depthStoreOp: 'store',
-        }
+      colorAttachments: [
+        {
+          clearValue: clearColor,
+          loadOp: "clear",
+          storeOp: "store",
+          view: context.getCurrentTexture().createView(),
+        },
+      ],
+      depthStencilAttachment: {
+        view: depth.tex.createView(),
+        depthClearValue: 1.0,
+        depthLoadOp: "clear",
+        depthStoreOp: "store",
+      },
     };
   } /** End of 'createEncoder' function */
 
@@ -83,10 +89,12 @@ class encoder {
    * @param buffer: any
    * @returns none
    */
-  public beginRenderPass(context: any, pipeline: any, buffer: any): void {   
+  public beginRenderPass(context: any, pipeline: any, buffer: any): void {
     // begin render pass
-    this.renderPath = this.gpuEncoder.beginRenderPass(this.renderpathDescription);
-    
+    this.renderPath = this.gpuEncoder.beginRenderPass(
+      this.renderpathDescription,
+    );
+
     // set pipeline
     this.renderPath.setPipeline(pipeline);
     // set vertex buffer
@@ -100,7 +108,7 @@ class encoder {
    * @param device: any
    * @returns none
    */
-  public endRenderPass(device: any): void {   
+  public endRenderPass(device: any): void {
     // end render pass
     this.renderPath.end();
 
