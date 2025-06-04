@@ -129,7 +129,7 @@ const rayMarch: Function = (): void => {
               spheres.forEach((sph: sphere) => {
                 dist = Math.min(dist, sphereDistance(origin, sph));
               })
-              origin = origin.add(dir.mulVec(dist));
+              origin = origin.add(dir.mulNum(dist));
               count++;
             }
             prb.pixelArray[i][j].isIntersect = dist <= 0.1;
@@ -157,7 +157,7 @@ const merge: Function = (): void => {
         for (let x: number = 0; x < prb.size; x++)
           for (let y: number = 0; y < prb.size; y++)
           {
-            let colors: number[] = [0, 0, 0, 0];
+            let colors: mth.vec3[] = [];
 
             const Count: Function = (indexX: number, indexY: number, index: number) => {
               let count: number = 0;
@@ -294,7 +294,7 @@ const init: Function = (): void => {
     cascades[i].size = 2 * Math.pow(2, i);
     for (let j: number = 0; j < frameSize / (2 * Math.pow(2, i) * 16); j++)
       for (let k: number = 0; k < frameSize / (2 * Math.pow(2, i) * 16); k++)
-        cascades[i].probeArray[j][k] = createProbe(frameSize / (2 * Math.pow(2, i) * 16), new mth.vec2(k + 0.5, j + 0.5) * frameSize / (2 * Math.pow(2, i) * 16));
+        cascades[i].probeArray[j][k] = createProbe(frameSize / (2 * Math.pow(2, i) * 16), (new mth.vec2(k + 0.5, j + 0.5)).mulNum(frameSize / (2 * Math.pow(2, i) * 16)));
   }
   cascades.reverse();
 } /** End of 'init' function */
