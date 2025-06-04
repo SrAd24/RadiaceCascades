@@ -60,7 +60,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   var pos: vec2f = textCoords * frameSize;
   var probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
   var probe1Size: f32 = 2 * probe1Size;
-  var probeX: f32 = floor(pos.x / probeSize), probeY: f32 = floor(pos.y / probeSize);
+  var probeX: f32 = floor(pos.x / probeSize);
+  var probeY: f32 = floor(pos.y / probeSize);
   var probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   var sizeN: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 1);
@@ -93,7 +94,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
     indexY2 = 2;
   }
 
-  colors = {vec3f(0), vec3f(0), vec3f(0), vec3f(0)};
+  colors = [vec3f(0), vec3f(0), vec3f(0), vec3f(0)];
   colorCount(cascadeIndex, indexY1, indexX1, 0, pos, probe1Size);
   colorCount(cascadeIndex, indexY1, indexX2, 1, pos, probe1Size);
   colorCount(cascadeIndex, indexY2, indexX1, 2, pos, probe1Size);
