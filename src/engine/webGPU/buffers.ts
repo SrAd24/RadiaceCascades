@@ -21,8 +21,22 @@ class buffer {
    * @param device: any
    * @returns none
    */
-  public writeBuffer(verteces: Float32Array, device: any): void {
-    device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length);
+  public writeBuffer(verteces: vertex[], device: any): void {
+    let bufferData: Float32Array = new Float32Array(verteces.length * 8);
+    verteces.forEach((vert, index) => {
+      let baseIndex = index * 8;
+
+      bufferData[baseIndex] = vert.position.x;
+      bufferData[baseIndex + 1] = vert.position.y;
+      bufferData[baseIndex + 2] = vert.position.z;
+      bufferData[baseIndex + 3] = vert.position.w;
+      bufferData[baseIndex + 4] = vert.color.x;
+      bufferData[baseIndex + 5] = vert.color.y;
+      bufferData[baseIndex + 6] = vert.color.z;
+      bufferData[baseIndex + 7] = vert.color.w;
+    });
+
+    device.queue.writeBuffer(this.gpuBuffer, 0, bufferData, 0, verteces.length);
   } /** End of 'writeBuffer' function */
 
   /**
@@ -31,7 +45,7 @@ class buffer {
    * @param verteces: vertex[]
    * @returns none
    */
-  public createBuffer(device: any, verteces: Float32Array): void {
+  public createBuffer(device: any, verteces: vertex[]): void {
     this.gpuBuffer = device.createBuffer({
       size: verteces.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
