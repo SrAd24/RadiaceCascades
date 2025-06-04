@@ -87,12 +87,20 @@ class gpu {
       buffers: vertexAttributes,
     };
 
+    // create depth stencil
+    const depthStencil: any = {
+      format: 'depth24plus',
+      depthWriteEnable: true,
+      depthCompare: 'less'
+    };
+    
     // set pipeline descriptor
     const descriptor = {
       vertex,
       fragment,
       primitive,
       layout,
+      depthStencil
     };
 
     // create render pipeline

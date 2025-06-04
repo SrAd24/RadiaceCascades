@@ -24,11 +24,39 @@ class encoder {
   } /** End of constructor */
 
   /**
+   * @info Create depth buffer function
+   * @param width: number
+   * @param height: number
+   * @param device: any
+   * @returns depth info
+   */
+  public createDepthTexture(width: number, height: number, device: any): any {
+    // create depth texture
+    const depthTexture: any = {
+      size: [width, height],
+      format: 'depth24plus',
+      usage: GPUTextureUsage.RENDER_ATTACHMENT
+    };
+
+    // create depth stencil
+    const depthStencil: any = {
+      format: 'depth24plus',
+      depthWriteEnable: true,
+      depthCompare: 'less'
+    };
+
+
+    return {tex: depthTexture, sten: depthStencil};
+  } /** End of 'createDepthTexture' function */
+
+  /**
    * @info Craete encoder function
    * @param device 
    * @returns none
    */
   public createEncoder(device: any, context: any): void {
+    let depth: any = this.createDepthTexture(context.width, context.height, device)
+
     this.gpuEncoder = device.createCommandEncoder();
     this.renderpathDescription = {
         colorAttachments: [
@@ -38,7 +66,13 @@ class encoder {
                 storeOp: "store",
                 view: context.getCurrentTexture().createView()
             }
-        ]
+        ],
+        depthStencilAttachment: {
+          view: depth.tex.createView,
+          depthClearValue: 1.0,
+          depthLoadOp: 'clear',
+          depthStoreOp: 'store',
+        }
     };
   } /** End of 'createEncoder' function */
 
