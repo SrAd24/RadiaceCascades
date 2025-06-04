@@ -175,8 +175,9 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   var intY: f32 = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
 
   textureStore(resultTexture, vec2u(textCoords), u32(cascadeMaxIndex - cascadeIndex),
-               (colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +
-               (colors[3] - colors[2]) * intX + (colors[0] - colors[2]) * intY + colors[2]);  // Color of current pixel ???
+               vec4f((colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +
+                     (colors[3] - colors[2]) * intX + (colors[0] - colors[2]) * intY + colors[2],
+                     0));  // Color of current pixel ???
 } /** End of 'merge' function */
 
 @compute @workgroup_size(16, 16)
