@@ -18,6 +18,19 @@ class buffer {
   public vertecesFloatArray: Float32Array | null = null;
 
   /**
+   * @info Create uniform buffer function
+   * @param device: GPUDevice
+   * @param size: number
+   */
+  public createUniformBuffer(device: GPUDevice, size: number) {
+    this.gpuBuffer = device.createBuffer({
+      size: size,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      mappedAtCreation: false,
+    });
+  } /** End of 'createUniformBuffer' fucntion */
+
+  /**
    * @info Set buffer function
    * @param verteces: vertex[]
    * @returns new buffer

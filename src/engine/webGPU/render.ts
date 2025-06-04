@@ -13,6 +13,7 @@ import { buffer } from "./buffers.ts";
 import { encoder } from "./encoder.ts";
 import { vertex } from "./vertex.ts";
 import * as mth from "../../math/mth.ts";
+import { model } from "../../model/model.ts";
 
 /** triangle verteces */
 const vertices: vertex[] = [
@@ -29,7 +30,6 @@ const vertices: vertex[] = [
     color: new mth.vec4(0, 0, 1, 1),
   },
 ];
-
 
 /** Render class */
 class render {
@@ -60,13 +60,15 @@ class render {
     let model1: model = new model();
     await model1.loadModel("cow.obj");
     console.log("model loaded");
-    
+
     if (this.core != undefined) {
       await this.core.initialize();
+
       /** Get canvas ID */
       this.canvasID = document.querySelector(
         "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
       );
+
       /** Get context */
       if (this.canvasID == null) throw Error("Canvas is undefined");
 
@@ -80,18 +82,9 @@ class render {
       });
     } else throw Error("Core is undefined");
 
-    this.command = new encoder();
-    if (this.command != undefined)
-      await this.command.createEncoder(
-        this.core.device,
-        this.context,
-        this.canvasID,
-      );
-    else console.log("command buffer ready");
-
     // Load cow model
     this.gpuBuffer = new buffer();
-    await this.gpuBuffer.createBuffer(this.core.device, model1.verteces);
+    await this.gpuBuffer.createBuffer(this.core.device, vertices);
 
     console.log("Render initialization ended");
   } /** End of 'initialize' function */
@@ -101,6 +94,18 @@ class render {
    * @returns none
    */
   public async render(): Promise<any> {
+    console.log("Render started");
+
+    // Create command buffer
+    this.command = new encoder();
+    if (this.command != undefined)
+      await this.command.createEncoder(
+        this.core.device,
+        this.context,
+        this.canvasID,
+      );
+    else console.log("command buffer ready");
+
     // begin render pass
     console.log(this.gpuBuffer);
     await this.command.beginRenderPass(
@@ -111,6 +116,8 @@ class render {
 
     // end render pass
     await this.command.endRenderPass(this.core.device);
+
+    console.log("Render ended");
   } /** End of 'render' function */
 } /** End of 'Render' class */
 

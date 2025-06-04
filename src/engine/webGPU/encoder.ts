@@ -17,6 +17,9 @@ class encoder {
   public renderpathDescription: any;
   public renderPath: any;
 
+  public depthTexture: any;
+  public texture: any;
+
   /**
    * @info Class constructor
    */
@@ -65,7 +68,7 @@ class encoder {
     context: any,
     canvasID: any,
   ): Promise<any> {
-    let depth: any = await this.createDepthTexture(
+    this.depthTexture = await this.createDepthTexture(
       canvasID.width,
       canvasID.height,
       device,
@@ -82,7 +85,7 @@ class encoder {
         },
       ],
       depthStencilAttachment: {
-        view: depth.tex.createView(),
+        view: this.depthTexture.tex.createView(),
         depthClearValue: 1.0,
         depthLoadOp: "clear",
         depthStoreOp: "store",
@@ -118,6 +121,15 @@ class encoder {
   } /** End of 'beginRenderPass' function */
 
   /**
+   * @info Destroy resources function
+   * @returns none
+   */
+  public async destroyResources(): Promise<any> {
+    await this.depthTexture.tex.destroy();
+    await this.gpuEncoder.destroy();
+  } /** End of 'destroyResources' function */
+
+  /**
    * @info End render pass function
    * @param device: any
    * @returns none
@@ -125,13 +137,17 @@ class encoder {
   public async endRenderPass(device: any): Promise<any> {
     // end render pass
     await this.renderPath.end();
+    console.log("render pass ended");
 
-    await device.lost.then((info: string) => {
-      console.error(`Device lost: ${info.message}`);
-      throw Error("Device lost");
-    });
     // submit queue
+    console.log("queue submitting");
     await device.queue.submit([await this.gpuEncoder.finish()]);
+    console.log("queue submitted");
+
+    // destroy resources
+    // console.log("destroying resources");
+    // await this.destroyResources();
+    // console.log("resources destroyed");
   } /** End of 'endRenderPass' function */
 } /** End of 'encoder' function */
 
