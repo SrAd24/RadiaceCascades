@@ -192,8 +192,8 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
     return;
   }
 
-  for (let i = cascadeMaxIndex - 1; i >= 0; i++) {
-    merge(i, vec2f(global_id.xy) / frameSize);
+  for (var i: u32 = u32(cascadeMaxIndex) - 1; i >= 0; i++) {
+    merge(f32(i), vec2f(global_id.xy) / frameSize);
   }
 } /** End of 'main' function */
 
