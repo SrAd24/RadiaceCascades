@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import {vec2} from './math/mth.js';
+import * as mth from "../../math/mth.js";
 
 /** Pixel interface */
 interface pixel {
@@ -86,15 +86,16 @@ const createProbe: Function = (size: number, pos: vec2): probe => {
   const distanceFarObject: number = searchFar(pos);
   const distanceNearObject: number = searchNear(pos);
 
-  let probeObject: probe = {};
-
-  probeObject.distanceFarObject = distanceFarObject;
-  probeObject.distanceNearObject = distanceNearObject;
-  probeObject.sizeSmallObject = smallestSize;
-  probeObject.angle = smallestSize / distanceFarObject;
-  probeObject.distance = distanceNearObject * smallestSize;
-  probeObject.size = size;
-  probeObject.pos = pos;
+  let probeObject: probe = {
+    pixelArray: [[]],
+    distanceFarObject: distanceFarObject,
+    distanceNearObject: distanceNearObject,
+    sizeSmallObject: smallestSize,
+    angle: smallestSize / distanceFarObject,
+    distance: distanceNearObject * smallestSize,
+    size: size,
+    pos: pos,
+  };
 
   for (let i: number = 0; i < probeObject.size; i++)
     for (let j: number = 0; j < probeObject.size; j++) {
