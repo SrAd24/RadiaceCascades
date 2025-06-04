@@ -11,6 +11,8 @@
 import { gpu } from "./gpu.js";
 import { buffer } from "./buffers.js";
 import { encoder } from "./encoder.js";
+import { vertex } from "./vertex.js";
+import { mth } from "./mth.ts"
 
 // Vertex attributes
 const vertexAttributes = [
@@ -33,10 +35,20 @@ const vertexAttributes = [
 ];
 
 /** triangle verteces */
-const vertices = new Float32Array([
-  0.0, 0.6, 0, 1, 1, 0, 0, 1, -0.5, -0.6, 0, 1, 0, 1, 0, 1, 0.5, -0.6, 0, 1, 0,
-  0, 1, 1,
-]);
+const vertices: vertex[] = [
+  {
+    position: new mth.vec4(0.0, 0.6, 0, 1),
+    color: new mth.vec4(1, 0, 0, 1)
+  },
+  {
+    position: new mth.vec4(-0.5, -0.6, 0, 1),
+    color: new mth.vec4(0, 1, 0, 1)
+  },
+  {
+    position: new mth.vec4(0.5, -0.6, 0, 1),
+    color: new mth.vec4(0, 0, 1, 1,)
+  },
+];
 
 /** Render class */
 class render {
