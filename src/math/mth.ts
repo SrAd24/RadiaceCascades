@@ -10,9 +10,9 @@
 // TODO #3 @CGSG220AI3 MAKE #PUBLIC IN ALL MTH CLASS
 
 /** EXPORTS */
-export { vec3 }  from './mth_vec3'
-export { vec4 } from './mth_vec4'
-export { vec2 } from './mth_vec2'
-export { mat4 } from './mth_mat4'
+export { vec3 }  from './mth_vec3.js'
+export { vec4 } from './mth_vec4.js'
+export { vec2 } from './mth_vec2.js'
+export { mat4 } from './mth_mat4.js'
 
 /** END OF 'mth.ts' FILE */

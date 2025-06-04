@@ -12,41 +12,21 @@ import { gpu } from "./gpu.js";
 import { buffer } from "./buffers.js";
 import { encoder } from "./encoder.js";
 import { vertex } from "./vertex.js";
-import { mth } from "./mth.ts"
-
-// Vertex attributes
-const vertexAttributes = [
-  {
-    attributes: [
-      {
-        shaderLocation: 0,
-        offset: 0,
-        format: "float32x4",
-      },
-      {
-        shaderLocation: 1,
-        offset: 16,
-        format: "float32x4",
-      },
-    ],
-    arrayStride: 32,
-    stepMode: "vertex",
-  },
-];
+import * as mth from "../../math/mth.js";
 
 /** triangle verteces */
 const vertices: vertex[] = [
   {
     position: new mth.vec4(0.0, 0.6, 0, 1),
-    color: new mth.vec4(1, 0, 0, 1)
+    color: new mth.vec4(1, 0, 0, 1),
   },
   {
     position: new mth.vec4(-0.5, -0.6, 0, 1),
-    color: new mth.vec4(0, 1, 0, 1)
+    color: new mth.vec4(0, 1, 0, 1),
   },
   {
     position: new mth.vec4(0.5, -0.6, 0, 1),
-    color: new mth.vec4(0, 0, 1, 1,)
+    color: new mth.vec4(0, 0, 1, 1),
   },
 ];
 

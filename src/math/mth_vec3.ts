@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { vec } from "./mth_vec";
+import { vec } from "./mth_vec.js";
 
 /** Vector 3d class */
 class vec3 implements vec {

@@ -8,9 +8,9 @@
  */
 
 /** IMPORTS */
-import { mth } from "./mth_def";
-import { vec3 } from "./mth_vec3";
-import { vec4 } from "./mth_vec4";
+import { mth } from "./mth_def.js";
+import { vec3 } from "./mth_vec3.js";
+import { vec4 } from "./mth_vec4.js";
 
 /** Matrix 4x4 class */
 class mat4 {

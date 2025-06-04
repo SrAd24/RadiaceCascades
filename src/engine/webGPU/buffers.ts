@@ -16,14 +16,18 @@ class buffer {
   public gpuBuffer: any;
 
   /**
-   * @info Write bufffer info funciton
+   * @info Set buffer function
    * @param verteces: vertex[]
-   * @param device: any
-   * @returns none
+   * @returns new buffer
    */
-  public writeBuffer(verteces: vertex[], device: any): void {
+  public setBuffer(verteces: vertex[]): Float32Array {
     let bufferData: Float32Array = new Float32Array(verteces.length * 8);
     verteces.forEach((vert, index) => {
+      if (vert == undefined) {
+        console.log("vert is undefined");
+        throw new Error("vert is undefined");
+      }
+
       let baseIndex = index * 8;
 
       bufferData[baseIndex] = vert.position.x;
@@ -36,7 +40,28 @@ class buffer {
       bufferData[baseIndex + 7] = vert.color.w;
     });
 
-    device.queue.writeBuffer(this.gpuBuffer, 0, bufferData, 0, verteces.length);
+    console.log(
+      "bufferData: ",
+      bufferData,
+      " verteces: ",
+      verteces,
+      " verteces.length: ",
+      verteces.length,
+      " verteces.byteLength: ",
+      bufferData.byteLength,
+    );
+
+    return bufferData;
+  } /** End of 'setBuffer' function */
+
+  /**
+   * @info Write bufffer info funciton
+   * @param verteces: Float32Array
+   * @param device: any
+   * @returns none
+   */
+  public writeBuffer(verteces: Float32Array, device: any): void {
+    device.queue.writeBuffer(this.gpuBuffer, 0, verteces, 0, verteces.length);
   } /** End of 'writeBuffer' function */
 
   /**
@@ -46,12 +71,14 @@ class buffer {
    * @returns none
    */
   public createBuffer(device: any, verteces: vertex[]): void {
+    let bufferData: Float32Array = this.setBuffer(verteces);
+
     this.gpuBuffer = device.createBuffer({
-      size: verteces.byteLength,
+      size: bufferData.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
 
-    this.writeBuffer(verteces, device);
+    this.writeBuffer(bufferData, device);
   } /** End of 'createBuffer' function */
 } /** End of 'buffer' class */
 
