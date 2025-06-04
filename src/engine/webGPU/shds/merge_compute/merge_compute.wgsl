@@ -12,7 +12,10 @@ const pi: f32 = 3.141592653589793238462643383279;
 const cascadeMaxIndex: f32 = 3;  // Temporary
 
 @group(0) @binding(0) var resultTexture : texture_storage_2d_array<r32float, read_write>;
-@group(0) @binding(1) var frameSize : f32;
+
+// @group(0) @binding(1) var frameSize : f32;
+
+const frameSize: f32 = 512;
 
 /** Ray color of nearest probes */
 var colors: array<vec3f, 4> = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
@@ -33,8 +36,8 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, pos: vec2
   for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       var data: vec4f = textureLoad(resultTexture,
-                               vec2u(u32(indexX), u32(indexY)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
-                               ui32(cascadeMaxIndex - cascadeIndex + 1));
+                                    vec2u(u32(indexX), u32(indexY)) * probe1Size + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
       if (data.w != 0) {
         colors[index] += data.xyz;
         count++;
