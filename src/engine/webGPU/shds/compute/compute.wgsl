@@ -15,11 +15,9 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(1) var baseColorTexture : texture_2d<f32>;
 @group(0) @binding(2) var depthTexture : texture_2d<f32>;
 @group(0) @binding(3) var resultTexture : texture_storage_2d_array<r32float, read_write>;
-
 // @group(0) @binding(4) var frameSize : f32;
-const frameSize: f32 = 512;
 
-@compute @workgroup_size(16, 16)
+const frameSize: f32 = 512;
 
 var cascadeIndex: f32 = 0;
 var textCoords: vec2f = vec2f(0);
@@ -53,12 +51,14 @@ fn rayMarch() {
   textureStore(resultTexture, vec2u(textCoords * frameSize), u32(cascadeMaxIndex - cascadeIndex), vec4f(textureLoad(baseColorTexture, vec2u(origin), 0).rgb, f32(dist <= 0.1)));
 } /** End of 'rayMarch' function */
 
+@compute @workgroup_size(16, 16);
+
 /**
  * @info Compute main function
  * @param global_id: vec3u
  * @return none
  */
-fn main(@builtin(global_invocation_id) global_id: vec3u) {
+ fn main(@builtin(global_invocation_id) global_id: vec3u) {
   if (global_id.x >= u32(frameSize) || global_id.y >= u32(frameSize)) {
     return;
   }

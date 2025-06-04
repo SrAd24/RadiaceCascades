@@ -14,8 +14,6 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(0) var resultTexture : texture_2d_array<f32>;
 @group(0) @binding(1) var frameSize : f32;
 
-@compute @workgroup_size(16, 16)
-
 /** Ray color of nearest probes */
 var colors: vec3f[];
 
@@ -97,6 +95,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
                (colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +
                (colors[3] - colors[2]) * intX + (colors[0] - colors[2]) * intY + colors[2]);  // Color of current pixel ???
 } /** End of 'merge' function */
+
+@compute @workgroup_size(16, 16)
 
 /**
  * @info Compute main function
