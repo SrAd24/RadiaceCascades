@@ -108,8 +108,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       var data: vec4f = textureLoad(resultTexture,
-                                    vec2u(u32(indexX1), u32(indexY1)) * ui32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
-                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+                                    vec2u(u32(indexX1), u32(indexY1)) * u32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    u32(cascadeMaxIndex - cascadeIndex + 1));
       if (data.w != 0) {
         colors[0] += data.xyz;
         count++;
@@ -125,8 +125,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       var data: vec4f = textureLoad(resultTexture,
-                                    vec2u(u32(indexX2), u32(indexY1)) * ui32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
-                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+                                    vec2u(u32(indexX2), u32(indexY1)) * u32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    u32(cascadeMaxIndex - cascadeIndex + 1));
       if (data.w != 0) {
         colors[1] += data.xyz;
         count++;
@@ -142,8 +142,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       var data: vec4f = textureLoad(resultTexture,
-                                    vec2u(u32(indexX1), u32(indexY2)) * ui32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
-                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+                                    vec2u(u32(indexX1), u32(indexY2)) * u32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    u32(cascadeMaxIndex - cascadeIndex + 1));
       if (data.w != 0) {
         colors[2] += data.xyz;
         count++;
@@ -159,8 +159,8 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
   for (var j: u32 = 0; j < 2; j++) {
     for (var k: u32 = 0; k < 2; k++) {
       var data: vec4f = textureLoad(resultTexture,
-                                    vec2u(u32(indexX2), u32(indexY2)) * ui32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
-                                    ui32(cascadeMaxIndex - cascadeIndex + 1));
+                                    vec2u(u32(indexX2), u32(indexY2)) * u32(probe1Size) + vec2u(2 * pos.x + k, 2 * pos.y + j),
+                                    u32(cascadeMaxIndex - cascadeIndex + 1));
       if (data.w != 0) {
         colors[3] += data.xyz;
         count++;
