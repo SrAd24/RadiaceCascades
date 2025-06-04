@@ -15,7 +15,7 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(1) var frameSize : f32;
 
 /** Ray color of nearest probes */
-var colors: vec3f[];
+var colors: vec3f[] = [];
 
 /**
  * @info Count color of ray nearest probe function
@@ -23,21 +23,23 @@ var colors: vec3f[];
  * @param indexX: f32
  * @param indexY: f32
  * @param index: f32
+ * @param pos: vec2f
  * @returns none
  **/
-fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32) {
-  var count: f32 = 0;
+fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32, var pos: vec2f) {
+  var count: u32 = 0;
 
-  for (let j: f32 = 0; j < 2; j++)
-    for (let k: f32 = 0; k < 2; k++) {
-      vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1, 0);
+  for (var j: u32 = 0; j < 2; j++)
+    for (var k: u32 = 0; k < 2; k++) {
+      vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + f32(k), 2 * pos.y + f32(j))) /
+                                              frameSize, cascadeMaxIndex - cascadeIndex + 1, 0);
       if (data.w != 0) {
         colors[index] += data.xyz;
         count++;
       }
     }
   if (count != 0)
-    colors[index] /= count;
+    colors[index] /= f32(count);
 } /** End of 'olorCount' function */
 
 /**
@@ -83,10 +85,10 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
     indexY2 = 2;
 
   colors = {vec3f(0), vec3f(0), vec3f(0), vec3f(0)};
-  colorCount(cascadeIndex, indexY1, indexX1, 0);
-  colorCount(cascadeIndex, indexY1, indexX2, 1);
-  colorCount(cascadeIndex, indexY2, indexX1, 2);
-  colorCount(cascadeIndex, indexY2, indexX2, 3);
+  colorCount(cascadeIndex, indexY1, indexX1, 0, pos);
+  colorCount(cascadeIndex, indexY1, indexX2, 1, pos);
+  colorCount(cascadeIndex, indexY2, indexX1, 2, pos);
+  colorCount(cascadeIndex, indexY2, indexX2, 3, pos);
 
   var intX: f32 = (probePos.x - (indexX1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
   var intY: f32 = (probePos.y - (indexY1 + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 2 + 4)) / probe1Size;
