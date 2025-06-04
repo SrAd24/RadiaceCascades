@@ -29,10 +29,14 @@ const rayMarch: Function = (cascadeIndex: number, textCoords: vec2): void => {
   const interval: number = 1;
   const pos: vec2 = textCoord * frameSize;
   const probeSize: number = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
+
+  const probeX: number = ceil(pos.x / probeSize), probeY: number = ceil(pos.y / probeSize);
+  const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+
   const angle: number = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
   const dir: vec2 = vec2(sin(angle), cos(angle));
 
-  let origin: vec2 = new vec2((0.5 + i) * probeSize, (0.5 + j) * probeSize);
+  let origin: vec2 = probePos;
   origin = origin + dir * interval * (1 - Math.pow(4, cascadeIndex)) / (1 - 4);
   const first: vec2 = origin;
   let count: number = 0;

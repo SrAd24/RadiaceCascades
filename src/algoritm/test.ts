@@ -114,13 +114,13 @@ const rayMarch: Function = (): void => {
   cascades.forEach((cscd: cascade) => {
     cscd.probeArray.forEach((probeArray: probe[]) => {
       probeArray.forEach((prb: probe) => {
-        prb.array.forEach((pixelArray: pixel[]) => {
-          pixelArray.array.forEach((P: pixel) => {
+        prb.array.forEach((pixelArray: pixel[], i: number) => {
+          pixelArray.forEach((P: pixel, j: number) => {
 
             let interval: number = 1;
             const dir: vec2 = new vec2(Math.sin(probeObject.pixelArray[i][j].angle),
-                                 Math.cos(probeObject.pixelArray[i][j].angle));
-            let origin: vec2 = new vec2((0.5 + i) * probeObject.size, (0.5 + j) * probeObject.size);
+                                       Math.cos(probeObject.pixelArray[i][j].angle));
+            let origin: vec2 = prb.pos;
             origin = origin.add(dir.mul((interval * (1 - Math.pow(4, cascadeIndex))) / (1 - 4)));
             const first: vec2 = origin;
             let dist: number = 1000;
