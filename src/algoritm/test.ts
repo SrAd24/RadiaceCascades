@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import * as mth from "../../math/mth.js";
+import * as mth from "../math/mth.js";
 
 /** Pixel interface */
 interface pixel {
@@ -51,9 +51,9 @@ interface nearProbe {
 } /** End of 'nearProbe' interface */
 
 /** Cascades array */
-let cascades: cascade[];
+let cascades: cascade[] = [];
 /** Sphere array */
-let spheres: sphere[];
+let spheres: sphere[] = [];
 /** Smallest sphere size */
 let smallestSize: number = 10000;
 
@@ -101,7 +101,7 @@ const createProbe: Function = (size: number, pos: vec2): probe => {
     for (let j: number = 0; j < probeObject.size; j++) {
       probeObject.pixelArray[i][j].dirIndex = i * probeObject.size + j;
       probeObject.pixelArray[i][j].angle = 2 * Math.PI * probeObject.pixelArray[i][j].dirIndex /  (probeObject.size * probeObject.size);
-      probeObject.pixelArray[i][j].IsIntersect = false;
+      probeObject.pixelArray[i][j].isIntersect = false;
     }
   return probeObject;
 } /** End of 'createProbe' function */
