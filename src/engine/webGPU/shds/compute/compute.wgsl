@@ -17,7 +17,6 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(3) var resultTexture : texture_2d_array<f32>;
 
 // @group(0) @binding(4) var frameSize : f32;
-
 const frameSize: f32 = 512;
 
 @compute @workgroup_size(16, 16)
@@ -25,36 +24,36 @@ const frameSize: f32 = 512;
 /**
  * @info Ray marching function
  * @param cascadeIndex: f32
- * @param textCoords: vec2
+ * @param textCoords: vec2f
  * @returns none
  **/
-fn rayMarch(cascadeIndex: f32, textCoords: vec2) {
+fn rayMarch(cascadeIndex: f32, textCoords: vec2f) {
   const interval: f32 = 1;
-  const pos: vec2 = textCoord * frameSize;
+  const pos: vec2f = textCoord * frameSize;
   const probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
 
   const probeX: f32 = floor(pos.x / probeSize);
   const probeY: f32 = floor(pos.y / probeSize);
-  const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+  const probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   const angle: f32 = 2 * pi * (pos.y * probeSize + pos.x) /  (probeSize * probeSize);
-  const dir: vec2 = vec2(sin(angle), cos(angle));
+  const dir: vec2f = vec2(sin(angle), cos(angle));
 
-  var origin: vec2 = probePos;
+  var origin: vec2f = probePos;
   origin = origin + dir * interval * (1 - pow(4, cascadeIndex)) / (1 - 4);
-  const first: vec2 = origin;
+  const first: vec2f = origin;
   var count: f32 = 0;
   while (dist > 0.1 && count < 1000 && length(first - origin) < interval * pow(4, cascadeIndex)) {
-    dist = textureLoad(depthTexture, origin / vec2(frameSize));
-    origin += dir * dist / vec2(frameSize);
+    dist = textureLoad(depthTexture, origin / vec2f(frameSize));
+    origin += dir * dist / vec2f(frameSize);
     count++;
   }
-  textureStore(resultTexture, textCoord, cascadeMaxIndex - cascadeIndex, vec4(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
+  textureStore(resultTexture, textCoord, cascadeMaxIndex - cascadeIndex, vec4f(textureLoad(baseColorTexture, origin).rgb, dist <= 0.1));
 } /** End of 'rayMarch' function */
 
 /**
  * @info Compute main function
- * @param global_id: vec3f
+ * @param global_id: vec3u
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
@@ -63,7 +62,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
   }
 
   for (let i: f32 = 0; i < cascadeMaxIndex; i++) {
-    rayMarch(i, vec2(global_id.xy) / frameSize);
+    rayMarch(i, vec2f(global_id.xy) / frameSize);
   }
 } /** End of 'main' function */
 

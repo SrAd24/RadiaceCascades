@@ -17,7 +17,7 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @compute @workgroup_size(16, 16)
 
 /** Ray color of nearest probes */
-let colors: vec3[];
+let colors: vec3f[];
 
 /**
  * @info Count color of ray nearest probe function
@@ -32,7 +32,7 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32) {
 
   for (let j: f32 = 0; j < 2; j++)
     for (let k: f32 = 0; k < 2; k++) {
-      vec4 data = textureLoad(resultTexture, (vec2(indexX, indexY) * probe1Size + vec2(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1);
+      vec4f data = textureLoad(resultTexture, (vec2f(indexX, indexY) * probe1Size + vec2f(2 * pos.x + k, 2 * pos.y + j)) / frameSize, cascadeMaxIndex - cascadeIndex + 1);
       if (data.w != 0) {
         colors[index] += data.xyz;
         count++;
@@ -45,18 +45,18 @@ fn colorCount(cascadeIndex: f32, indexX: f32, indexY: f32, index: f32) {
 /**
  * @info Merge cascades function
  * @param cascadeIndex: f32
- * @param textCoords: vec2
+ * @param textCoords: vec2f
  * @returns none
  **/
-fn merge(cascadeIndex: f32, textCoords: vec2) {
+fn merge(cascadeIndex: f32, textCoords: vec2f) {
   if (cascadeMaxIndex == 1)
     return;
 
-  const pos: vec2 = textCoord * frameSize;
+  const pos: vec2f = textCoord * frameSize;
   const probeSize: f32 = frameSize / (2 * 16 * pow(2, cascadeMaxIndex - cascadeIndex));
   const probe1Size: f32 = 2 * probe1Size;
   const probeX: f32 = floor(pos.x / probeSize), probeY: f32 = floor(pos.y / probeSize);
-  const probePos = vec2(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
+  const probePos = vec2f(probeX + 0.5, probeY + 0.5) * frameSize / pow(2, cascadeMaxIndex - cascadeIndex + 1 + 4);
 
   const sizeN: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 1);
   const sizeN1: f32 = pow(2, cascadeIndex - cascadeMaxIndex + 2);
@@ -84,7 +84,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2) {
   if (indexY2 == -1)
     indexY2 = 2;
 
-  colors = {vec3(0), vec3(0), vec3(0), vec3(0)};
+  colors = {vec3f(0), vec3f(0), vec3f(0), vec3f(0)};
   colorCount(cascadeIndex, indexY1, indexX1, 0);
   colorCount(cascadeIndex, indexY1, indexX2, 1);
   colorCount(cascadeIndex, indexY2, indexX1, 2);
@@ -100,7 +100,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2) {
 
 /**
  * @info Compute main function
- * @param global_id: vec3f
+ * @param global_id: vec3u
  * @return none
  */
 fn main(@builtin(global_invocation_id) global_id: vec3u) {
@@ -109,7 +109,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3u) {
   }
 
   for (let i = cascadeMaxIndex - 1; i >= 0; i++) {
-    merge(i, vec2(global_id.xy) / frameSize);
+    merge(i, vec2f(global_id.xy) / frameSize);
   }
 } /** End of 'main' function */
 
