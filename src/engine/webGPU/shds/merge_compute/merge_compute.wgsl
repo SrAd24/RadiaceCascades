@@ -15,7 +15,7 @@ const cascadeMaxIndex: f32 = 3;  // Temporary
 @group(0) @binding(1) var frameSize : f32;
 
 /** Ray color of nearest probes */
-var colors: vec3f[] = [];
+var colors: array<vec3f, 4> = [];
 
 /**
  * @info Count color of ray nearest probe function
@@ -79,7 +79,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
     indexX2 = indexX1 - 1;
   }
   if (indexX2 == -1) {
-    indexX2 = 2
+    indexX2 = 2;
   }
 
   var indexY: f32 = posY / sizeN1;
@@ -94,7 +94,7 @@ fn merge(cascadeIndex: f32, textCoords: vec2f) {
     indexY2 = 2;
   }
 
-  colors = [vec3f(0), vec3f(0), vec3f(0), vec3f(0)];
+  colors = array<vec3f, 4>(vec3f(0.0), vec3f(0.0), vec3f(0.0), vec3f(0.0));
   colorCount(cascadeIndex, indexY1, indexX1, 0, pos, probe1Size);
   colorCount(cascadeIndex, indexY1, indexX2, 1, pos, probe1Size);
   colorCount(cascadeIndex, indexY2, indexX1, 2, pos, probe1Size);
