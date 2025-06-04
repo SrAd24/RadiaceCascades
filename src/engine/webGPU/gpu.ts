@@ -65,7 +65,7 @@ class gpu {
     this.shader1 = new shader();
     await this.shader1.createShader("main", this.device);
     this.computeShader = new shader();
-    await this.computeShader.createShader("compute", this.device);
+    await this.computeShader.createShader("merge_compute", this.device);
 
     if (this.shader1.shaderModule == undefined)
       throw Error("Shader is undefined");
