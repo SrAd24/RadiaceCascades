@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 03.06.2025
+ * LAST UPDATE : 04.06.2025
  */
 
 /** IMPORTS */
@@ -39,7 +39,7 @@ interface cascade {
 /** Sphere interface */
 interface sphere {
   radius: number;  // Sphere radius
-  position: vec2;  // Sphere position
+  position: mth.vec2;  // Sphere position
 } /** End of 'sphere' interface */
 
 /** Near probe interface */
@@ -114,14 +114,14 @@ const rayMarch: Function = (): void => {
   cascades.forEach((cscd: cascade, cascadeIndex: number) => {
     cscd.probeArray.forEach((probeArray: probe[]) => {
       probeArray.forEach((prb: probe) => {
-        prb.forEach((pixelArray: pixel[], i: number) => {
+        prb.pixelArray.forEach((pixelArray: pixel[], i: number) => {
           pixelArray.forEach((P: pixel, j: number) => {
 
             let interval: number = 1;
             const dir: mth.vec2 = new mth.vec2(Math.sin(prb.pixelArray[i][j].angle),
                                        Math.cos(prb.pixelArray[i][j].angle));
             let origin: mth.vec2 = prb.pos;
-            origin = origin.add(dir.mul((interval * (1 - Math.pow(4, cascadeIndex))) / (1 - 4)));
+            origin = origin.add(dir.mulNum((interval * (1 - Math.pow(4, cascadeIndex))) / (1 - 4)));
             const first: mth.vec2 = origin;
             let dist: number = 1000;
             let count: number = 0;
@@ -129,7 +129,7 @@ const rayMarch: Function = (): void => {
               spheres.forEach((sph: sphere) => {
                 dist = Math.min(dist, sphereDistance(origin, sph));
               })
-              origin = origin.add(dir.mul(dist));
+              origin = origin.add(dir.mulVec(dist));
               count++;
             }
             prb.pixelArray[i][j].isIntersect = dist <= 0.1;
@@ -166,7 +166,7 @@ const merge: Function = (): void => {
                 for (let k: number = 0; k < 2; k++)
                   if (cascades[i + 1].probeArray[indexY][indexX].pixelArray[2 * y + j][2 * x + k].isIntersect)
                   {
-                    colors[0] += cascades[i + 1].probeArray[indexY][indexX].pixelArray[2 * y + j][2 * x + k].color;
+                    colors[0] = colors[0].add(cascades[i + 1].probeArray[indexY][indexX].pixelArray[2 * y + j][2 * x + k].color);
                     count++;
                   }
               if (count != 0)
@@ -181,8 +181,8 @@ const merge: Function = (): void => {
                                  (cascades[i + 1].probeArray[nearPrb.indexY2][nearPrb.indexX2].pos.sub(cascades[i + 1].probeArray[nearPrb.indexY2][nearPrb.indexX1].pos).length());
             const intY: number = prb.pos.sub(cascades[i + 1].probeArray[nearPrb.indexY1][nearPrb.indexX2].pos).length() /
                                  (cascades[i + 1].probeArray[nearPrb.indexY1][nearPrb.indexX1].pos.sub(cascades[i + 1].probeArray[nearPrb.indexY1][nearPrb.indexX2].pos).length());
-            prb.pixelArray[y][x].color = (colors[2] - colors[3] - colors[0] + colors[1]) * intX * intY +
-                                         (colors[3] - colors[2]) * intX + (colors[0] - colors[2]) * intY + colors[2];
+            prb.pixelArray[y][x].color = (colors[2].sub(colors[3]).sub(colors[0]).add(colors[1]).mulNum(intX).mulNum(intY)).add(
+                                         (colors[3].sub(colors[2]).mulNum(intX)).add(colors[0].sub(colors[2]).mulNum(intY).add(colors[2])));
           }
       })
     });
@@ -264,7 +264,7 @@ const searchSmallest: Function = (): void => {
 const searchNear: Function = (pos: mth.vec2): number => {
   let dist: number = 10000;
 
-  for (let i: number = 0; i < spheres.length(); i++)
+  for (let i: number = 0; i < spheres.length; i++)
     dist = Math.min(dist, Math.max(0, spheres[i].position.sub(pos).length() - spheres[i].radius));
   return dist;
 } /** End of 'searchNear' function */
@@ -294,7 +294,7 @@ const init: Function = (): void => {
     cascades[i].size = 2 * Math.pow(2, i);
     for (let j: number = 0; j < frameSize / (2 * Math.pow(2, i) * 16); j++)
       for (let k: number = 0; k < frameSize / (2 * Math.pow(2, i) * 16); k++)
-        cascades[i].probeArray[j][k] = createProbe(frameSize / (2 * Math.pow(2, i) * 16), mth.vec2(k + 0.5, j + 0.5) * frameSize / (2 * Math.pow(2, i) * 16));
+        cascades[i].probeArray[j][k] = createProbe(frameSize / (2 * Math.pow(2, i) * 16), new mth.vec2(k + 0.5, j + 0.5) * frameSize / (2 * Math.pow(2, i) * 16));
   }
   cascades.reverse();
 } /** End of 'init' function */
