@@ -10,6 +10,9 @@
 /** Encoder render path variables */
 const clearColor = { r: 0, g: 1, b: 0.5, a: 1 }; // Clear color
 
+/** IMPORTS */
+import {group} from './group.ts';
+
 /** Encoder class */
 class encoder {
   /** #public parameters */
@@ -19,6 +22,7 @@ class encoder {
 
   public depthTexture: any;
   public texture: any;
+  public groups: group[] = [];
 
   /**
    * @info Class constructor
