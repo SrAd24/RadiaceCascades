@@ -77,7 +77,7 @@ class gpu {
     // get adapter
     this.adapter = await navigator.gpu.requestAdapter();
 
-    if (this.adapter == null) {
+    if (!this.adapter) {
       alert("Can`t get adapter");
       throw Error("Can`t get adapter");
     }
@@ -92,7 +92,7 @@ class gpu {
     this.context = canvas.getContext("webgpu");
 
     // Create swapchain descriptor
-    console.log(canvas.width, canvas.height)
+    console.log(canvas.width, canvas.height);
     this.context.width = canvas.width;
     this.context.height = canvas.height;
 

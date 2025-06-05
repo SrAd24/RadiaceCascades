@@ -8,65 +8,70 @@
  */
 
 /** IMPORTS */
-import { dict } from './units/dictionary.ts';
-import { render } from '../engine/render/render.ts';
+import { dict } from "./units/dictionary.ts";
+import { render } from "../engine/render/render.ts";
 
 /** Animation class */
 class anim {
-    /** #private parameters */
-    private rnd: render;
+  /** #private parameters */
+  private rnd: render = new render();
 
-    /** #public parametes */
-    public constructor() {
-    } /** End of constructor */
+  /** #public parametes */
+  public constructor() {} /** End of constructor */
 
-    /**
-     * @info render initialize function
-     * @returns none
-     */
-    public async init(): Promise<any> {
-      // initialize render
-      console.log("Render initialization started");
-      await this.rnd.init();
-      console.log("Render initialization ended");
+  /**
+   * @info render initialize function
+   * @param canvas: string
+   * @returns none
+   */
+  public async init(canvas: string): Promise<any> {
+    // initialize render
+    console.log("Render initialization started");
+    const canvasId: Element | null = document.querySelector(canvas);
+    if (canvasId == null) throw Error("Canvas is undefined");
+    await this.rnd.init(canvasId);
+    console.log("Render initialization ended");
 
-      // initialize units
-      console.log("Unit initialization started");
-      dict.units.forEach((unit, index) => {
-        await unit.init(this.rnd);
-      });
-      console.log("Unit initialization ended");
-    } /** End of 'init' function */
-    
-    /**
-     * @info render function
-     * @returns none
-     */
-    public async render(): Promise<any> {
-      dict.units.forEach((unit, index) => {
-        await unit.render(this.rnd);
-      });
-    } /** Ebd of 'render' function */
+    // initialize units
+    console.log("Unit initialization started, unit cout: ", dict.units.length);
+    dict.units.forEach((unit, index) => {
+      unit.init(this.rnd);
+    });
+    console.log("Unit initialization ended");
+  } /** End of 'init' function */
 
-    /**
-     * @info response function
-     * @returns none
-     */
-    public async response(): Promise<any> {
-      dict.units.forEach((unit, index) => {
-        await unit.response(this.rnd);
-      });
-    } /** End of 'response' function */
+  /**
+   * @info render function
+   * @returns none
+   */
+  public async render(): Promise<any> {
+    dict.units.forEach((unit, index) => {
+      unit.render(this.rnd);
+    });
+  } /** Ebd of 'render' function */
 
-    /**
-     * @info destroy function
-     * @returns none
-     */
-    public async destroy(): Promise<any> {       
-      dict.units.forEach((unit, index) => {
-        await unit.destroy(this.rnd);
-      });
-    } /** End of 'destroy' function */   
+  /**
+   * @info response function
+   * @returns none
+   */
+  public async response(): Promise<any> {
+    dict.units.forEach((unit, index) => {
+      unit.response(this.rnd);
+    });
+  } /** End of 'response' function */
+
+  /**
+   * @info destroy function
+   * @returns none
+   */
+  public async destroy(): Promise<any> {
+    dict.units.forEach((unit, index) => {
+      unit.destroy(this.rnd);
+    });
+  } /** End of 'destroy' function */
 } /** End of 'anim' class */
+
+/** EXPORTS */
+export { anim };
 
 /** END OF 'anim.ts' FILE */

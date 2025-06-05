@@ -8,26 +8,26 @@
  */
 
 /** IMPORTS */
-import { unit } from './units.ts';
+import { unit } from "./units.ts";
 
 /** Unit dictionary class */
-class dictionary implements _dictionary {
-    /** #public parameters */
-    units: unit[];
+class dictionary {
+  /** #public parameters */
+  units: unit[] = [];
 
-    /**
-     * @info Add unit in unit dictionary
-     * @param newUnit: unit
-     */
-    add(newUnit: unit) {
-      this.units.push(newUnit);
-    } /** End of 'add' function */
+  /**
+   * @info Add unit in unit dictionary
+   * @param newUnit: unit
+   */
+  add(newUnit: unit) {
+    this.units.push(newUnit);
+  } /** End of 'add' function */
 } /** End of 'dictionary' class */
 
 // unit dictionary
-dict: dictionary = new dictionary();
+const dict: dictionary = new dictionary();
 
 /** EXPORTS */
-export { dictionary };
+export { dict };
 
 /** END OF 'dictionary.ts' FILE */

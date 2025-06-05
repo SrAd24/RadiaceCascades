@@ -9,16 +9,23 @@
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "600" height = "400">
     </canvas>
 
-    <script>
-      console.log(2);
-    </script>     
+    <script type="module">
+      import { uni_test } from './js/samples/uni_test.mjs';
+    </script>
   
     <script type="module">
       import { frame } from "./js/engine/frame/frame.mjs";
+      import { anim } from './js/anim/anim.mjs';
 
-      const fr = await new frame("The_only_normal_group_for_the_entire_time_at_the_CGSG");
-
-      fr.mainloop();
+      //const fr = await new frame("The_only_normal_group_for_the_entire_time_at_the_CGSG");
+      //fr.mainloop();
+      
+      let animation = new anim();
+      async function loop() {
+        await animation.init('#The_only_normal_group_for_the_entire_time_at_the_CGSG');
+      }
+      await loop();
+      
       // await rnd.init();
       
       // async function loop() {

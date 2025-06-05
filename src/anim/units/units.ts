@@ -8,14 +8,14 @@
  */
 
 /** IMPORTS */
-import { dict } from './dictionary.ts';
+import { dict } from "./dictionary.ts";
 
 /** Units abstract class */
 abstract class unit {
   /**
    * @info Class constructor
    */
-  public constructor(): void {
+  public constructor() {
     dict.add(this);
   } /** End of constructor */
 
@@ -24,28 +24,31 @@ abstract class unit {
    * @param render: any
    * @returns none
    */
-  abstract init(render: any): void;
+  abstract init(render: any): Promise<any>;
 
   /**
    * @info Init function
    * @param render: any
    * @returns none
    */
-  abstract render(render: any): void;
+  abstract render(render: any): Promise<any>;
 
   /**
    * @info Init function
    * @param render: any
    * @returns none
    */
-  abstract response(render: any): void;
+  abstract response(render: any): Promise<any>;
 
   /**
    * @info Init function
    * @param render: any
    * @returns none
    */
-  abstract destroy(render: any): void;
+  abstract destroy(render: any): Promise<any>;
 } /** End of 'unit' abstract class */
+
+/** EXPORTS */
+export { unit };
 
 /** END OF 'units.ts' FILE */
