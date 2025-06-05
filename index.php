@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="./src/styles/css/style.css">
 </head>
 <body>
-    <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG">
+    <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "600" height = "400">
     </canvas>
 
     <script>
@@ -14,16 +14,18 @@
     </script>     
   
     <script type="module">
-      import { render } from "./js/engine/webGPU/render.mjs";
+      import { frame } from "./js/engine/frame/frame.mjs";
 
-      const rnd = new render();
+      const fr = await new frame("The_only_normal_group_for_the_entire_time_at_the_CGSG");
 
-      await rnd.initialize();
-      async function mainloop() {
-        await rnd.render();
-        requestAnimationFrame(mainloop);
-      }
-      mainloop();
+      fr.mainloop();
+      // await rnd.init();
+      
+      // async function loop() {
+      //   await rnd.render();
+      //   requestAnimationFrame(loop);
+      // }
+      // loop();
       
 </script>
 </body>

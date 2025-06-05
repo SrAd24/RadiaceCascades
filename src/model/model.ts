@@ -8,8 +8,8 @@
  */
 
 /** IMPORTS */
-import { vertex } from "../engine/webGPU/vertex.js";
-import * as mth from "../math/mth.js";
+import { vertex } from "../engine/res/vertex.ts";
+import * as mth from "../math/mth.ts";
 
 /** Class model */
 class model {

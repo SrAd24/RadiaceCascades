@@ -19,7 +19,7 @@ class shader {
    */
   private async readShader(shaderName: String): Promise<string> {
     const response = await fetch(
-      "src/engine/webGPU/shds/" + shaderName + "/" + shaderName + ".wgsl",
+      "src/engine/res/shds/" + shaderName + "/" + shaderName + ".wgsl",
     );
 
     // const response = await fetch("src/engine/webGPU/shds/main/main.wgsl");

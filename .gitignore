@@ -29,6 +29,7 @@ jspm_packages/
 
 *.mjs
 *.js
+*.replit
 
 todo.ts
 todo.js

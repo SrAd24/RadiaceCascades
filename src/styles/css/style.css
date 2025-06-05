@@ -14,8 +14,8 @@ body {
 body canvas {
   grid-area: body;
   background: blue;
-  width: auto;
-  height: auto;
+  width: 600;
+  height: 400;
 }
 
 /*# sourceMappingURL=style.css.map */
