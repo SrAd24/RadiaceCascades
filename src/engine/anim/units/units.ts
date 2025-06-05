@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { dict } from "./dictionary.ts";
+import { dict } from "./dictionary";
 
 /** Units abstract class */
 abstract class unit {

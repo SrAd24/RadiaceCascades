@@ -160,6 +160,25 @@ class mat4 {
     return new mat4(c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1);
   } /** End of 'rotateY' function */
 
+  /* Point radius-vector transformation by matrix function.
+   * ARGUMENTS:
+   *   - vector:
+   *       const vec3<type> &V;
+   * RETURNS:
+   *   (vec3<type>) New vector.
+   */
+  public TransformPoint(V: vec3) : vec3
+  {
+    const M = this.m;
+    let ty: vec3 = new vec3(V.x * M[0][0] + V.y * M[1][0] + V.z * M[2][0] + M[3][0],
+                           V.x * M[0][1] + V.y * M[1][1] + V.z * M[2][1] + M[3][1],
+                           V.x * M[0][2] + V.y * M[1][2] + V.z * M[2][2] + M[3][2]);
+
+    return ty;
+  } /* End of 'TransformPoint' function */
+
+
+  
   /**
    * @info Rotate matrix by z axis function
    * @param angle in degree

@@ -9,8 +9,11 @@
  
 /** Vertex out struct*/
 struct vertexOut {
-    @builtin(position) position: vec4f,
-    @location(0) color: vec4f
+    @builtin(position) gl_position: vec4f,
+    @location(0) position: vec3f,
+    @location(1) texcoord: vec2f,
+    @location(2) normal: vec3f,
+    @location(3) color: vec4f
 } /** End of 'vertexOut' struct */
 
 /** Vertex shader **/
@@ -22,10 +25,15 @@ struct vertexOut {
  * @param color: vec4f
  * @return vertex out struct
  */
-fn vertex_main(@location(0) position: vec4f,
-               @location(1) color: vec4f) -> vertexOut {
+fn vertex_main(@location(0) position: vec3f,
+               @location(1) texcoord: vec2f,
+               @location(2) normal: vec3f,
+               @location(3) color: vec4f) -> vertexOut {
   var out: vertexOut;
+  out.gl_position = vec4f(position, 1.0);
   out.position = position;
+  out.texcoord = texcoord;
+  out.normal = normal;
   out.color = color;
   return out;
 } /** End of 'vertex_main' function */

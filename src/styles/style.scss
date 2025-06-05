@@ -7,7 +7,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 2fr 1fr;
-  background-color: red;
+  background-color: black;
   row-gap: 20px;
   column-gap: 20px;
   justify-items: center;
@@ -19,12 +19,7 @@ body {
     "footer footer footer footer";
 
   canvas {
-//    grid-column: 1 / 5;
-//    grid-row: 2 / 3;
     grid-area: body;
     background: $b;
-
-    width: 600;
-    height: 400;
-  }    
+  }
 }

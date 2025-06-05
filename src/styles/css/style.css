@@ -3,7 +3,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 2fr 1fr;
-  background-color: red;
+  background-color: black;
   row-gap: 20px;
   column-gap: 20px;
   justify-items: center;
@@ -14,8 +14,6 @@ body {
 body canvas {
   grid-area: body;
   background: blue;
-  width: 600;
-  height: 400;
 }
 
 /*# sourceMappingURL=style.css.map */

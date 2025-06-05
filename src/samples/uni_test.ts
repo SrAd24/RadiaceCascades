@@ -8,9 +8,10 @@
  */
 
 /** IMPORTS */
-import { unit } from "../anim/units/units.ts";
+import { unit } from "../engine/anim/units/units";
 
 class _uni_test extends unit {
+  pipeline: any;
   /** #public parameters */
   /**
    * @info Init function
@@ -18,7 +19,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async init(render: any): Promise<any> {
-    console.log("test_unit init");
+    this.pipeline = await render.createShaders();
   } /** End of 'init' function */
 
   /**
@@ -27,7 +28,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async render(render: any): Promise<any> {
-    console.log("test_unit render");
+    await render.draw(this.pipeline);
   } /** End of 'render' function */
 
   /**
@@ -36,7 +37,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async response(render: any): Promise<any> {
-    console.log("test_unit response");
+    // console.log("test_unit response");
   } /** End of 'response' function */
 
   /**
