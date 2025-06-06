@@ -41,15 +41,19 @@ class _uni_control extends unit {
 
       render.cam.azimuth +=
         (input.isCLick == true ? 1 : 0) *
-        timer.globalDeltaTime *
-        3 *
-        (-5.0 * input.mouseDX);
+          timer.globalDeltaTime *
+          3 *
+          (-5.0 * input.mouseDX) +
+        (input.arrows.left ? 1 : 0) * 0.5 +
+        (input.arrows.right ? 1 : 0) * -0.5;
 
       render.cam.elevator +=
         (input.isCLick == true ? 1 : 0) *
-        timer.globalDeltaTime *
-        2 *
-        (5.0 * input.mouseDY);
+          timer.globalDeltaTime *
+          2 *
+          (5.0 * input.mouseDY) +
+        (input.arrows.up ? 1 : 0) * 0.5 +
+        (input.arrows.down ? 1 : 0) * -0.5;
 
       if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
       else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;

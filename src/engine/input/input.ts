@@ -26,6 +26,12 @@ class _input {
   public canvasID: any;
   public bodyID: any;
   public isControl: boolean = false;
+  public arrows: any = {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+  };
 
   /**
    * @info Class constructor
@@ -40,10 +46,28 @@ class _input {
       if (event.keyCode == 16) {
         this.isControl = true;
       }
+      if (event.keyCode == 37) {
+        this.arrows.left = true;
+      } else if (event.keyCode == 38) {
+        this.arrows.up = true;
+      } else if (event.keyCode == 39) {
+        this.arrows.right = true;
+      } else if (event.keyCode == 40) {
+        this.arrows.down = true;
+      }
     });
     document.addEventListener("keyup", (event: any) => {
       if (event.keyCode == 16) {
         this.isControl = false;
+      }
+      if (event.keyCode == 37) {
+        this.arrows.left = false;
+      } else if (event.keyCode == 38) {
+        this.arrows.up = false;
+      } else if (event.keyCode == 39) {
+        this.arrows.right = false;
+      } else if (event.keyCode == 40) {
+        this.arrows.down = false;
       }
     });
     this.canvasID.addEventListener("contextmenu", (event: any) => {
