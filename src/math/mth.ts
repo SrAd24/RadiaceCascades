@@ -13,5 +13,6 @@ export { vec4 } from "./mth_vec4.ts";
 export { vec2 } from "./mth_vec2.ts";
 export { mat4 } from "./mth_mat4.ts";
 export { mth } from "./mth_def.ts";
+export { camera } from "./camera.ts";
 
 /** END OF 'mth.ts' FILE */
