@@ -35,7 +35,6 @@ class _uni_control extends unit {
     const canvas = document.querySelector(
       "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
     );
-    console.log(input.isControl);
     if (input.isControl) {
       /* Handle camera orienntation */
       render.cam.setOrientation();

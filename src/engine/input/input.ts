@@ -37,14 +37,12 @@ class _input {
     );
     this.bodyID = document.querySelector("#body");
     document.addEventListener("keydown", (event: any) => {
-      console.log("1");
-      if (event.keyCode == 17) {
+      if (event.keyCode == 16) {
         this.isControl = true;
       }
     });
     document.addEventListener("keyup", (event: any) => {
-      console.log("0");
-      if (event.keyCode == 17) {
+      if (event.keyCode == 16) {
         this.isControl = false;
       }
     });
