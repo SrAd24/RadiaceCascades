@@ -7,7 +7,7 @@
  * LAST UPDATE : 05.06.2025
  */
 
-import { resources } from '../res-types';
+import { resources } from "../res-types";
 
 enum texFormat {
   none = "",
@@ -58,13 +58,13 @@ class texture {
     if (device == undefined) throw Error("Device is undefined");
 
     this.tex = device.createTexture({
-        size: [w, h], 
-        format: 'texFormat',
-        usage: texUsg,
-        mipLevelCount: mipLevel,
-        sampleCount: sampleCnt
+      size: [w, h],
+      format: "texFormat",
+      usage: texUsg,
+      mipLevelCount: mipLevel,
+      sampleCount: sampleCnt,
     });
-    
+
     return this;
   }
 

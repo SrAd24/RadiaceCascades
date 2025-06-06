@@ -4,14 +4,34 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 02.06.2025
+ * LAST UPDATE : 06.06.2025
  */
 
 /** IMPORTS */
 import { core } from "./core/core";
 import { resources } from "./res-types";
 import { material_pattern } from "./res/material_patterns";
-import * as mth from "../../math/mth";
+import { buffer } from "../res/buffers.ts";
+import { vertex } from "../res/vertex.ts";
+import * as mth from "../../math/mth.ts";
+import { compute } from "../res/compute.ts";
+import { texture } from "../res/texture.ts";
+
+/** triangle verteces */
+const vertices: vertex[] = [
+  {
+    position: new mth.vec4(0.0, 0.6, 1, 1),
+    color: new mth.vec4(1, 0, 0, 1),
+  },
+  {
+    position: new mth.vec4(-0.5, -0.6, 0, 1),
+    color: new mth.vec4(0, 1, 0, 1),
+  },
+  {
+    position: new mth.vec4(0.5, -0.6, 0, 1),
+    color: new mth.vec4(0, 0, 1, 1),
+  },
+];
 
 /** Render class */
 class render extends core implements resources {
@@ -99,6 +119,198 @@ class render extends core implements resources {
 
     this.depthTexture = await this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
+
+    /** Create compute data */
+    const size = 512;
+
+    const diagonal: number = Math.sqrt(2) * size;
+    const interval0: number = 10;
+    const factor: number = Math.ceil(
+      Math.log(diagonal / interval0) / Math.log(4),
+    );
+    const intervalStart: number =
+      (interval0 * (1 - Math.pow(4, factor))) / (1 - 4);
+    // const cascadeNumber: number = 7;
+    const cascadeNumber: number =
+      Math.ceil(Math.log(intervalStart) / Math.log(4)) - 1;
+    console.log("Cascade number:" + cascadeNumber);
+
+    let baseColorTexture: texture = new texture();
+    baseColorTexture.createTexture(
+      this.core.device,
+      size,
+      size,
+      "r32float",
+      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
+      1,
+      "2d",
+    );
+    let distanceTexture: texture = new texture();
+    distanceTexture.createTexture(
+      this.core.device,
+      size,
+      size,
+      "r32float",
+      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
+      1,
+      "2d",
+    );
+    let resultColorTexture: texture = new texture();
+    resultColorTexture.createTexture(
+      this.core.device,
+      size,
+      size,
+      "r32float",
+      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
+      cascadeNumber + 1,
+      "2d-array",
+    );
+
+    let probeCount: number = 2 * 16 * Math.pow(2, cascadeNumber - 1);
+    let temporaryTexture: texture = new texture();
+    temporaryTexture.createTexture(
+      this.core.device,
+      probeCount,
+      probeCount,
+      "r32float",
+      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
+      1,
+      "2d",
+    );
+
+    const computeBindGroupLayout = this.core.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.COMPUTE,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d",
+          },
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.COMPUTE,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d",
+          },
+        },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.COMPUTE,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d-array",
+          },
+        },
+        {
+          binding: 3,
+          visibility: GPUShaderStage.COMPUTE,
+          buffer: {
+            type: "uniform",
+          },
+        },
+        {
+          binding: 4,
+          visibility: GPUShaderStage.COMPUTE,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d",
+          },
+        },
+      ],
+    });
+
+    let computeBuffer: buffer = new buffer();
+    computeBuffer.createUniformBuffer(this.core.device, 16);
+
+    await this.core.device.queue.writeBuffer(
+      computeBuffer.gpuBuffer,
+      0,
+      new Float32Array([cascadeNumber - 1, size, 0, 0]),
+    );
+
+    const computeBindGroup = this.core.device.createBindGroup({
+      layout: computeBindGroupLayout,
+      entries: [
+        {
+          binding: 0,
+          resource: baseColorTexture.gpuTextureView,
+        },
+        {
+          binding: 1,
+          resource: distanceTexture.gpuTextureView,
+        },
+        {
+          binding: 2,
+          resource: resultColorTexture.gpuTextureView,
+        },
+        {
+          binding: 3,
+          resource: {
+            buffer: computeBuffer.gpuBuffer,
+          },
+        },
+        {
+          binding: 4,
+          resource: temporaryTexture.gpuTextureView,
+        },
+      ],
+    });
+
+    let computeObject: compute = new compute();
+    computeObject.createComputePipeline(
+      this.core.device,
+      this.core.computeShader,
+      computeBindGroupLayout,
+      computeBindGroup,
+    );
+
+    let mergeComputeObject: compute = new compute();
+    mergeComputeObject.createComputePipeline(
+      this.core.device,
+      this.core.mergeComputeShader,
+      computeBindGroupLayout,
+      computeBindGroup,
+    );
+
+    let inputComputeObject: compute = new compute();
+    inputComputeObject.createComputePipeline(
+      this.core.device,
+      this.core.inputComputeShader,
+      computeBindGroupLayout,
+      computeBindGroup,
+    );
+
+    const start = new Date();
+
+    inputComputeObject.dispatch(this.core.device, 16, 16);
+    for (let i: number = 0; i < cascadeNumber; i++) {
+      await this.core.device.queue.writeBuffer(
+        computeBuffer.gpuBuffer,
+        0,
+        new Float32Array([cascadeNumber - 1, size, i, 0]),
+      );
+      computeObject.dispatch(this.core.device, 16, 16);
+    }
+    for (let i: number = cascadeNumber - 1; i >= -2; i--) {
+      await this.core.device.queue.writeBuffer(
+        computeBuffer.gpuBuffer,
+        0,
+        new Float32Array([cascadeNumber - 1, size, i, 0]),
+      );
+
+      mergeComputeObject.dispatch(this.core.device, 16, 16);
+    }
+
+    const end = new Date();
+
+    console.log("Time:" + (end.getTime() - start.getTime()));
 
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
