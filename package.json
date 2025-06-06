@@ -20,11 +20,15 @@
   "homepage": "https://github.com/SrAd24/RadiaceCascades#readme",
   "description": "",
   "dependencies": {
+    "@types/react": "^19.1.6",
     "express": "^5.1.0",
     "filereader": "^0.10.3",
     "node-sass": "^9.0.0",
     "php": "^1.1.0",
     "php-express": "^0.0.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-is": "^19.1.0",
     "sass": "^1.89.1",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
@@ -32,6 +36,8 @@
     "webpack": "^5.99.9"
   },
   "devDependencies": {
-    "@webgpu/types": "^0.1.61"
+    "@vitejs/plugin-react": "^4.5.1",
+    "@webgpu/types": "^0.1.61",
+    "vite": "^6.3.5"
   }
 }
