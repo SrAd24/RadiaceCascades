@@ -54,6 +54,8 @@ class _input {
       if (event.button === 0) this.isCLick = true;
       else if (event.button === 2) this.isCLickR = true;
       if (event.button === 1) this.isCLickM = true;
+      this.mouseX = event.clientX;
+      this.mouseY = event.clientY;
     });
     this.bodyID.addEventListener("mouseup", (event: any) => {
       if (event.button === 0) this.isCLick = false;
