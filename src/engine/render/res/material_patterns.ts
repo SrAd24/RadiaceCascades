@@ -88,12 +88,10 @@ class material_pattern {
       },
       primitive: {
         topology: "triangle-list",
-        cullMode: "back",
-        frontFace: "ccw"
       },
       layout: "auto",
       depthStencil: {
-        format: "depth32float", 
+        format: "depth24plus", 
         depthWriteEnabled: true,
         depthCompare: "less"
       }

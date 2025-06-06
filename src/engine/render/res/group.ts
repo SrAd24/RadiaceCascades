@@ -66,6 +66,7 @@ class group {
           binding: binding,
           resource: {
             buffer: data,
+            size: 128,
           },
         },
       ],

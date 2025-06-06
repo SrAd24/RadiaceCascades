@@ -12,10 +12,11 @@ import { core } from "./core/core";
 import { resources } from "./res-types";
 import { group } from "./res/group";
 import { material_pattern } from "./res/material_patterns";
-import { buffer } from "../res/buffers.ts";
-import { vertex } from "../res/vertex.ts";
-import * as mth from "../../math/mth.ts";
+import { buffer } from "./res/buffers";
+import { vertex } from "./res/vertex";
+import * as mth from "../../math/mth";
 import { primitive } from "./res/primitives";
+import { timer } from "../input/timer";
 
 /** triangle verteces */
 const vertices: vertex[] = [
@@ -88,7 +89,9 @@ class render extends core implements resources {
 
     await this.passEncoder.setBindGroup(0, this.gr1);
 
-    const M = new Float32Array(this.cam.vp.mul(mth.mat4.identity()).m.flat());
+    let M = new Float32Array(
+      this.cam.vp.m.flat().concat(mth.mat4.rotateY(0).m.flat()),
+    );
 
     await this.mBuf.updateBuffer(M);
 
@@ -109,24 +112,23 @@ class render extends core implements resources {
     await this.webGPUInit(canvas);
 
     this.cam = new mth.camera(c.width, c.height);
-    this.cam.set(new mth.vec3(1, 0, 0), new mth.vec3(0, 0, 0));
+    this.cam.set(new mth.vec3(0, 0, 3), new mth.vec3(0, 0, 0));
 
     const depthTextureDesc: GPUTextureDescriptor = {
       size: [this.context.canvas.width, this.context.canvas.height],
-      arrayLayerCount: 1,
       mipLevelCount: 1,
       sampleCount: 1,
       dimension: "2d",
-      format: "depth32float",
+      format: "depth24plus",
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     };
 
     this.depthTexture = await this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
-    this.mBuf = await this.buffers.createBuffer(GPUBufferUsage.STORAGE, 64);
+    this.mBuf = await this.buffers.createBuffer(GPUBufferUsage.STORAGE, 128);
+    console.log(this.mBuf);
 
-    console.log(this.gr1);
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
 

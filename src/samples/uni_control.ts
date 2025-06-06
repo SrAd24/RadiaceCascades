@@ -9,7 +9,7 @@
 
 /** IMPORTS */
 import * as mth from "../math/mth.ts";
-import { unit, input, timer } from "../anim/anim.ts";
+import { unit, input, timer } from "../engine/anim/anim";
 
 /** Unit control class */
 class _uni_control extends unit {
@@ -28,32 +28,28 @@ class _uni_control extends unit {
    */
   public async response(render: any): Promise<any> {
     /* Changing positions of camera and point where it is attached */
-    let loc: mth.vec3 = render.cam.loc;
-    let at: mth.vec3 = render.cam.at;
-    render.cam.set(at, loc, new mth.vec3(0, 1, 0));
+    //render.cam.set(at, loc, new mth.vec3(0, 1, 0));
 
     /** Get canvas id */
+    //await input.response();
     const canvas = document.querySelector(
       "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
     );
+    if (input.isCLick) {
+      /* Handle camera orienntation */
+      render.cam.setOrientation();
 
-    /* Handle camera orienntation */
-    render.cam.setOrientation();
+      render.cam.azimuth += timer.globalDeltaTime * 3 * (-5.0 * input.mouseDX);
 
-    render.cam.deltaAzimuth = -0.15 * input.isClick * input.mouseDX;
-    render.cam.azimuth += render.cam.deltaAzimuth;
+      render.cam.elevator += timer.globalDeltaTime * 2 * (5.0 * input.mouseDY);
 
-    render.cam.deltaElevator = -0.15 * input.isClick * input.mouseDY;
-    render.cam.elevator -= render.cam.deltaElevator;
+      if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
+      else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;
 
-    if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
-    else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;
+      render.cam.dist += -(0.007 * input.mouseDZ);
+      if (render.cam.dist < 0.1) render.cam.dist = 0.1;
 
-    /* Setup result camera */
-    if (
-      Math.abs(render.cam.deltaAzimuth) > 0 ||
-      Math.abs(render.cam.deltaElevator) > 0
-    ) {
+      /* Setup result camera */
       /* Setting new position of attached point */
       render.cam.set(
         mth.mat4
@@ -64,17 +60,16 @@ class _uni_control extends unit {
         render.cam.at,
         new mth.vec3(0, 1, 0),
       );
-      render.cam.at = render.cam.loc;
+    } /* Changing positions of camera and point where it is attached */
+
+    if (input.isCLickR) {
+      render.cam.mouseParallel(input);
+      render.cam.set(render.cam.loc, render.cam.at);
     }
+    input.mouseDX = input.mouseDY = input.mouseDZ = 0;
+    //render.cam.set(loc, at, new mth.vec3(0, 1, 0));
 
-    /* Changing positions of camera and point where it is attached */
-    render.cam.set(loc, at, new mth.vec3(0, 1, 0));
-
-    /* Handle camera position by mouse */
-    if (input.isClickR) render.cam.mouseParallel(input);
-
-    /* Setting new params */
-    render.cam.setOrientation();
+    //console.log(render.cam.at)
   } /** End of 'init' function */
 
   /**

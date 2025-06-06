@@ -27,10 +27,8 @@ class _uni_test extends unit {
    * @returns none
    */
   public async init(render: any): Promise<any> {
-    console.log(this.V)
     this.pipeline = await render.createShaders();
     this.prim = await render.createPrimitive(this.pipeline, this.V, this.I);
-      
   } /** End of 'init' function */
 
   /**

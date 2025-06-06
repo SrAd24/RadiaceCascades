@@ -54,7 +54,7 @@ class buffer {
   public async updateBuffer(data: Float32Array = new Float32Array()) {
     const rnd = await this.render.getRender();
 
-    console.log(rnd.device.queue.writeBuffer(this.buf, 0, data))
+    await rnd.device.queue.writeBuffer(this.buf, 0, data)
     //if (data.length > 0) await rnd.device.queue.writeBuffer(this.buf, 0, data);
   } /** End of 'writeBuffer' function */
 } /** End of 'buffer' class */

@@ -167,18 +167,17 @@ class mat4 {
    * RETURNS:
    *   (vec3<type>) New vector.
    */
-  public TransformPoint(V: vec3) : vec3
-  {
+  public TransformPoint(V: vec3): vec3 {
     const M = this.m;
-    let ty: vec3 = new vec3(V.x * M[0][0] + V.y * M[1][0] + V.z * M[2][0] + M[3][0],
-                           V.x * M[0][1] + V.y * M[1][1] + V.z * M[2][1] + M[3][1],
-                           V.x * M[0][2] + V.y * M[1][2] + V.z * M[2][2] + M[3][2]);
+    let ty: vec3 = new vec3(
+      V.x * M[0][0] + V.y * M[1][0] + V.z * M[2][0] + M[3][0],
+      V.x * M[0][1] + V.y * M[1][1] + V.z * M[2][1] + M[3][1],
+      V.x * M[0][2] + V.y * M[1][2] + V.z * M[2][2] + M[3][2],
+    );
 
     return ty;
   } /* End of 'TransformPoint' function */
 
-
-  
   /**
    * @info Rotate matrix by z axis function
    * @param angle in degree
@@ -427,7 +426,7 @@ class mat4 {
   public static view(loc: vec3, at: vec3, up1: vec3): mat4 {
     let dir: vec3 = at.sub(loc).normilize();
     let right: vec3 = dir.cross(up1).normilize();
-    let up: vec3 = right.cross(dir).normilize();
+    let up: vec3 = right.cross(dir);
 
     return new mat4(
       right.x,
@@ -444,7 +443,7 @@ class mat4 {
       0,
       -loc.dot(right),
       -loc.dot(up),
-      -(-loc.dot(dir)),
+      loc.dot(dir),
       1,
     );
   } /* End of 'view' function */
@@ -468,18 +467,9 @@ class mat4 {
     f: number,
   ): mat4 {
     return new mat4(
-      (2 * n) / (r - l),
-      0,
-      0,
-      0,
-      0,
-      (2 * n) / (t - b),
-      0,
-      0,
-      (r + l) / (r - l),
-      (t + b) / (t - b),
-      -(f + n) / (f - n),
-      -1,
+      (2 * n) / (r - l), 0, 0, 0,
+      0, (2 * n) / (t - b), 0, 0,
+      (r + l) / (r - l), (t + b) / (t - b), -(f + n) / (f - n), -1,
       0,
       0,
       (-2 * n * f) / (f - n),

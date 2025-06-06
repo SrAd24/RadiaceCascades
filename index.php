@@ -5,7 +5,7 @@
     <title>Radiance cascades forever</title>
     <link rel="stylesheet" href="./src/styles/css/style.css">
 </head>
-<body>
+<body id="body">
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "800" height = "600">
     </canvas>
 

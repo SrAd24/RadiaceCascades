@@ -76,7 +76,7 @@ class anim extends render {
   public async mainloop() {
     const draw = async () => {
       // Responce timer
-      await this.responseTimer();
+      await timer.responseTimer();
 
       // Responce units
       await this.responseUnits();

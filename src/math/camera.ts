@@ -21,9 +21,9 @@ class camera {
   public view: mth.mat4 = mth.mat4.identity();
   public proj: mth.mat4 = mth.mat4.identity();
   public vp: mth.mat4 = mth.mat4.identity();
-  public projDist: number = 0.1;
+  public projDist: number = 1;
   public projFar: number = 1000;
-  public projSize: number = 1;
+  public projSize: number = 0.1;
   public wp: number = 0;
   public hp: number = 0;
   public frameW: number = 0;
@@ -53,20 +53,21 @@ class camera {
    * @returns none
    */
   public setProj(): void {
-    this.wp = this.projSize;
-    this.hp = this.projSize;
+    let wp = this.projSize;
+    let hp = this.projSize;
 
-    if (this.frameW > this.frameH) this.wp *= this.frameW / this.frameH;
-    else this.hp *= this.frameH / this.frameW;
+    if (this.frameW > this.frameH) wp *= this.frameW / this.frameH;
+    else hp *= this.frameH / this.frameW;
     
     this.proj = mth.mat4.Frustum(
-      -this.wp / 2,
-      this.wp / 2,
-      -this.hp / 2,
-      this.hp / 2,
-      this.projDist,
+      -wp / 2,
+      wp / 2,
+      -hp / 2,
+      hp / 2,
+      this.projSize,
       this.projFar,
     );
+    
   } /** End of 'setProj' function */
 
   /**
@@ -88,38 +89,31 @@ class camera {
   } /** End of 'setOrientation' function */
 
   /**
+   * @info Set default camera function
+   * @returns none
+   */
+  public setDefault(): void {
+    this.set(new mth.vec3(0, 0, -5), new mth.vec3(0, 0, 0));
+  } /** End of 'setDefault' function */
+
+  /**
    * @info Set location, at point & up function
    * @param loc: mth.vec4
    * @param at: mth.vec4
    * @param up: mth.vec4
    * @returns none
    */
-  public set(loc: mth.vec3, at: mth.vec3, up: mth.vec3 = new mth.vec3(0, 1, 0)): void {
-    this.setProj();
-
-    this.view = mth.mat4.view(loc, at, up);
-
-    this.right = new mth.vec3(
-      this.view.m[0][0],
-      this.view.m[1][0],
-      this.view.m[2][0],
-    );
-    this.up = new mth.vec3(
-      this.view.m[0][1],
-      this.view.m[1][1],
-      this.view.m[2][1],
-    );
-    this.dir = new mth.vec3(
-      -this.view.m[0][2],
-      -this.view.m[1][2],
-      -this.view.m[2][2],
-    );
+  public set(
+    loc: mth.vec3,
+    at: mth.vec3,
+    up: mth.vec3 = new mth.vec3(0, 1, 0),
+  ): void {
     this.loc = loc;
     this.at = at;
-
-    this.vp = this.view.mul(
-      this.proj == null ? mth.mat4.identity() : this.proj,
-    );
+    this.up = up;
+    this.view = mth.mat4.view(loc, at, up);
+    this.setProj();
+    this.vp = this.view.mul(this.proj);
   } /** End of 'set' function */
 
   /**

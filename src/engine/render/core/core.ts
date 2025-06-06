@@ -7,11 +7,8 @@
  * LAST UPDATE : 05.06.2025
  */
 
-/** IMPORTS */
-import { timer } from '../../input/timer';
-
 /** Core class */
-class core extends timer {
+class core {
   /** #public parameters */
   public adapter: any; // GPUAdepter
   public device: any; // GPUDevice
