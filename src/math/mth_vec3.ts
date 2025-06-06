@@ -13,6 +13,10 @@ import { vec } from "./mth_vec.js";
 /** Vector 3d class */
 class vec3 implements vec {
   /** #public parameters */
+  public x: number,
+  public y: number,
+  public z: number,
+
   /**
    * @info Class constructor
    * @param x: number
@@ -20,10 +24,21 @@ class vec3 implements vec {
    * @param z: number
    */
   public constructor(
-    public x: number,
-    public y: number,
-    public z: number,
-  ) {} /** End of constructor */
+    x: number,
+    y?: number,
+    z?: number,
+  ) {
+    if (y == undefined && z == undefined) {
+      this.x = x;
+      this.y = x;
+      this.z = x;
+    }
+    else if (y != undefined && z != undefined) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+  } /** End of constructor */
 
   /**
    * @info Evaluate vector length function
