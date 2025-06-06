@@ -8,7 +8,7 @@
  */
 
 /** Timer class */
-class timer {
+class _timer {
   /** #private parameters */
   private startTime: number = 0;
   private oldTime: number = 0;
@@ -68,6 +68,9 @@ class timer {
     this.oldTime = t;
   }
 } /** End of 'timer' class */
+
+/** Timer variable */
+const timer: _timer = new _timer();
 
 /** EXPORTS */
 export { timer };

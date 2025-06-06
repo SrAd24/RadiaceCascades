@@ -118,6 +118,32 @@ class camera {
       this.proj == null ? mth.mat4.identity() : this.proj,
     );
   } /** End of 'set' function */
+
+  /**
+   * @info Mouse parallel function
+   * @returns none
+   */
+  public mouseParallel(input: any): void {
+    let dv: mth.vec3;
+    let sx: number;
+    let sy: number;
+
+    this.wp = this.projSize;
+    this.hp = this.projSize;
+    if (this.frameW > this.frameH) this.wp *= this.frameW / this.frameH;
+    else this.wp *= this.frameH / this.frameW;
+
+    sx =
+      (((-input.mouseDX * this.wp) / this.frameW) * this.dist) / this.projSize;
+    sy =
+      (((input.mouseDY * this.hp) / this.frameH) * this.dist) / this.projSize;
+
+    dv = this.right.mulNum(sx).add(this.up.mulNum(sy));
+
+    dv.mulNum(0.5);
+    this.at = this.at.add(dv);
+    this.loc = this.loc.add(dv);
+  } /** End of 'mouseParallel' function */
 } /** End of 'camera' class */
 
 /** EXPORTS */

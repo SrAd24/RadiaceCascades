@@ -10,6 +10,9 @@
 /** IMPORTS */
 import { dict } from "./units/dictionary";
 import { render } from "../render/render";
+import { unit } from "./units/units";
+import { input } from "../input/input";
+import { timer } from "../input/timer";
 
 /** Animation class */
 class anim extends render {
@@ -93,6 +96,6 @@ class anim extends render {
 } /** End of 'anim' class */
 
 /** EXPORTS */
-export { anim };
+export { anim, unit, input, timer };
 
 /** END OF 'anim.ts' FILE */

@@ -11,6 +11,7 @@
 
     <script type="module">
       import { uni_test } from './js/samples/uni_test.mjs';
+      import { uni_control } from './js/samples/uni_control.mjs';
     </script>
   
     <script type="module">
