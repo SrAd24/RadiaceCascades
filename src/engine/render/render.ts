@@ -42,6 +42,7 @@ class render extends core implements resources {
   private buffers: buffer;
   private mBuf: any;
   private depthTexture: any;
+  private msaaTexture: any;
   private depthTextureView: any;
   private gr: any = new group();
   private gr1: any;
@@ -90,16 +91,15 @@ class render extends core implements resources {
     await this.passEncoder.setBindGroup(0, this.gr1);
 
     let M = new Float32Array(
-      this.cam.vp.m.flat().concat(mth.mat4.rotateY(0).m.flat()),
+      this.cam.vp.m.flat().concat(mth.mat4.rotateY(timer.time * 45).m.flat()),
     );
-
     await this.mBuf.updateBuffer(M);
 
     if (prim.numOfI > 0) {
       await this.passEncoder.setIndexBuffer(prim.iBuf.buf, "uint32");
 
       await this.passEncoder.drawIndexed(prim.numOfI, 1, 0, 0, 0);
-    } else await this.passEncoder.draw(3);
+    } else await this.passEncoder.draw(prim.numOfV / 12);
   }
 
   /** #public parameters */
@@ -108,26 +108,33 @@ class render extends core implements resources {
    * @returns none
    */
   public async initialization(canvas: Element) {
+    // Создаем мультисэмпловую текстуру
     const c = canvas as HTMLCanvasElement;
     await this.webGPUInit(canvas);
 
     this.cam = new mth.camera(c.width, c.height);
-    this.cam.set(new mth.vec3(0, 0, 3), new mth.vec3(0, 0, 0));
+    this.cam.set(new mth.vec3(0, 8, 30), new mth.vec3(0, 5, 0));
 
     const depthTextureDesc: GPUTextureDescriptor = {
       size: [this.context.canvas.width, this.context.canvas.height],
       mipLevelCount: 1,
-      sampleCount: 1,
+      sampleCount: 4,
       dimension: "2d",
-      format: "depth24plus",
+      format: "depth32float",
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     };
+
+    this.msaaTexture = this.device.createTexture({
+      size: [this.context.canvas.width, this.context.canvas.height],
+      sampleCount: 4,
+      format: navigator.gpu.getPreferredCanvasFormat(),
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
 
     this.depthTexture = await this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
     this.mBuf = await this.buffers.createBuffer(GPUBufferUsage.STORAGE, 128);
-    console.log(this.mBuf);
 
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
@@ -140,8 +147,9 @@ class render extends core implements resources {
     const renderPassDescriptor = {
       colorAttachments: [
         {
-          view: this.context.getCurrentTexture().createView(),
-          clearValue: [0.0, 1.0, 0.0, 1.0],
+          view: this.msaaTexture.createView(),
+          resolveTarget: this.context.getCurrentTexture().createView(),
+          clearValue: [0.0, 0.0, 0.0, 1.0],
           loadOp: "clear",
           storeOp: "store",
         },

@@ -13,9 +13,9 @@ import { vec } from "./mth_vec.js";
 /** Vector 3d class */
 class vec3 implements vec {
   /** #public parameters */
-  public x: number,
-  public y: number,
-  public z: number,
+  public x: number = 0;
+  public y: number = 0;
+  public z: number = 0;
 
   /**
    * @info Class constructor
@@ -23,17 +23,12 @@ class vec3 implements vec {
    * @param y: number
    * @param z: number
    */
-  public constructor(
-    x: number,
-    y?: number,
-    z?: number,
-  ) {
+  public constructor(x: number, y?: number, z?: number) {
     if (y == undefined && z == undefined) {
       this.x = x;
       this.y = x;
       this.z = x;
-    }
-    else if (y != undefined && z != undefined) {
+    } else if (y != undefined && z != undefined) {
       this.x = x;
       this.y = y;
       this.z = z;

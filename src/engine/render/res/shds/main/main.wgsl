@@ -54,7 +54,7 @@ fn vertex_main(@location(0) position: vec3f,
  * @return point color
  */
 fn fragment_main(data: vertexOut) -> @location(0) vec4f {
-  return data.color;
+  return vec4f(data.normal, 1.0);
 } /** End of 'fragment_main' function*/
 
 /** END OF 'main.wgsl' FILE */

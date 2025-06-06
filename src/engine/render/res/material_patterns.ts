@@ -17,28 +17,28 @@ const vertexAttributes = [
       {
         shaderLocation: 0,
         offset: 0,
-        format: "float32x3"
+        format: "float32x3",
       },
       // Texture
       {
         shaderLocation: 1,
         offset: 12,
-        format: "float32x2"
+        format: "float32x2",
       },
       // Normal
       {
         shaderLocation: 2,
         offset: 20,
-        format: "float32x3"
+        format: "float32x3",
       },
       // Color
       {
         shaderLocation: 3,
         offset: 32,
-        format: "float32x4"
-      }
+        format: "float32x4",
+      },
     ],
-  }
+  },
 ];
 
 /** Shader class */
@@ -56,7 +56,7 @@ class material_pattern {
   private async readShader(shaderName: String): Promise<string> {
     const response = await fetch("src/engine/render/res/shds/main/main.wgsl");
 
-    if (!(response).ok) {
+    if (!response.ok) {
       throw Error("can`t read shader");
     }
     const data = await response.text();
@@ -86,15 +86,21 @@ class material_pattern {
           },
         ],
       },
+      multisample: {
+        count: 4,
+        mask: 0xffffffff,
+        alphaToCoverageEnabled: false,
+      },
       primitive: {
         topology: "triangle-list",
       },
       layout: "auto",
       depthStencil: {
-        format: "depth24plus", 
+        format: "depth32float",
         depthWriteEnabled: true,
-        depthCompare: "less"
-      }
+        depthCompare: "less",
+        sampleCount: 4
+      },
     });
     return this;
   }
