@@ -47,7 +47,7 @@ class material_pattern {
   private shaderModule: GPUShaderModule | undefined; // Shader module variable
   public pipeline: GPURenderPipeline | undefined;
 
-  constructor(private core: resources) {}
+  constructor(private render: resources) {}
   /**
    * @info Read shader info function
    * @param shaderName: String
@@ -65,13 +65,13 @@ class material_pattern {
   } /** End of 'readShader' function */
 
   public async createMaterialPattern(shaderName: string): Promise<any> {
-    const device = await this.core.getDevice();
+    const rnd = await this.render.getRender();
     const shaderCode = await this.readShader(shaderName);
 
-    this.shaderModule = await device.createShaderModule({
+    this.shaderModule = await rnd.device.createShaderModule({
       code: shaderCode,
     });
-    this.pipeline = await device.createRenderPipeline({
+    this.pipeline = await rnd.device.createRenderPipeline({
       vertex: {
         module: this.shaderModule,
         entryPoint: "vertex_main",

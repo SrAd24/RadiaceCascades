@@ -12,6 +12,14 @@ import { unit } from "../engine/anim/units/units";
 
 class _uni_test extends unit {
   pipeline: any;
+  prim: any;
+  V: Float32Array = new Float32Array([
+    -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.5, -0.5,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, -0.5, 0.5, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 1.0,
+  ]);
+  I: Uint32Array = new Uint32Array([0, 1, 2, 2, 1, 3]);
   /** #public parameters */
   /**
    * @info Init function
@@ -19,7 +27,10 @@ class _uni_test extends unit {
    * @returns none
    */
   public async init(render: any): Promise<any> {
+    console.log(this.V)
     this.pipeline = await render.createShaders();
+    this.prim = await render.createPrimitive(this.pipeline, this.V, this.I);
+      
   } /** End of 'init' function */
 
   /**
@@ -28,7 +39,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async render(render: any): Promise<any> {
-    await render.draw(this.pipeline);
+    await render.draw(this.prim);
   } /** End of 'render' function */
 
   /**
@@ -36,9 +47,9 @@ class _uni_test extends unit {
    * @param render: any
    * @returns none
    */
-  public async response(render: any): Promise<any> {
-    // console.log("test_unit response");
-  } /** End of 'response' function */
+  public async response(
+    render: any,
+  ): Promise<any> {} /** End of 'response' function */
 
   /**
    * @info Init function

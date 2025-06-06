@@ -18,9 +18,9 @@ class camera {
   public up: mth.vec3 = new mth.vec3(0, 1, 0);
   public right: mth.vec3 = new mth.vec3(1, 0, 0);
   public dir: mth.vec3 = new mth.vec3(0, 0, 1);
-  public view: mth.mat4 | null = mth.mat4.identity();
-  public proj: mth.mat4 | null = mth.mat4.identity();
-  public vp: mth.mat4 | null = mth.mat4.identity();
+  public view: mth.mat4 = mth.mat4.identity();
+  public proj: mth.mat4 = mth.mat4.identity();
+  public vp: mth.mat4 = mth.mat4.identity();
   public projDist: number = 0.1;
   public projFar: number = 1000;
   public projSize: number = 1;
@@ -43,7 +43,10 @@ class camera {
   /**
    * @info Class constructor
    */
-  public constructor() {} /** End of constructor */
+  public constructor(frameW: number, frameH: number) {
+    this.frameW = frameW;
+    this.frameH = frameH;
+  } /** End of constructor */
 
   /**
    * @info Set new projection function
@@ -55,7 +58,7 @@ class camera {
 
     if (this.frameW > this.frameH) this.wp *= this.frameW / this.frameH;
     else this.hp *= this.frameH / this.frameW;
-
+    
     this.proj = mth.mat4.Frustum(
       -this.wp / 2,
       this.wp / 2,
@@ -91,7 +94,7 @@ class camera {
    * @param up: mth.vec4
    * @returns none
    */
-  public set(loc: mth.vec3, at: mth.vec3, up: mth.vec3): void {
+  public set(loc: mth.vec3, at: mth.vec3, up: mth.vec3 = new mth.vec3(0, 1, 0)): void {
     this.setProj();
 
     this.view = mth.mat4.view(loc, at, up);

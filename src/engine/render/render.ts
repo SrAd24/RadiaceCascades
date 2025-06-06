@@ -10,12 +10,12 @@
 /** IMPORTS */
 import { core } from "./core/core";
 import { resources } from "./res-types";
+import { group } from "./res/group";
 import { material_pattern } from "./res/material_patterns";
 import { buffer } from "../res/buffers.ts";
 import { vertex } from "../res/vertex.ts";
 import * as mth from "../../math/mth.ts";
-import { compute } from "../res/compute.ts";
-import { texture } from "../res/texture.ts";
+import { primitive } from "./res/primitives";
 
 /** triangle verteces */
 const vertices: vertex[] = [
@@ -37,67 +37,67 @@ const vertices: vertex[] = [
 class render extends core implements resources {
   private commandEncoder: any;
   private passEncoder: any;
-  private pipelines: material_pattern;
+  private material_patterns: material_pattern;
+  private buffers: buffer;
+  private mBuf: any;
   private depthTexture: any;
   private depthTextureView: any;
-  private vertexBuffer: any;
-
-  private vertices = new Float32Array([
-    0.0,
-    0.5,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1,
-    0,
-    0,
-    1.0, // Верхняя вершина (красная)
-    -0.5,
-    -0.5,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0,
-    1,
-    0,
-    1.0, // Левая нижняя (зелёная)
-    0.5,
-    -0.5,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0,
-    0,
-    1,
-    1.0, // Правая нижняя (синяя)
-  ]);
-
-  public constructor() {
-    super();
-    this.pipelines = new material_pattern(this);
-  }
-
-  public async createShaders(shdName: string): Promise<any> {
-    return await this.pipelines.createMaterialPattern(shdName);
-  }
+  private gr: any = new group();
+  private gr1: any;
+  private primitives: primitive;
+  private cam: mth.camera = new mth.camera(0, 0);
 
   /** #public parameters */
   /**
    * @info Returning device function
    * @returns device
    */
-  public getDevice(): any {
-    return this.device;
+  public getRender(): any {
+    return this;
   } /** End of 'getDevice' function */
+
+  public constructor() {
+    super();
+    this.material_patterns = new material_pattern(this);
+    this.buffers = new buffer(this);
+    this.primitives = new primitive(this);
+  }
+
+  public async createShaders(shdName: string): Promise<any> {
+    return await this.material_patterns.createMaterialPattern(shdName);
+  }
+
+  public async createPrimitive(
+    mtl_ptn: material_pattern,
+    vData: Float32Array,
+    iData: Float32Array = new Float32Array(),
+  ): Promise<any> {
+    return await this.primitives.createPrimitive(mtl_ptn, vData, iData);
+  }
+
+  public async draw(prim: primitive, world: mth.mat4 = mth.mat4.identity()) {
+    this.gr1 = await this.gr.createBindGroup(
+      this.device,
+      0,
+      prim.mtl_ptn.pipeline.getBindGroupLayout(0),
+      "read-only-storage",
+      this.mBuf.buf,
+    );
+    await this.passEncoder.setPipeline(prim.mtl_ptn.pipeline);
+    await this.passEncoder.setVertexBuffer(0, prim.vBuf.buf);
+
+    await this.passEncoder.setBindGroup(0, this.gr1);
+
+    const M = new Float32Array(this.cam.vp.mul(mth.mat4.identity()).m.flat());
+
+    await this.mBuf.updateBuffer(M);
+
+    if (prim.numOfI > 0) {
+      await this.passEncoder.setIndexBuffer(prim.iBuf.buf, "uint32");
+
+      await this.passEncoder.drawIndexed(prim.numOfI, 1, 0, 0, 0);
+    } else await this.passEncoder.draw(3);
+  }
 
   /** #public parameters */
   /**
@@ -105,7 +105,11 @@ class render extends core implements resources {
    * @returns none
    */
   public async initialization(canvas: Element) {
+    const c = canvas as HTMLCanvasElement;
     await this.webGPUInit(canvas);
+
+    this.cam = new mth.camera(c.width, c.height);
+    this.cam.set(new mth.vec3(1, 0, 0), new mth.vec3(0, 0, 0));
 
     const depthTextureDesc: GPUTextureDescriptor = {
       size: [this.context.canvas.width, this.context.canvas.height],
@@ -120,206 +124,11 @@ class render extends core implements resources {
     this.depthTexture = await this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
-    /** Create compute data */
-    const size = 512;
+    this.mBuf = await this.buffers.createBuffer(GPUBufferUsage.STORAGE, 64);
 
-    const diagonal: number = Math.sqrt(2) * size;
-    const interval0: number = 10;
-    const factor: number = Math.ceil(
-      Math.log(diagonal / interval0) / Math.log(4),
-    );
-    const intervalStart: number =
-      (interval0 * (1 - Math.pow(4, factor))) / (1 - 4);
-    // const cascadeNumber: number = 7;
-    const cascadeNumber: number =
-      Math.ceil(Math.log(intervalStart) / Math.log(4)) - 1;
-    console.log("Cascade number:" + cascadeNumber);
-
-    let baseColorTexture: texture = new texture();
-    baseColorTexture.createTexture(
-      this.core.device,
-      size,
-      size,
-      "r32float",
-      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
-      1,
-      "2d",
-    );
-    let distanceTexture: texture = new texture();
-    distanceTexture.createTexture(
-      this.core.device,
-      size,
-      size,
-      "r32float",
-      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
-      1,
-      "2d",
-    );
-    let resultColorTexture: texture = new texture();
-    resultColorTexture.createTexture(
-      this.core.device,
-      size,
-      size,
-      "r32float",
-      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
-      cascadeNumber + 1,
-      "2d-array",
-    );
-
-    let probeCount: number = 2 * 16 * Math.pow(2, cascadeNumber - 1);
-    let temporaryTexture: texture = new texture();
-    temporaryTexture.createTexture(
-      this.core.device,
-      probeCount,
-      probeCount,
-      "r32float",
-      GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING,
-      1,
-      "2d",
-    );
-
-    const computeBindGroupLayout = this.core.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.COMPUTE,
-          storageTexture: {
-            format: "r32float",
-            access: "read-write",
-            viewDimension: "2d",
-          },
-        },
-        {
-          binding: 1,
-          visibility: GPUShaderStage.COMPUTE,
-          storageTexture: {
-            format: "r32float",
-            access: "read-write",
-            viewDimension: "2d",
-          },
-        },
-        {
-          binding: 2,
-          visibility: GPUShaderStage.COMPUTE,
-          storageTexture: {
-            format: "r32float",
-            access: "read-write",
-            viewDimension: "2d-array",
-          },
-        },
-        {
-          binding: 3,
-          visibility: GPUShaderStage.COMPUTE,
-          buffer: {
-            type: "uniform",
-          },
-        },
-        {
-          binding: 4,
-          visibility: GPUShaderStage.COMPUTE,
-          storageTexture: {
-            format: "r32float",
-            access: "read-write",
-            viewDimension: "2d",
-          },
-        },
-      ],
-    });
-
-    let computeBuffer: buffer = new buffer();
-    computeBuffer.createUniformBuffer(this.core.device, 16);
-
-    await this.core.device.queue.writeBuffer(
-      computeBuffer.gpuBuffer,
-      0,
-      new Float32Array([cascadeNumber - 1, size, 0, 0]),
-    );
-
-    const computeBindGroup = this.core.device.createBindGroup({
-      layout: computeBindGroupLayout,
-      entries: [
-        {
-          binding: 0,
-          resource: baseColorTexture.gpuTextureView,
-        },
-        {
-          binding: 1,
-          resource: distanceTexture.gpuTextureView,
-        },
-        {
-          binding: 2,
-          resource: resultColorTexture.gpuTextureView,
-        },
-        {
-          binding: 3,
-          resource: {
-            buffer: computeBuffer.gpuBuffer,
-          },
-        },
-        {
-          binding: 4,
-          resource: temporaryTexture.gpuTextureView,
-        },
-      ],
-    });
-
-    let computeObject: compute = new compute();
-    computeObject.createComputePipeline(
-      this.core.device,
-      this.core.computeShader,
-      computeBindGroupLayout,
-      computeBindGroup,
-    );
-
-    let mergeComputeObject: compute = new compute();
-    mergeComputeObject.createComputePipeline(
-      this.core.device,
-      this.core.mergeComputeShader,
-      computeBindGroupLayout,
-      computeBindGroup,
-    );
-
-    let inputComputeObject: compute = new compute();
-    inputComputeObject.createComputePipeline(
-      this.core.device,
-      this.core.inputComputeShader,
-      computeBindGroupLayout,
-      computeBindGroup,
-    );
-
-    const start = new Date();
-
-    inputComputeObject.dispatch(this.core.device, 16, 16);
-    for (let i: number = 0; i < cascadeNumber; i++) {
-      await this.core.device.queue.writeBuffer(
-        computeBuffer.gpuBuffer,
-        0,
-        new Float32Array([cascadeNumber - 1, size, i, 0]),
-      );
-      computeObject.dispatch(this.core.device, 16, 16);
-    }
-    for (let i: number = cascadeNumber - 1; i >= -2; i--) {
-      await this.core.device.queue.writeBuffer(
-        computeBuffer.gpuBuffer,
-        0,
-        new Float32Array([cascadeNumber - 1, size, i, 0]),
-      );
-
-      mergeComputeObject.dispatch(this.core.device, 16, 16);
-    }
-
-    const end = new Date();
-
-    console.log("Time:" + (end.getTime() - start.getTime()));
-
+    console.log(this.gr1);
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
-
-  public async draw(pip: any) {
-    await this.passEncoder.setPipeline(pip.pipeline);
-    await this.passEncoder.setVertexBuffer(0, this.vertexBuffer);
-    await this.passEncoder.draw(3);
-  }
 
   /**
    * @info Render function
@@ -347,45 +156,6 @@ class render extends core implements resources {
 
     this.passEncoder =
       this.commandEncoder.beginRenderPass(renderPassDescriptor);
-
-    let m: any = mth.mat4.rotateX(this.time / 100);
-    let v1: mth.vec3 = new mth.vec3(
-      this.vertices[0],
-      this.vertices[1],
-      this.vertices[2],
-    );
-    let v2: mth.vec3 = new mth.vec3(
-      this.vertices[12],
-      this.vertices[13],
-      this.vertices[14],
-    );
-    let v3: mth.vec3 = new mth.vec3(
-      this.vertices[24],
-      this.vertices[25],
-      this.vertices[26],
-    );
-    v1 = m.TransformPoint(v1);
-    v2 = m.TransformPoint(v2);
-    v3 = m.TransformPoint(v3);
-    (this.vertices[0] = v1.x),
-      (this.vertices[1] = v1.y),
-      (this.vertices[2] = v1.z);
-    (this.vertices[12] = v2.x),
-      (this.vertices[13] = v2.y),
-      (this.vertices[14] = v2.z);
-    (this.vertices[24] = v3.x),
-      (this.vertices[25] = v3.y),
-      (this.vertices[26] = v3.z);
-
-    // Копируем данные в буфер
-
-    this.vertexBuffer = this.device.createBuffer({
-      size: this.vertices.byteLength,
-      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-      mappedAtCreation: true,
-    });
-    new Float32Array(this.vertexBuffer.getMappedRange()).set(this.vertices);
-    this.vertexBuffer.unmap(); // Разблокируем буфер
   } /** End of 'renderStart' function */
 
   /**

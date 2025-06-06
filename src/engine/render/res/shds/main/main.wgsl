@@ -16,6 +16,12 @@ struct vertexOut {
     @location(3) color: vec4f
 } /** End of 'vertexOut' struct */
 
+struct mts {
+  transform: mat4x4<f32>
+};
+
+@group(0) @binding(0) var<storage, read> data: array<mts>;
+
 /** Vertex shader **/
 @vertex 
 
@@ -30,8 +36,8 @@ fn vertex_main(@location(0) position: vec3f,
                @location(2) normal: vec3f,
                @location(3) color: vec4f) -> vertexOut {
   var out: vertexOut;
-  out.gl_position = vec4f(position, 1.0);
-  out.position = position;
+  out.gl_position = data[0].transform * vec4f(position, 1.0);
+  out.position = (data[0].transform * vec4f(position, 1.0)).xyz;
   out.texcoord = texcoord;
   out.normal = normal;
   out.color = color;

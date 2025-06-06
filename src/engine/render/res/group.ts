@@ -34,7 +34,9 @@ class group {
         {
           binding: binding,
           visibility: visibility,
-          buffer: type,
+          buffer: {
+            type: type,
+          },
         },
       ],
     });
@@ -55,15 +57,22 @@ class group {
     type: any,
     data: any,
   ): Promise<any> {
-    await this.createBindGroupLayout(device, binding, visibility, type);
+    //await this.createBindGroupLayout(device, binding, visibility, type);
 
     this.groupBinding = await device.createBindGroup({
-      layout: this.groupLayout,
-      resource: {
-        buffer: data,
-      },
+      layout: visibility,
+      entries: [
+        {
+          binding: binding,
+          resource: {
+            buffer: data,
+          },
+        },
+      ],
     });
+    return this.groupBinding;
   } /** End of 'createBindGroup' function */
 } /** End of 'group' class */
 
+export { group };
 /** END OF 'group.ts' FILE */

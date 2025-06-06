@@ -45,7 +45,7 @@ class core extends timer {
     this.device = await this.adapter.requestDevice();
 
     // get queue
-    this.queue = this.device.queue;
+    this.queue = await this.device.queue;
 
     // Create context
     this.context = canvas.getContext("webgpu");
