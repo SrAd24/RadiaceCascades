@@ -14,11 +14,8 @@ import * as mth from "../../math/mth.ts";
 class _input {
   /** #public parameters */
   public mouseX: number = 0;
-  public mouseOldX: number = 0;
   public mouseY: number = 0;
-  public mouseOldY: number = 0;
   public mouseZ: number = 0;
-  public mouseOldZ: number = 0;
   public mouseDX: number = 0;
   public mouseDY: number = 0;
   public mouseDZ: number = 0;
@@ -28,6 +25,7 @@ class _input {
   public isCLickM: boolean = false;
   public canvasID: any;
   public bodyID: any;
+  public isControl: boolean = false;
 
   /**
    * @info Class constructor
@@ -38,6 +36,18 @@ class _input {
       "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
     );
     this.bodyID = document.querySelector("#body");
+    document.addEventListener("keydown", (event: any) => {
+      console.log("1");
+      if (event.keyCode == 17) {
+        this.isControl = true;
+      }
+    });
+    document.addEventListener("keyup", (event: any) => {
+      console.log("0");
+      if (event.keyCode == 17) {
+        this.isControl = false;
+      }
+    });
     this.canvasID.addEventListener("contextmenu", (event: any) => {
       event.preventDefault();
     });
@@ -46,19 +56,20 @@ class _input {
       if (event.button === 0) this.isCLick = true;
       else if (event.button === 2) this.isCLickR = true;
       if (event.button === 1) this.isCLickM = true;
-      this.mouseX = this.mouseOldX;
-      this.mouseY = this.mouseOldY;
     });
     this.bodyID.addEventListener("mouseup", (event: any) => {
-      const rect = this.canvasID.getBoundingClientRect();
       if (event.button === 0) this.isCLick = false;
       if (event.button === 2) this.isCLickR = false;
-      this.mouseOldX = this.mouseX;
-      this.mouseOldY = this.mouseY;
     });
     this.canvasID.addEventListener("wheel", (event: WheelEvent) => {
-      this.mouseDZ = this.mouseDZ - event.deltaZ;
-      this.mouseDZ = event.deltaZ;
+      event.preventDefault();
+      this.mouseDZ = event.deltaY;
+    });
+    this.canvasID.addEventListener("mouseleave", (event: any) => {
+      this.isCLick = false;
+      this.isCLickR = false;
+      this.mouseDX = 0;
+      this.mouseDY = 0;
     });
     this.bodyID.addEventListener("mousemove", (event: any) => {
       const rect = this.canvasID.getBoundingClientRect();
@@ -68,7 +79,7 @@ class _input {
         event.clientX - rect.left < this.canvasID.width &&
         event.clientY - rect.top > 0 &&
         event.clientY - rect.top < this.canvasID.height &&
-        (this.isCLick || this.isCLickR)
+        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick))
       ) {
         this.mouseDX = event.clientX - this.mouseX;
         this.mouseDY = event.clientY - this.mouseY;

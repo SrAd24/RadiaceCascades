@@ -58,7 +58,7 @@ class camera {
 
     if (this.frameW > this.frameH) wp *= this.frameW / this.frameH;
     else hp *= this.frameH / this.frameW;
-    
+
     this.proj = mth.mat4.Frustum(
       -wp / 2,
       wp / 2,
@@ -67,7 +67,6 @@ class camera {
       this.projSize,
       this.projFar,
     );
-    
   } /** End of 'setProj' function */
 
   /**

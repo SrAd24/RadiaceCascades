@@ -35,13 +35,22 @@ class _uni_control extends unit {
     const canvas = document.querySelector(
       "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
     );
-    if (input.isCLick) {
+    console.log(input.isControl);
+    if (input.isControl) {
       /* Handle camera orienntation */
       render.cam.setOrientation();
 
-      render.cam.azimuth += timer.globalDeltaTime * 3 * (-5.0 * input.mouseDX);
+      render.cam.azimuth +=
+        (input.isCLick == true ? 1 : 0) *
+        timer.globalDeltaTime *
+        3 *
+        (-5.0 * input.mouseDX);
 
-      render.cam.elevator += timer.globalDeltaTime * 2 * (5.0 * input.mouseDY);
+      render.cam.elevator +=
+        (input.isCLick == true ? 1 : 0) *
+        timer.globalDeltaTime *
+        2 *
+        (5.0 * input.mouseDY);
 
       if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
       else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;
@@ -60,13 +69,13 @@ class _uni_control extends unit {
         render.cam.at,
         new mth.vec3(0, 1, 0),
       );
-    } /* Changing positions of camera and point where it is attached */
-
-    if (input.isCLickR) {
-      render.cam.mouseParallel(input);
-      render.cam.set(render.cam.loc, render.cam.at);
+      render.cam.set(render.cam.loc, render.cam.at, render.cam.up);
+      if (input.isCLickR) {
+        render.cam.mouseParallel(input);
+        render.cam.set(render.cam.loc, render.cam.at);
+      }
+      input.mouseDX = input.mouseDY = input.mouseDZ = 0;
     }
-    input.mouseDX = input.mouseDY = input.mouseDZ = 0;
     //render.cam.set(loc, at, new mth.vec3(0, 1, 0));
 
     //console.log(render.cam.at)
