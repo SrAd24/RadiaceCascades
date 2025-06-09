@@ -9,7 +9,7 @@
 </head>
 <body id="body">
     <?php
-      $mysql = mysqli_connect("root@viperr.space", "root", "root", "viperr");
+      $mysql = mysqli_connect("127.0.0.1", "root@viperr.space", "Im_bot228", "viperr");
 
       if ($mysql == false)
          echo "can`t connect";
