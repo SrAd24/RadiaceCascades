@@ -27,7 +27,6 @@
     </script>
   
     <script type="module">
-      import { frame } from "./js/engine/frame/frame.mjs";
       import { anim } from './js/engine/anim/anim.mjs';
 
       // const fr = new frame();
