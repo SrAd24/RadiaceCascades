@@ -8,6 +8,15 @@
     <link rel="shortcut icon" href="./bin/favicon/favicon2.jpg" type="image/jpg">
 </head>
 <body id="body">
+    <?php
+      $mysql = mysqli_connect("viperr.space", "root", "");
+
+      if ($mysql == false)
+        echo "can`t connect";
+      else
+        echo "connected";
+    ?>
+
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "800" height = "600">
     </canvas>
 
