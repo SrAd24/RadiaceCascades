@@ -9,7 +9,7 @@
 </head>
 <body id="body">
     <?php
-      $mysql = mysqli_connect("viperr.space", "root", "");
+      $mysql = mysqli_connect("viperr.space", "root", "root", "dbname");
 
       if ($mysql == false)
         echo "can`t connect";
