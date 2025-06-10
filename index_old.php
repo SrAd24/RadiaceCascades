@@ -17,9 +17,12 @@
          echo "connected";
     ?>
 
-    <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "800" height = "600">
+    <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "512" height = "512">
     </canvas>
 
+    <input type="color" id="colorPicker" name="colorPicker" value="#000000">
+    <input type="range" id="brushSize" min="5" max="20" value="7">
+  
     <script type="module">
       import { uni_test } from './js/samples/uni_test.mjs';
       import { uni_control } from './js/samples/uni_control.mjs';

@@ -105,8 +105,8 @@ class _input {
         event.clientX - rect.left < this.canvasID.width &&
         event.clientY - rect.top > 0 &&
         event.clientY - rect.top < this.canvasID.height &&
-        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick)*/
-        )
+        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick)
+        )*/
       ) {
         this.mouseDX = event.clientX - this.mouseX;
         this.mouseDY = event.clientY - this.mouseY;
