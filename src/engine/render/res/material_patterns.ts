@@ -1,10 +1,10 @@
-/* FILE NAME   : shaders.ts
+/* FILE NAME   : material_pattern.ts
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 02.06.2025
+ * LAST UPDATE : 10.06.2025
  */
 
 import { resources } from "../res-types";
@@ -71,6 +71,59 @@ class material_pattern {
     this.shaderModule = await rnd.device.createShaderModule({
       code: shaderCode,
     });
+
+    const bindGroupLayout = rnd.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: {
+            type: "read-only-storage",
+          },
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.FRAGMENT,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d-array",
+          },
+        },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.FRAGMENT,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d-array",
+          },
+        },
+        {
+          binding: 3,
+          visibility: GPUShaderStage.FRAGMENT,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d",
+          },
+        },
+        {
+          binding: 4,
+          visibility: GPUShaderStage.FRAGMENT,
+          storageTexture: {
+            format: "r32float",
+            access: "read-write",
+            viewDimension: "2d-array",
+          },
+        },
+      ],
+    });
+
+    const pipelineLayout: GPUPipelineLayout = rnd.device.createPipelineLayout({
+      bindGroupLayouts: [bindGroupLayout],
+    });
+
     this.pipeline = await rnd.device.createRenderPipeline({
       vertex: {
         module: this.shaderModule,
@@ -86,20 +139,15 @@ class material_pattern {
           },
         ],
       },
-      multisample: {
-        count: 4,
-        mask: 0xffffffff,
-        alphaToCoverageEnabled: false,
-      },
       primitive: {
         topology: "triangle-list",
       },
-      layout: "auto",
+      // layout: "auto",
+      layout: pipelineLayout,
       depthStencil: {
-        format: "depth32float",
+        format: "depth24plus",
         depthWriteEnabled: true,
         depthCompare: "less",
-        sampleCount: 4
       },
     });
     return this;
@@ -109,4 +157,4 @@ class material_pattern {
 /** EXPORTS */
 export { material_pattern };
 
-/** END OF 'shaders.ts' FILE */
+/** END OF 'material_pattern.ts' FILE */
