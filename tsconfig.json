@@ -8,5 +8,6 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "baseUrl": "./src",
+    "types": ["@webgpu/types"]
   }
 }
