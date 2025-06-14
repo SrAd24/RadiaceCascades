@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import * as mth from "./mth.ts";
+import * as mth from "./mth";
 
 /** Camera class */
 class camera {
@@ -92,7 +92,7 @@ class camera {
    * @returns none
    */
   public setDefault(): void {
-    this.set(new mth.vec3(0, 0, -5), new mth.vec3(0, 0, 0));
+    this.set(new mth.vec3(5), new mth.vec3(0, 0, 0));
   } /** End of 'setDefault' function */
 
   /**
@@ -112,6 +112,22 @@ class camera {
     this.up = up;
     this.view = mth.mat4.view(loc, at, up);
     this.setProj();
+    this.right = new mth.vec3(
+      this.view.m[0][0],
+      this.view.m[1][0],
+      this.view.m[2][0],
+    );
+    this.up = new mth.vec3(
+      this.view.m[0][1],
+      this.view.m[1][1],
+      this.view.m[2][1],
+    );
+    this.dir = new mth.vec3(
+      this.view.m[0][2],
+      this.view.m[1][2],
+      this.view.m[2][2],
+    );
+
     this.vp = this.view.mul(this.proj);
   } /** End of 'set' function */
 
@@ -130,9 +146,9 @@ class camera {
     else this.wp *= this.frameH / this.frameW;
 
     sx =
-      (((-input.mouseDX * this.wp) / this.frameW) * this.dist) / this.projSize;
+      (((-input.mouseDX * this.wp) / this.frameW) * this.dist) / this.projSize / 2;
     sy =
-      (((input.mouseDY * this.hp) / this.frameH) * this.dist) / this.projSize;
+      (((input.mouseDY * this.hp) / this.frameH) * this.dist) / this.projSize / 2;
 
     dv = this.right.mulNum(sx).add(this.up.mulNum(sy));
 

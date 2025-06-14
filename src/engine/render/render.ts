@@ -15,24 +15,8 @@ import { material_pattern } from "./res/material_patterns";
 import { buffer } from "./res/buffers";
 import { vertex } from "./res/vertex";
 import * as mth from "../../math/mth";
-import { primitive } from "./res/primitives";
+import { primitive } from "./res/primitives/primitives";
 import { timer } from "../input/timer";
-
-/** triangle verteces */
-const vertices: vertex[] = [
-  {
-    position: new mth.vec4(0.0, 0.6, 1, 1),
-    color: new mth.vec4(1, 0, 0, 1),
-  },
-  {
-    position: new mth.vec4(-0.5, -0.6, 0, 1),
-    color: new mth.vec4(0, 1, 0, 1),
-  },
-  {
-    position: new mth.vec4(0.5, -0.6, 0, 1),
-    color: new mth.vec4(0, 0, 1, 1),
-  },
-];
 
 /** Render class */
 class render extends core implements resources {
@@ -44,7 +28,7 @@ class render extends core implements resources {
   private depthTexture: any;
   private msaaTexture: any;
   private depthTextureView: any;
-  private gr: any = new group();
+  private gr: group;
   private gr1: any;
   private primitives: primitive;
   private cam: mth.camera = new mth.camera(0, 0);
@@ -63,6 +47,7 @@ class render extends core implements resources {
     this.material_patterns = new material_pattern(this);
     this.buffers = new buffer(this);
     this.primitives = new primitive(this);
+    this.gr = new group(this);
   }
 
   public async createShaders(shdName: string): Promise<any> {
@@ -78,20 +63,22 @@ class render extends core implements resources {
   }
 
   public async draw(prim: primitive, world: mth.mat4 = mth.mat4.identity()) {
-    this.gr1 = await this.gr.createBindGroup(
-      this.device,
-      0,
-      prim.mtl_ptn.pipeline.getBindGroupLayout(0),
-      "read-only-storage",
-      this.mBuf.buf,
-    );
+    // this.gr1 = await this.gr.createBindGroup(
+    //   this.device,
+    //   0,
+    //   prim.mtl_ptn.pipeline.getBindGroupLayout(0),
+    //   "read-only-storage",
+    //   this.mBuf.buf,
+    // );
     await this.passEncoder.setPipeline(prim.mtl_ptn.pipeline);
     await this.passEncoder.setVertexBuffer(0, prim.vBuf.buf);
 
     await this.passEncoder.setBindGroup(0, this.gr1);
 
     let M = new Float32Array(
-      this.cam.vp.m.flat().concat(mth.mat4.rotateY(timer.time * 45).m.flat()),
+      this.cam.vp.m
+        .flat()
+        .concat(mth.mat4.rotateY(timer.time * 0 * 45).m.flat()),
     );
     await this.mBuf.updateBuffer(M);
 
@@ -111,7 +98,16 @@ class render extends core implements resources {
     // Создаем мультисэмпловую текстуру
     const c = canvas as HTMLCanvasElement;
     await this.webGPUInit(canvas);
-
+    let a = await this.gr.createBindGroup({
+      groupIndex: 0,
+      bindings: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+        },
+      ],
+    });
+    console.log(a);
     this.cam = new mth.camera(c.width, c.height);
     this.cam.set(new mth.vec3(0, 8, 30), new mth.vec3(0, 5, 0));
 

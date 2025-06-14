@@ -8,7 +8,7 @@
  */
 
 /** IMPORTS */
-import { unit } from "./units.ts";
+import { unit } from "./units";
 
 /** Unit dictionary class */
 class dictionary {

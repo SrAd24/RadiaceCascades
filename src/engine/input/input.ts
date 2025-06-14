@@ -4,11 +4,8 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 06.06.2025
+ * LAST UPDATE : 07.06.2025
  */
-
-/** IMPORTS */
-import * as mth from "../../math/mth.ts";
 
 /** Input class */
 class _input {
@@ -22,7 +19,6 @@ class _input {
   public mouseWheel: number = 0;
   public isCLick: boolean = false;
   public isCLickR: boolean = false;
-  public isCLickM: boolean = false;
   public canvasID: any;
   public bodyID: any;
   public isControl: boolean = false;
@@ -31,6 +27,12 @@ class _input {
     right: false,
     up: false,
     down: false,
+  };
+  public wasd: any = {
+    w: false,
+    a: false,
+    s: false,
+    d: false,
   };
 
   /**
@@ -55,6 +57,18 @@ class _input {
       } else if (event.keyCode == 40) {
         this.arrows.down = true;
       }
+      if (event.keyCode == 87) {
+        this.wasd.w = true;
+      }
+      if (event.keyCode == 65) {
+        this.wasd.a = true;
+      }
+      if (event.keyCode == 68) {
+        this.wasd.d = true;
+      }
+      if (event.keyCode == 83) {
+        this.wasd.s = true;
+      }
     });
     document.addEventListener("keyup", (event: any) => {
       if (event.keyCode == 16) {
@@ -69,6 +83,18 @@ class _input {
       } else if (event.keyCode == 40) {
         this.arrows.down = false;
       }
+      if (event.keyCode == 87) {
+        this.wasd.w = false;
+      }
+      if (event.keyCode == 65) {
+        this.wasd.a = false;
+      }
+      if (event.keyCode == 68) {
+        this.wasd.d = false;
+      }
+      if (event.keyCode == 83) {
+        this.wasd.s = false;
+      }
     });
     this.canvasID.addEventListener("contextmenu", (event: any) => {
       event.preventDefault();
@@ -77,7 +103,6 @@ class _input {
       this.mouseDX = this.mouseDY = 0;
       if (event.button === 0) this.isCLick = true;
       else if (event.button === 2) this.isCLickR = true;
-      if (event.button === 1) this.isCLickM = true;
       this.mouseX = event.clientX;
       this.mouseY = event.clientY;
     });

@@ -13,15 +13,20 @@ import { vec } from "./mth_vec.js";
 /** Vector 2d class */
 class vec2 implements vec {
   /** #public parameters */
+  public x: number = 0;
+  public y: number = 0;
+
+  /** #public parameters */
   /**
    * @info Class constructor
    * @param x: number
    * @param y: number
    */
-  public constructor(
-    public x: number,
-    public y: number,
-  ) {} /** End of constructor */
+  public constructor(x: number, y?: number) {
+    this.x = x;
+    if (y == undefined) this.y = x;
+    else this.y = y;
+  } /** End of constructor */
 
   /**
    * @info Evaluate vector length function

@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 05.06.2025
+ * LAST UPDATE : 07.06.2025
  */
 
 /** Timer class */
@@ -59,7 +59,7 @@ class _timer {
     }
     // FPS
     this.frameCounter++;
-    if (t - this.oldTimeFPS > 2) {
+    if (t - this.oldTimeFPS > 1) {
       this.FPS = this.frameCounter / (t - this.oldTimeFPS);
       this.oldTimeFPS = t;
       this.frameCounter = 0;

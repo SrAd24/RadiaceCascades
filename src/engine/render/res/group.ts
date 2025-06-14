@@ -4,76 +4,100 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 03.06.2025
+ * LAST UPDATE : 14.06.2025
  */
 
-/** Class group */
+/** IMPORTS */
+import { DIContainer } from "../res-types";
+import { render } from "../render";
+import { buffer } from "./buffers";
+
+/** Visibility flags */
+enum visibilityFlags {
+  frag = Number(GPUShaderStage.FRAGMENT),
+  vert = Number(GPUShaderStage.VERTEX),
+  compute = Number(GPUShaderStage.COMPUTE),
+} /** End of 'visibilityFlags' enum */
+
+/** Bind group interface */
+interface bindGroup {
+  groupIndex: number;
+  bindings: Array<{
+    binding: number;
+    visibility: visibilityFlags;
+    buffer?: buffer;
+  }>;
+} /** End of 'bindGroup' interface */
+
+/** Group class */
 class group {
   /** #public parameters */
-  public groupLayout: any;
-  public groupBinding: any;
+  public bindGroupLayout: GPUBindGroupLayout; // Bind group layout
+  public bindGroup: GPUBindGroup; // Bind group
 
-  /**
-   * @info Class constructor
-   */
-  public constructor() {} /** End of constructor */
+  /** #protected parameters */
+  protected get render(): render {
+    return DIContainer.currentRender;
+  } /** End of 'render' function */
 
-  /**
-   * @info Initialize group function
-   * @param device: any
-   * @returns none
-   */
-  public async createBindGroupLayout(
-    device: any,
-    binding: any,
-    visibility: any,
-    type: any,
-  ): Promise<any> {
-    this.groupLayout = await device.createBindGroupLayout({
-      entries: [
-        {
-          binding: binding,
-          visibility: visibility,
-          buffer: {
-            type: type,
-          },
-        },
-      ],
-    });
-  } /** End of 'createBindGroupLayout' function */
-
+  /** #public parameters */
   /**
    * @info Create group function
-   * @param device: any
-   * @param binding: any
-   * @param visibility: any
-   * @param type: any
-   * @returns none
+   * @param Group parameters
+   * @returns new group
    */
-  public async createBindGroup(
-    device: any,
-    binding: any,
-    visibility: any,
-    type: any,
-    data: any,
-  ): Promise<any> {
-    //await this.createBindGroupLayout(device, binding, visibility, type);
+  public async create(groupParams: bindGroup): Promise<any> {
+    const bindGroupLayoutDescriptor: GPUBindGroupLayoutDescriptor = {
+      entries: [],
+    };
 
-    this.groupBinding = await device.createBindGroup({
-      layout: visibility,
-      entries: [
-        {
-          binding: binding,
-          resource: {
-            buffer: data,
-            size: 128,
-          },
-        },
-      ],
-    });
-    return this.groupBinding;
+    for (let i = 0; i < groupParams.bindings.length; i++) {
+      bindGroupLayoutDescriptor.entries.push({
+        binding: groupParams.bindings[i].binding,
+        visibility: groupParams.bindings[i].visibility,
+        buffer: groupParams.bindings[i].buffer,
+      });
+    }
+
+    this.bindGroupLayout = await render.device.createBindGroupLayout(
+      bindGroupLayoutDescriptor,
+    );
+
+    const bindGroupDescriptor: GPUBindGroupDescriptor = {
+      layout: this.bindGroupLayout,
+      entries: [],
+    };
+
+    for (let i = 0; i < bindGroupLayoutDescriptor.length; i++) {
+      bindGroupLayoutDescriptor.entries.push({
+        binding: bindGroupLayoutDescriptor.entries[i].binding,
+        resource: { buffer: bindGroupLayoutDescriptor.entries[i].buffer.buf },
+      });
+    }
+    this.bindGroup = await rnd.device.createBindGroup(bindGroupDescriptor);
+    return this;
   } /** End of 'createBindGroup' function */
 } /** End of 'group' class */
 
-export { group };
+class group_manager {
+  /** #private parameters */
+  private groups: Map<number, group> = new Map();
+  private nextId = 0;
+
+  /** #public parameters */
+  /**
+   * @info Create group function
+   * @param Group parameters
+   * @returns new group
+   */
+  public async createBindGroup(groupParams: bindGroup): Promise<group> {
+    const groupId = this.nextId++;
+    let obj = new group();
+    await obj.create(groupParams);
+    this.groups.set(groupId, obj);
+    return obj;
+  } /** End of 'createBindGroup' function */
+} /** End of 'group_manager' class */
+
+export { group_manager };
 /** END OF 'group.ts' FILE */

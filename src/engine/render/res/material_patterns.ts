@@ -8,6 +8,7 @@
  */
 
 import { resources } from "../res-types";
+import { primitive_type } from "./primitives/primitives";
 
 const vertexAttributes = [
   {
@@ -54,7 +55,9 @@ class material_pattern {
    * @returns info in string
    */
   private async readShader(shaderName: String): Promise<string> {
-    const response = await fetch("src/engine/render/res/shds/main/main.wgsl");
+    const response = await fetch(
+      "src/engine/render/res/shds/" + shaderName + "/" + shaderName + ".wgsl",
+    );
 
     if (!response.ok) {
       throw Error("can`t read shader");
@@ -64,8 +67,15 @@ class material_pattern {
     return data;
   } /** End of 'readShader' function */
 
-  public async createMaterialPattern(shaderName: string): Promise<any> {
+  public async createMaterialPattern(
+    shaderName: string,
+    topology: primitive_type = primitive_type.trimesh,
+    groups: Array<bindGroup> = [],
+  ): Promise<any> {
     const rnd = await this.render.getRender();
+
+    
+    
     const shaderCode = await this.readShader(shaderName);
 
     this.shaderModule = await rnd.device.createShaderModule({
@@ -82,7 +92,7 @@ class material_pattern {
         entryPoint: "fragment_main",
         targets: [
           {
-            format: navigator.gpu.getPreferredCanvasFormat(),
+            format: rnd.defSwapchainTextureFormat,
           },
         ],
       },
@@ -92,14 +102,14 @@ class material_pattern {
         alphaToCoverageEnabled: false,
       },
       primitive: {
-        topology: "triangle-list",
+        topology: topology,
       },
       layout: "auto",
       depthStencil: {
-        format: "depth32float",
+        format: rnd.defDepthTextureFormat,
         depthWriteEnabled: true,
         depthCompare: "less",
-        sampleCount: 4
+        sampleCount: 4,
       },
     });
     return this;

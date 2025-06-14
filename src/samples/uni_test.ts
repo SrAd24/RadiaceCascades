@@ -9,6 +9,7 @@
 
 /** IMPORTS */
 import { unit } from "../engine/anim/units/units";
+
 import * as mth from "../math/mth";
 class vertex {
   public position: mth.vec3 = new mth.vec3(0, 0, 0);
@@ -71,36 +72,35 @@ class _uni_test extends unit {
           new mth.vec3(parseFloat(x), parseFloat(y), parseFloat(z)),
         );
       } else if (fileData[index] == "f" && fileData[index + 1] == " ") {
-          let x: string = "";
-          let y: string = "";
-          let z: string = "";
-          index++;
+        let x: string = "";
+        let y: string = "";
+        let z: string = "";
+        index++;
 
-          while (fileData[index] == " " && index < fileData.length) index++;
-          while (fileData[index] != " " && index < fileData.length)
-            x += fileData[index++];
-          while (fileData[index] == " " && index < fileData.length) index++;
-          while (fileData[index] != " " && index < fileData.length)
-            y += fileData[index++];
-          while (fileData[index] == " " && index < fileData.length) index++;
-          while (
-            fileData[index] != " " &&
-            index < fileData.length &&
-            fileData[index] != "\r" &&
-            fileData[index] != "\n"
-          )
-            z += fileData[index++];
-          let p3 = parseInt(x.split("//")[0]);
-          let p2 = parseInt(y.split("//")[0]);
-          let p = parseInt(z.split("//")[0]);
-        
-          this.I[icnt++] = p3 - 1;
-          this.I[icnt++] = p2 - 1;
-          this.I[icnt++] = p  - 1;
+        while (fileData[index] == " " && index < fileData.length) index++;
+        while (fileData[index] != " " && index < fileData.length)
+          x += fileData[index++];
+        while (fileData[index] == " " && index < fileData.length) index++;
+        while (fileData[index] != " " && index < fileData.length)
+          y += fileData[index++];
+        while (fileData[index] == " " && index < fileData.length) index++;
+        while (
+          fileData[index] != " " &&
+          index < fileData.length &&
+          fileData[index] != "\r" &&
+          fileData[index] != "\n"
+        )
+          z += fileData[index++];
+        let p3 = parseInt(x.split("//")[0]);
+        let p2 = parseInt(y.split("//")[0]);
+        let p = parseInt(z.split("//")[0]);
+
+        this.I[icnt++] = p3 - 1;
+        this.I[icnt++] = p2 - 1;
+        this.I[icnt++] = p - 1;
       }
     }
     this.Isnt = new Uint32Array(this.I);
-    console.log(this.Isnt);
     let a = 0;
 
     for (let i = 0; i < this.I.length; i += 3) {
@@ -118,9 +118,6 @@ class _uni_test extends unit {
       this.verteces[i].normal = this.verteces[i].normal.normilize();
     }
 
-    
-
-    console.log(this.verteces);
     this.V = new Float32Array(this.verteces.length * 12);
     for (let i = 0; i < this.verteces.length; i++) {
       this.V[a++] = this.verteces[i].position.x;
@@ -137,7 +134,6 @@ class _uni_test extends unit {
       this.V[a++] = this.verteces[i].color.w;
     }
     this.pipeline = await render.createShaders();
-    console.log(this.V)
     this.prim = await render.createPrimitive(this.pipeline, this.V, this.Isnt);
   } /** End of 'init' function */
 

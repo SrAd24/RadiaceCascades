@@ -67,7 +67,7 @@ class vec4 implements vec {
       vector.x + this.x,
       vector.y + this.y,
       vector.z + this.z,
-      vector.w + this.w,
+      vector.w + this.w
     );
   } /** End of 'add' function */
 
@@ -81,7 +81,7 @@ class vec4 implements vec {
       this.x - vector.x,
       this.y - vector.y,
       this.z - vector.z,
-      this.w - vector.w,
+      this.w - vector.w
     );
   } /** End of 'sub' function */
 
@@ -95,7 +95,7 @@ class vec4 implements vec {
       this.x * vector.x,
       this.y * vector.y,
       this.z * vector.z,
-      this.w * vector.w,
+      this.w * vector.w
     );
   } /** End of 'mul' function */
 

@@ -8,11 +8,10 @@
  */
 
 /** IMPORTS */
-import * as mth from "../math/mth.ts";
-import { unit, input, timer } from "../engine/anim/anim";
+import { vrc } from "vrc";
 
 /** Unit control class */
-class _uni_control extends unit {
+class _uni_control extends vrc.unit {
   /** #public parameters */
   /**
    * @info Init function
@@ -27,61 +26,57 @@ class _uni_control extends unit {
    * @returns none
    */
   public async response(render: any): Promise<any> {
-    /* Changing positions of camera and point where it is attached */
-    //render.cam.set(at, loc, new mth.vec3(0, 1, 0));
-
-    /** Get canvas id */
-    //await input.response();
-    const canvas = document.querySelector(
-      "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
-    );
-    if (input.isControl) {
+    let a = new Array(100);
+    for (let i = 0; i < 100; i++) {
+      a[i] = vrc.vertex.point(vrc.vec3(i));
+    }
+    let b = new vrc.topology(a);
+    console.log(b);
+    if (vrc.input.isControl) {
       /* Handle camera orienntation */
       render.cam.setOrientation();
 
       render.cam.azimuth +=
-        (input.isCLick == true ? 1 : 0) *
-          timer.globalDeltaTime *
+        (vrc.input.isCLick == true ? 1 : 0) *
+          vrc.timer.globalDeltaTime *
           3 *
-          (-5.0 * input.mouseDX) +
-        (input.arrows.left ? 1 : 0) * 0.5 +
-        (input.arrows.right ? 1 : 0) * -0.5;
+          (-5.0 * vrc.input.mouseDX) +
+        (vrc.input.arrows.left ? 1 : 0) * -0.5 +
+        (vrc.input.arrows.right ? 1 : 0) * 0.5;
 
       render.cam.elevator +=
-        (input.isCLick == true ? 1 : 0) *
-          timer.globalDeltaTime *
+        (vrc.input.isCLick == true ? 1 : 0) *
+          vrc.timer.globalDeltaTime *
           2 *
-          (5.0 * input.mouseDY) +
-        (input.arrows.up ? 1 : 0) * 0.5 +
-        (input.arrows.down ? 1 : 0) * -0.5;
+          (5.0 * vrc.input.mouseDY) +
+        (vrc.input.arrows.up ? 1 : 0) * -0.5 +
+        (vrc.input.arrows.down ? 1 : 0) * 0.5;
 
       if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
       else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;
 
-      render.cam.dist += -(0.007 * input.mouseDZ);
+      render.cam.dist += -(0.007 * vrc.input.mouseDZ);
       if (render.cam.dist < 0.1) render.cam.dist = 0.1;
 
       /* Setup result camera */
       /* Setting new position of attached point */
       render.cam.set(
-        mth.mat4
+        vrc.mat4
           .rotateX(render.cam.elevator)
-          .mul(mth.mat4.rotateY(render.cam.azimuth))
-          .mul(mth.mat4.translate(render.cam.at))
-          .TransformPoint(new mth.vec3(0, render.cam.dist, 0)),
+          .mul(vrc.mat4.rotateY(render.cam.azimuth))
+          .mul(vrc.mat4.translate(render.cam.at))
+          .TransformPoint(vrc.vec3(0, render.cam.dist, 0)),
         render.cam.at,
-        new mth.vec3(0, 1, 0),
+        vrc.vec3(0, 1, 0),
       );
-      render.cam.set(render.cam.loc, render.cam.at, render.cam.up);
-      if (input.isCLickR) {
-        render.cam.mouseParallel(input);
+      //render.cam.set(render.cam.loc, render.cam.at, render.cam.up);
+      if (vrc.input.isCLickR) {
+        render.cam.mouseParallel(vrc.input);
         render.cam.set(render.cam.loc, render.cam.at);
       }
-      input.mouseDX = input.mouseDY = input.mouseDZ = 0;
     }
-    //render.cam.set(loc, at, new mth.vec3(0, 1, 0));
 
-    //console.log(render.cam.at)
+    vrc.input.mouseDX = vrc.input.mouseDY = vrc.input.mouseDZ = 0;
   } /** End of 'init' function */
 
   /**

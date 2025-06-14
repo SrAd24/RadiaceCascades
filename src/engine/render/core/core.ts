@@ -4,17 +4,19 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 05.06.2025
+ * LAST UPDATE : 13.06.2025
  */
 
 /** Core class */
 class core {
   /** #public parameters */
   public adapter: any; // GPUAdepter
-  public device: any; // GPUDevice
+  public device: GPUDevice; // GPUDevice
   public queue: any; // GPUQueue
-  public swapchain: any; // GPUSwapchain
   public context: any; // GPUCanvasContext
+  public defTextureFormat: any; // GPUTextureFormat
+  public defDepthTextureFormat: any; // GPUTextureFormat
+  public defSwapchainTextureFormat: any; // GPUTextureFormat
 
   /** #public parameters */
   /**
@@ -33,11 +35,6 @@ class core {
     // get adapter
     this.adapter = await navigator.gpu.requestAdapter();
 
-    if (this.adapter == null) {
-      alert("Can`t get adapter");
-      throw Error("Can`t get adapter");
-    }
-
     // get device
     this.device = await this.adapter.requestDevice();
 
@@ -47,10 +44,16 @@ class core {
     // Create context
     this.context = canvas.getContext("webgpu");
 
+    // Set default texture formats
+    this.defSwapchainTextureFormat =
+      await navigator.gpu.getPreferredCanvasFormat();
+    this.defTextureFormat = "rgba32float";
+    this.defDepthTextureFormat = "depth32float";
+
     // Configure context
     this.context.configure({
       device: this.device,
-      format: "bgra8unorm",
+      format: this.defSwapchainTextureFormat,
     });
   } /** End of 'webGPUInit' function */
 } /** End of 'core' class */

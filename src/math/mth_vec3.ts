@@ -116,7 +116,7 @@ class vec3 implements vec {
     return new vec3(
       this.y * vector.z - this.z * vector.y,
       this.z * vector.x - this.x * vector.z,
-      this.x * vector.y - this.y * vector.x,
+      this.x * vector.y - this.y * vector.x
     );
   } /** End of 'cross' function */
 

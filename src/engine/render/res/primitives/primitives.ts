@@ -7,9 +7,17 @@
  * LAST UPDATE : 05.06.2025
  */
 
+/** IMPORTS */
 import { resources } from "../res-types";
-import { buffer } from "./buffers";
 import { material_pattern } from "./material_patterns";
+
+/** Primitive type enum */
+export enum primitive_type {
+  trimesh = "triangle-list",
+  tristrip = "triangle-strip",
+  lines = "line-list",
+  points = "point-list",
+} /** End of 'primitive_type' enum */
 
 /** Shader class */
 class primitive {
@@ -19,7 +27,7 @@ class primitive {
   public mtl_ptn: any;
   public numOfI: any;
   public numOfV: any;
-  
+
   constructor(private render: resources) {}
 
   /** #public parameters */
@@ -34,10 +42,19 @@ class primitive {
     iData: Float32Array = new Float32Array(),
   ): Promise<primitive> {
     const rnd = await this.render.getRender();
-    console.log(rnd)
-    this.vBuf = await rnd.buffers.createBuffer(rnd.buffers.bufType.vertex, vData.byteLength, vData);
+    console.log(rnd);
+    this.vBuf = await rnd.buffers.createBuffer(
+      rnd.buffers.bufType.vertex,
+      vData.byteLength,
+      vData,
+    );
     this.numOfV = vData.length;
-    if ((this.numOfI = iData.length) != 0) this.iBuf = await rnd.buffers.createBuffer(rnd.buffers.bufType.index, iData.byteLength, iData);
+    if ((this.numOfI = iData.length) != 0)
+      this.iBuf = await rnd.buffers.createBuffer(
+        rnd.buffers.bufType.index,
+        iData.byteLength,
+        iData,
+      );
     this.mtl_ptn = mtl_ptn;
     return this;
   } /** End of 'createBuffer' function */
