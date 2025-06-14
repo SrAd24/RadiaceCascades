@@ -7,6 +7,8 @@
  * LAST UPDATE : 13.06.2025
  */
 
+/// <reference types="@webgpu/types" />
+
 /** Core class */
 class core {
   /** #public parameters */
