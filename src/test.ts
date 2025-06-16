@@ -1,24 +1,24 @@
+
 import { stdVertex } from "./engine/render/res/primitives/topology";
 
-// Автоматическая активация при импорте
-const ctx = {
-  std: stdVertex,
-};
+// Создаем namespace
+namespace VRC {
+  export const std = stdVertex;
+  // Добавьте другие классы здесь
+}
 
-// Делаем доступным для TypeScript
+// Делаем namespace глобально доступным
 declare global {
-  interface Window {
-    __modules?: typeof ctx;
-  }
+  var VRC: typeof VRC;
 }
 
-// Активируем только для текущего модуля
-if (typeof window !== "undefined") {
-  window.__modules = ctx;
+(globalThis as any).VRC = VRC;
+
+// Если хотите прямой доступ без namespace
+declare global {
+  var std: typeof stdVertex;
 }
-console.log(window.__modules);
 
-// Экспортируем псевдонимы
-export const std = stdVertex;
+(globalThis as any).std = stdVertex;
 
-// export const std = stdVertex;
+export { VRC, std: stdVertex as std };
