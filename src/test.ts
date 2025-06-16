@@ -1,9 +1,16 @@
+
 import { stdVertex } from "./engine/render/res/primitives/topology";
 
 // Создаем namespace
 namespace VRC {
   export const std = stdVertex;
   // Добавьте другие классы здесь
+}
+
+// Делаем доступным глобально только после импорта этого модуля
+declare global {
+  var VRC: typeof VRC;
+  var std: typeof stdVertex;
 }
 
 // Устанавливаем глобальные переменные
@@ -13,10 +20,10 @@ namespace VRC {
 // Экспортируем для TypeScript
 export { VRC, std: stdVertex as std };
 
-// Модульная декларация для файлов, которые импортируют этот модуль
-declare module "*.ts" {
+// Дополнительная типизация для модулей, которые импортируют этот файл
+declare module "*" {
   global {
-    var VRC: typeof VRC;
     var std: typeof stdVertex;
+    var VRC: typeof VRC;
   }
 }
