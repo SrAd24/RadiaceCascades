@@ -27,8 +27,8 @@ class _uni_control extends vrc.unit {
    * @returns none
    */
   public async response(render: render): Promise<any> {
-    // let x = new std(1, 2);
-    // console.log(x);
+    let x = new std(1, 2);
+    console.log(x);
 
     if (vrc.input.isControl) {
       /* Handle camera orienntation */
