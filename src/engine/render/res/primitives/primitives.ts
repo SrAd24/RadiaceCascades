@@ -1,15 +1,17 @@
-/* FILE NAME   : shaders.ts
+/* FILE NAME   : primitves.ts
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 05.06.2025
+ * LAST UPDATE : 14.06.2025
  */
 
 /** IMPORTS */
-import { resources } from "../res-types";
-import { material_pattern } from "./material_patterns";
+import { DIContainer, render } from "../../render";
+import { material_pattern } from "../mtl_ptn/material_patterns";
+import { topology } from "./topology";
+import { buffer } from "../buffers";
 
 /** Primitive type enum */
 export enum primitive_type {
@@ -19,48 +21,73 @@ export enum primitive_type {
   points = "point-list",
 } /** End of 'primitive_type' enum */
 
-/** Shader class */
+/** Primitive interface */
+interface primitive_descriptor {
+  material_pattern: material_pattern;
+  topology: topology<any>;
+} /** End of 'primitive_descriptor' interface */
+
+/** Primitive class */
 class primitive {
   /** #private parameters */
-  public iBuf: any;
-  public vBuf: any;
-  public mtl_ptn: any;
-  public numOfI: any;
-  public numOfV: any;
+  public mtl_ptn!: material_pattern;
+  public iBuf!: buffer;
+  public vBuf!: buffer;
+  public numOfI: number = 0;
+  public numOfV: number = 0;
 
-  constructor(private render: resources) {}
+  /** #protected parameters */
+  protected get render(): render {
+    return DIContainer.currentRender;
+  } /** End of 'render' function */
 
   /** #public parameters */
   /**
-   * @info Read shader info function
-   * @param shaderName: String
-   * @returns info in string
+   * @info Create primitve function
+   * @param primitive parameters
+   * @returns none
    */
-  public async createPrimitive(
-    mtl_ptn: material_pattern,
-    vData: Float32Array,
-    iData: Float32Array = new Float32Array(),
-  ): Promise<primitive> {
-    const rnd = await this.render.getRender();
-    console.log(rnd);
-    this.vBuf = await rnd.buffers.createBuffer(
-      rnd.buffers.bufType.vertex,
-      vData.byteLength,
-      vData,
-    );
-    this.numOfV = vData.length;
-    if ((this.numOfI = iData.length) != 0)
-      this.iBuf = await rnd.buffers.createBuffer(
-        rnd.buffers.bufType.index,
-        iData.byteLength,
-        iData,
-      );
-    this.mtl_ptn = mtl_ptn;
-    return this;
-  } /** End of 'createBuffer' function */
-} /** End of 'shader' class */
+  public async create(primParams: primitive_descriptor) {
+    const vdata = primParams.topology.getVertexes();
+    const idata = primParams.topology.getIndexes();
+
+    this.vBuf = await this.render.createBuffer({
+      size: vdata.byteLength,
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+      data: vdata,
+    });
+    console.log(vdata)
+    this.vBuf.update(vdata);
+
+    this.numOfV = primParams.topology.vertexes.length;
+    if ((this.numOfI = idata.length) != 0)
+      this.iBuf = await this.render.createBuffer({
+        size: idata.byteLength,
+        usage: GPUBufferUsage.INDEX,
+        data: idata
+      });
+    this.mtl_ptn = primParams.material_pattern;
+  } /** End of 'create' function */
+} /** End of 'primitive' class */
+
+/** Primitive manager class */
+class primitive_manager {
+  /** #public parameters */
+  /**
+   * @info Create primitive function
+   * @param primitive parameters
+   * @returns new primitve
+   */
+  public async createPrimitive(primParams: primitive_descriptor): Promise<primitive> {
+    let obj = new primitive();
+    await obj.create(primParams);
+    return obj;
+  } /** End of 'createPrimitive' function */
+} /** End of 'group_manager' class */
 
 /** EXPORTS */
 export { primitive };
+export { primitive_manager };
+export { primitive_descriptor };
 
-/** END OF 'shaders.ts' FILE */
+/** END OF 'primitive.ts' FILE */

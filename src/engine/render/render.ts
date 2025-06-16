@@ -9,29 +9,36 @@
 
 /** IMPORTS */
 import { core } from "./core/core";
-import { resources } from "./res-types";
-import { group } from "./res/group";
-import { material_pattern } from "./res/material_patterns";
+import { group, group_manager } from "./res/groups/groups";
+import { material_pattern_manager } from "./res/mtl_ptn/material_patterns";
+import { buffer_manager } from "./res/buffers";
+import { primitive_manager } from "./res/primitives/primitives";
+///import { vertexAttributesType } from "./res/mtl_ptn/material_patterns";
 import { buffer } from "./res/buffers";
-import { vertex } from "./res/vertex";
 import * as mth from "../../math/mth";
 import { primitive } from "./res/primitives/primitives";
 import { timer } from "../input/timer";
 
+/** DIContainer class */
+class DIContainer {
+  static currentRender: render;
+} /** End of 'DIContainer' class */
+
 /** Render class */
-class render extends core implements resources {
+class render extends core {
+  // private group_manager: group_manager;
+  // private material_pattern_manager: material_pattern_manager;
+  // private buffer_manager: material_pattern_manager;
   private commandEncoder: any;
   private passEncoder: any;
-  private material_patterns: material_pattern;
-  private buffers: buffer;
+  // private buffers: buffer;
   private mBuf: any;
   private depthTexture: any;
   private msaaTexture: any;
+  private msaaTextureView: any;
   private depthTextureView: any;
-  private gr: group;
-  private gr1: any;
-  private primitives: primitive;
-  private cam: mth.camera = new mth.camera(0, 0);
+  public globalGroup!: group;
+  public cam: mth.camera = new mth.camera(0, 0);
 
   /** #public parameters */
   /**
@@ -44,49 +51,60 @@ class render extends core implements resources {
 
   public constructor() {
     super();
-    this.material_patterns = new material_pattern(this);
-    this.buffers = new buffer(this);
-    this.primitives = new primitive(this);
-    this.gr = new group(this);
+    DIContainer.currentRender = this;
+
+    const resources = [
+      group_manager.prototype,
+      material_pattern_manager.prototype,
+      buffer_manager.prototype,
+      primitive_manager.prototype,
+    ];
+
+    const methodNames = resources
+      .map((proto) =>
+        Object.getOwnPropertyNames(proto).filter(
+          (name) =>
+            name.startsWith("create") &&
+            typeof (proto as any)[name] === "function",
+        ),
+      )
+      .reduce((acc, methods) => acc.concat(methods), []);
+    for (const methodName of methodNames) {
+      for (const proto of resources) {
+        if ((proto as any)[methodName]) {
+          (this as any)[methodName] = (proto as any)[methodName].bind(this);
+          break;
+        }
+      }
+    }
   }
 
-  public async createShaders(shdName: string): Promise<any> {
-    return await this.material_patterns.createMaterialPattern(shdName);
-  }
+  // public async createShaders(shdName: string): Promise<any> {
+  //   return await this.material_patterns.createMaterialPattern(shdName);
+  // }
 
-  public async createPrimitive(
-    mtl_ptn: material_pattern,
-    vData: Float32Array,
-    iData: Float32Array = new Float32Array(),
-  ): Promise<any> {
-    return await this.primitives.createPrimitive(mtl_ptn, vData, iData);
-  }
+  // public async createPrimitive(
+  //   mtl_ptn: material_pattern,
+  //   vData: Float32Array,
+  //   iData: Float32Array = new Float32Array(),
+  // ): Promise<any> {
+  //   return await this.primitives.createPrimitive(mtl_ptn, vData, iData);
+  // }
 
   public async draw(prim: primitive, world: mth.mat4 = mth.mat4.identity()) {
-    // this.gr1 = await this.gr.createBindGroup(
-    //   this.device,
-    //   0,
-    //   prim.mtl_ptn.pipeline.getBindGroupLayout(0),
-    //   "read-only-storage",
-    //   this.mBuf.buf,
-    // );
     await this.passEncoder.setPipeline(prim.mtl_ptn.pipeline);
-    await this.passEncoder.setVertexBuffer(0, prim.vBuf.buf);
+    await this.passEncoder.setVertexBuffer(0, prim.vBuf.buffer);
 
-    await this.passEncoder.setBindGroup(0, this.gr1);
+    await this.passEncoder.setBindGroup(0, this.globalGroup.bindGroup);
 
-    let M = new Float32Array(
-      this.cam.vp.m
-        .flat()
-        .concat(mth.mat4.rotateY(timer.time * 0 * 45).m.flat()),
-    );
-    await this.mBuf.updateBuffer(M);
+    let M = new Float32Array(this.cam.vp.m.flat().concat(world.m.flat()));
+    await this.mBuf.update(M);
 
     if (prim.numOfI > 0) {
-      await this.passEncoder.setIndexBuffer(prim.iBuf.buf, "uint32");
+      await this.passEncoder.setIndexBuffer(prim.iBuf.buffer, "uint32");
 
       await this.passEncoder.drawIndexed(prim.numOfI, 1, 0, 0, 0);
-    } else await this.passEncoder.draw(prim.numOfV / 12);
+    } else await this.passEncoder.draw(prim.numOfV);
   }
 
   /** #public parameters */
@@ -98,16 +116,6 @@ class render extends core implements resources {
     // Создаем мультисэмпловую текстуру
     const c = canvas as HTMLCanvasElement;
     await this.webGPUInit(canvas);
-    let a = await this.gr.createBindGroup({
-      groupIndex: 0,
-      bindings: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-        },
-      ],
-    });
-    console.log(a);
     this.cam = new mth.camera(c.width, c.height);
     this.cam.set(new mth.vec3(0, 8, 30), new mth.vec3(0, 5, 0));
 
@@ -127,11 +135,41 @@ class render extends core implements resources {
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
-    this.depthTexture = await this.device.createTexture(depthTextureDesc);
+    this.globalGroup = await this.createBindGroup({
+      groupIndex: 0,
+      bindings: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: this.mBuf,
+        },
+      ],
+    });
+
+    this.depthTexture = this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
-    this.mBuf = await this.buffers.createBuffer(GPUBufferUsage.STORAGE, 128);
+    this.mBuf = await this.createBuffer({
+      size: 128,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      type: "read-only-storage",
+    });
+    console.log(this.mBuf);
 
+    this.globalGroup = await this.createBindGroup({
+      groupIndex: 0,
+      bindings: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: this.mBuf,
+        },
+      ],
+    });
+    console.log(this.globalGroup);
+    this.msaaTextureView = this.msaaTexture.createView();
+
+    //this.globalGroup = this.createBuffer();
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
 
@@ -143,7 +181,7 @@ class render extends core implements resources {
     const renderPassDescriptor = {
       colorAttachments: [
         {
-          view: this.msaaTexture.createView(),
+          view: this.msaaTextureView,
           resolveTarget: this.context.getCurrentTexture().createView(),
           clearValue: [0.0, 0.0, 0.0, 1.0],
           loadOp: "clear",
@@ -158,7 +196,7 @@ class render extends core implements resources {
       },
     };
 
-    this.commandEncoder = await this.device.createCommandEncoder();
+    this.commandEncoder = this.device.createCommandEncoder();
 
     this.passEncoder =
       this.commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -171,11 +209,12 @@ class render extends core implements resources {
   public async renderEnd(): Promise<any> {
     this.passEncoder.end();
 
-    await this.queue.submit([this.commandEncoder.finish()]);
+    this.queue.submit([this.commandEncoder.finish()]);
   } /** End of 'render' function */
 } /** End of 'Render' class */
 
 /** EXPORTS */
 export { render };
+export { DIContainer };
 
 /** END OF 'render.ts' FILE */

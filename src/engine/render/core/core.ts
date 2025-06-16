@@ -7,18 +7,16 @@
  * LAST UPDATE : 13.06.2025
  */
 
-/// <reference types="@webgpu/types" />
-
 /** Core class */
 class core {
   /** #public parameters */
-  public adapter: any; // GPUAdepter
-  public device: GPUDevice; // GPUDevice
-  public queue: any; // GPUQueue
-  public context: any; // GPUCanvasContext
-  public defTextureFormat: any; // GPUTextureFormat
-  public defDepthTextureFormat: any; // GPUTextureFormat
-  public defSwapchainTextureFormat: any; // GPUTextureFormat
+  public adapter!: GPUAdapter; // Adepter
+  public device!: GPUDevice; // Device
+  public queue!: GPUQueue; // Queue
+  public context!: GPUCanvasContext; // Canvas context
+  public defTextureFormat!: GPUTextureFormat; // Texture format
+  public defDepthTextureFormat!: GPUTextureFormat; // Texture format
+  public defSwapchainTextureFormat!: GPUTextureFormat; // Texture format
 
   /** #public parameters */
   /**
@@ -35,20 +33,29 @@ class core {
     }
 
     // get adapter
-    this.adapter = await navigator.gpu.requestAdapter();
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) {
+      alert("No GPU adapter found");
+      throw Error("No GPU adapter found");
+    }
+    this.adapter = adapter;
 
     // get device
     this.device = await this.adapter.requestDevice();
 
     // get queue
-    this.queue = await this.device.queue;
+    this.queue = this.device.queue;
 
     // Create context
-    this.context = canvas.getContext("webgpu");
+    const context = canvas.getContext("webgpu");
+    if (!context) {
+      alert("Failed to get WebGPU context");
+      throw new Error("Failed to get WebGPU context");
+    }
+    this.context = context;
 
     // Set default texture formats
-    this.defSwapchainTextureFormat =
-      await navigator.gpu.getPreferredCanvasFormat();
+    this.defSwapchainTextureFormat = navigator.gpu.getPreferredCanvasFormat();
     this.defTextureFormat = "rgba32float";
     this.defDepthTextureFormat = "depth32float";
 

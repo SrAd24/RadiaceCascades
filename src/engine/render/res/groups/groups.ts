@@ -1,4 +1,4 @@
-/* FILE NAME   : group.ts
+/* FILE NAME   : groups.ts
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
@@ -8,19 +8,18 @@
  */
 
 /** IMPORTS */
-import { DIContainer } from "../res-types";
-import { render } from "../render";
-import { buffer } from "./buffers";
+import { DIContainer, render } from "../../render";
+import { buffer } from "../buffers";
 
 /** Visibility flags */
-enum visibilityFlags {
+export enum visibilityFlags {
   frag = Number(GPUShaderStage.FRAGMENT),
   vert = Number(GPUShaderStage.VERTEX),
   compute = Number(GPUShaderStage.COMPUTE),
 } /** End of 'visibilityFlags' enum */
 
 /** Bind group interface */
-interface bindGroup {
+interface group_descriptor {
   groupIndex: number;
   bindings: Array<{
     binding: number;
@@ -32,8 +31,8 @@ interface bindGroup {
 /** Group class */
 class group {
   /** #public parameters */
-  public bindGroupLayout: GPUBindGroupLayout; // Bind group layout
-  public bindGroup: GPUBindGroup; // Bind group
+  public bindGroupLayout!: GPUBindGroupLayout; // Bind group layout
+  public bindGroup!: GPUBindGroup; // Bind group
 
   /** #protected parameters */
   protected get render(): render {
@@ -44,22 +43,26 @@ class group {
   /**
    * @info Create group function
    * @param Group parameters
-   * @returns new group
+   * @returns none
    */
-  public async create(groupParams: bindGroup): Promise<any> {
+  public async create(groupParams: group_descriptor) {
     const bindGroupLayoutDescriptor: GPUBindGroupLayoutDescriptor = {
       entries: [],
     };
 
-    for (let i = 0; i < groupParams.bindings.length; i++) {
-      bindGroupLayoutDescriptor.entries.push({
-        binding: groupParams.bindings[i].binding,
-        visibility: groupParams.bindings[i].visibility,
-        buffer: groupParams.bindings[i].buffer,
-      });
-    }
+    const entriesLayout: GPUBindGroupLayoutEntry[] = [];
 
-    this.bindGroupLayout = await render.device.createBindGroupLayout(
+    for (let i = 0; i < groupParams.bindings.length; i++) {
+      if (groupParams.bindings[i].buffer) {
+        entriesLayout.push({
+          binding: groupParams.bindings[i].binding,
+          visibility: groupParams.bindings[i].visibility,
+          buffer: { type: groupParams.bindings[i].buffer!.bufferType },
+        });
+      }
+    }
+    bindGroupLayoutDescriptor.entries = entriesLayout;
+    this.bindGroupLayout = this.render.device.createBindGroupLayout(
       bindGroupLayoutDescriptor,
     );
 
@@ -68,36 +71,38 @@ class group {
       entries: [],
     };
 
-    for (let i = 0; i < bindGroupLayoutDescriptor.length; i++) {
-      bindGroupLayoutDescriptor.entries.push({
-        binding: bindGroupLayoutDescriptor.entries[i].binding,
-        resource: { buffer: bindGroupLayoutDescriptor.entries[i].buffer.buf },
-      });
+    const entries: GPUBindGroupEntry[] = [];
+    for (let i = 0; i < groupParams.bindings.length; i++) {
+      if (groupParams.bindings[i].buffer) {
+        entries.push({
+          binding: groupParams.bindings[i].binding,
+          resource: { buffer: groupParams.bindings[i].buffer!.buffer },
+        });
+      }
     }
-    this.bindGroup = await rnd.device.createBindGroup(bindGroupDescriptor);
-    return this;
+    bindGroupDescriptor.entries = entries;
+    this.bindGroup = this.render.device.createBindGroup(bindGroupDescriptor);
   } /** End of 'createBindGroup' function */
 } /** End of 'group' class */
 
+/** Group manager class */
 class group_manager {
-  /** #private parameters */
-  private groups: Map<number, group> = new Map();
-  private nextId = 0;
-
   /** #public parameters */
   /**
    * @info Create group function
    * @param Group parameters
    * @returns new group
    */
-  public async createBindGroup(groupParams: bindGroup): Promise<group> {
-    const groupId = this.nextId++;
+  public async createBindGroup(groupParams: group_descriptor): Promise<group> {
     let obj = new group();
     await obj.create(groupParams);
-    this.groups.set(groupId, obj);
     return obj;
   } /** End of 'createBindGroup' function */
 } /** End of 'group_manager' class */
 
+/** EXPORTS */
+export { group };
 export { group_manager };
-/** END OF 'group.ts' FILE */
+export { group_descriptor };
+
+/** END OF 'groups.ts' FILE */

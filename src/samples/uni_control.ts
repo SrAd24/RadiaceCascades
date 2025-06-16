@@ -8,6 +8,7 @@
  */
 
 /** IMPORTS */
+import { render } from "engine/render/render";
 import { vrc } from "vrc";
 
 /** Unit control class */
@@ -25,13 +26,10 @@ class _uni_control extends vrc.unit {
    * @param render: any
    * @returns none
    */
-  public async response(render: any): Promise<any> {
-    let a = new Array(100);
-    for (let i = 0; i < 100; i++) {
-      a[i] = vrc.vertex.point(vrc.vec3(i));
-    }
-    let b = new vrc.topology(a);
-    console.log(b);
+  public async response(render: render): Promise<any> {
+    // let x = new std(1, 2);
+    // console.log(x);
+
     if (vrc.input.isControl) {
       /* Handle camera orienntation */
       render.cam.setOrientation();

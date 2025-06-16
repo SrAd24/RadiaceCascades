@@ -7,59 +7,88 @@
  * LAST UPDATE : 05.06.2025
  */
 
-import { resources } from "../res-types";
+/** IMPORTS */
+import { DIContainer, render } from "../render";
 
-/** Shader class */
+export enum bufferUsage {
+  vertex = GPUBufferUsage.VERTEX,
+  index = GPUBufferUsage.INDEX,
+  ssbo = GPUBufferUsage.STORAGE,
+  uniform = GPUBufferUsage.UNIFORM,
+  copy_src = GPUBufferUsage.COPY_SRC,
+  copy_dst = GPUBufferUsage.COPY_DST,
+}
+
+/** Buffer interface */
+interface buffer_descriptor {
+  usage: bufferUsage;
+  size: number;
+  type?: GPUBufferBindingType;
+  data?: Float32Array;
+} /** End of 'buffer_descriptor' interface */
+
+/** Buffer class */
 class buffer {
-  public bufType: object = {
-    none: 0,
-    vertex: Number(GPUBufferUsage.VERTEX),
-    index: Number(GPUBufferUsage.INDEX),
-    ssbo: Number(GPUBufferUsage.STORAGE),
-  };
   /** #private parameters */
-  public buf: GPUBuffer; // Shader module variable
+  public buffer!: GPUBuffer;
+  public bufferType!: GPUBufferBindingType;
+  public bufferUsage!: bufferUsage;
 
-  constructor(private render: resources | any) {}
+  /** #protected parameters */
+  protected get render(): render {
+    return DIContainer.currentRender;
+  } /** End of 'render' function */
 
   /** #public parameters */
   /**
-   * @info Read shader info function
-   * @param shaderName: String
-   * @returns info in string
+   * @info Create buffer function
+   * @param
+   * @returns none
    */
-  public async createBuffer(
-    type: number = bufType.none,
-    size: number = 0,
-    data: Float32Array = new Float32Array(),
-  ): Promise<buffer> {
-    const rnd = await this.render.getRender();
-    let b = new buffer(rnd);
+  public async create(bufferParams: buffer_descriptor) {
+    if (bufferParams.type) this.bufferType = bufferParams.type;
+    this.bufferUsage = bufferParams.usage;
 
-    b.buf = rnd.device.createBuffer({
-      size: size,
-      usage: type | GPUBufferUsage.COPY_DST,
+    this.buffer = this.render.device.createBuffer({
+      size: bufferParams.size,
+      usage: bufferParams.usage,
+      mappedAtCreation: true,
     });
 
-    if (data.length > 0) await rnd.device.queue.writeBuffer(b.buf, 0, data);
-    return b;
+    if (bufferParams.data)
+      new Uint32Array(this.buffer.getMappedRange()).set(bufferParams.data);
+    this.buffer.unmap();
   } /** End of 'createBuffer' function */
 
   /** #public parameters */
   /**
-   * @info Read shader info function
-   * @param shaderName: String
-   * @returns info in string
+   * @info Udpate buffer function
+   * @param data: Float32Array
+   * @returns none
    */
-  public async updateBuffer(data: Float32Array = new Float32Array()) {
-    const rnd = await this.render.getRender();
-
-    await rnd.device.queue.writeBuffer(this.buf, 0, data)
-    //if (data.length > 0) await rnd.device.queue.writeBuffer(this.buf, 0, data);
-  } /** End of 'writeBuffer' function */
+  public async update(data: Float32Array) {
+    this.render.device.queue.writeBuffer(this.buffer, 0, data);
+  } /** End of 'update' function */
 } /** End of 'buffer' class */
+
+/** Buffer manager class */
+class buffer_manager {
+  /** #public parameters */
+  /**
+   * @info Create buffer function
+   * @param Buffer parameters
+   * @returns new buffer
+   */
+  public async createBuffer(bufferParams: buffer_descriptor): Promise<buffer> {
+    let obj = new buffer();
+    await obj.create(bufferParams);
+    return obj;
+  } /** End of 'createBuffer' function */
+} /** End of 'group_manager' class */
 
 /** EXPORTS */
 export { buffer };
+export { buffer_manager };
+export { buffer_descriptor };
 
-/** END OF 'shaders.ts' FILE */
+/** END OF 'buffers.ts' FILE */

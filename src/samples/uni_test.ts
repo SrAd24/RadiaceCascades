@@ -9,27 +9,15 @@
 
 /** IMPORTS */
 import { unit } from "../engine/anim/units/units";
+import { vrc } from "vrc";
+import "test.ts";
 
 import * as mth from "../math/mth";
-class vertex {
-  public position: mth.vec3 = new mth.vec3(0, 0, 0);
-  public texcoord: mth.vec2 = new mth.vec2(0, 0);
-  public normal: mth.vec3 = new mth.vec3(0, 0, 0);
-  public color: mth.vec4 = new mth.vec4(0, 0, 0, 0);
-
-  constructor(pos: mth.vec3) {
-    this.position = pos;
-  }
-}
 
 class _uni_test extends unit {
   private pipeline: any;
   private prim: any;
-  public verteces: vertex[] = []; // verteces array
 
-  V: Float32Array = new Float32Array();
-  I: number[] = [];
-  Isnt: Uint32Array = new Uint32Array();
   /** #public parameters */
   /**
    * @info Init function
@@ -37,10 +25,14 @@ class _uni_test extends unit {
    * @returns none
    */
   public async init(render: any): Promise<any> {
+    let x = new std(1, 2);
+    console.log(x);
     // load file data
     const filePath = "../../bin/models/" + "cow.obj";
     const fetchedFile = await fetch(filePath);
     const fileData = (await fetchedFile.text()).toString();
+    let verteces: any[] = [];
+    let inds: number[] = [];
 
     // read file data
     let vertexCount: number = 0;
@@ -68,7 +60,7 @@ class _uni_test extends unit {
         )
           z += fileData[index++];
 
-        this.verteces[vertexCount++] = new vertex(
+        verteces[vertexCount++] = vrc.vertex.std(
           new mth.vec3(parseFloat(x), parseFloat(y), parseFloat(z)),
         );
       } else if (fileData[index] == "f" && fileData[index + 1] == " ") {
@@ -95,46 +87,31 @@ class _uni_test extends unit {
         let p2 = parseInt(y.split("//")[0]);
         let p = parseInt(z.split("//")[0]);
 
-        this.I[icnt++] = p3 - 1;
-        this.I[icnt++] = p2 - 1;
-        this.I[icnt++] = p - 1;
+        inds[icnt++] = p3 - 1;
+        inds[icnt++] = p2 - 1;
+        inds[icnt++] = p - 1;
       }
     }
-    this.Isnt = new Uint32Array(this.I);
-    let a = 0;
 
-    for (let i = 0; i < this.I.length; i += 3) {
-      let p0 = this.verteces[this.I[i]].position;
-      let p1 = this.verteces[this.I[i + 1]].position;
-      let p2 = this.verteces[this.I[i + 2]].position;
-      let N = p1.sub(p0).cross(p2.sub(p0)).normilize();
-      this.verteces[this.I[i]].normal = this.verteces[this.I[i]].normal.add(N);
-      this.verteces[this.I[i + 1]].normal =
-        this.verteces[this.I[i + 1]].normal.add(N);
-      this.verteces[this.I[i + 2]].normal =
-        this.verteces[this.I[i + 2]].normal.add(N);
-    }
-    for (let i = 0; i < this.verteces.length; i++) {
-      this.verteces[i].normal = this.verteces[i].normal.normilize();
-    }
+    let topo = new vrc.topology(verteces, inds);
 
-    this.V = new Float32Array(this.verteces.length * 12);
-    for (let i = 0; i < this.verteces.length; i++) {
-      this.V[a++] = this.verteces[i].position.x;
-      this.V[a++] = this.verteces[i].position.y;
-      this.V[a++] = this.verteces[i].position.z;
-      this.V[a++] = this.verteces[i].texcoord.x;
-      this.V[a++] = this.verteces[i].texcoord.y;
-      this.V[a++] = this.verteces[i].normal.x;
-      this.V[a++] = this.verteces[i].normal.y;
-      this.V[a++] = this.verteces[i].normal.z;
-      this.V[a++] = this.verteces[i].color.x;
-      this.V[a++] = this.verteces[i].color.y;
-      this.V[a++] = this.verteces[i].color.z;
-      this.V[a++] = this.verteces[i].color.w;
-    }
-    this.pipeline = await render.createShaders();
-    this.prim = await render.createPrimitive(this.pipeline, this.V, this.Isnt);
+    await topo.evalNormals();
+    this.pipeline = await render.createMaterialPattern({
+      shaderName: "main",
+      vertexAttributes: vrc.vertexAttributes.std,
+      topology: "triangle-list",
+    });
+    console.log(this.pipeline);
+    this.prim = await render.createPrimitive({
+      material_pattern: this.pipeline,
+      topology: topo,
+    });
+    console.log(this.prim);
+    // let s = await render.createBuffer({
+    //   usage: vrc.bufferUsage.copy_dst | vrc.bufferUsage.vertex,
+    //   size: this.V.byteLength,
+    //   data: this.V,
+    // });
   } /** End of 'init' function */
 
   /**
@@ -143,7 +120,9 @@ class _uni_test extends unit {
    * @returns none
    */
   public async render(render: any): Promise<any> {
-    await render.draw(this.prim);
+    let m = mth.mat4.rotateY(vrc.timer.time * 45);
+
+    await render.draw(this.prim, m);
   } /** End of 'render' function */
 
   /**

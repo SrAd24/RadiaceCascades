@@ -15,8 +15,13 @@ import { mat4 } from "math/mth_mat4";
 import { input } from "./engine/input/input";
 import { timer } from "./engine/input/timer";
 import { unit } from "./engine/anim/anim";
-import { topology, vertex } from "./engine/render/res/primitives/topology";
+import {
+  topology,
+  vertex,
+  vertexAttributes,
+} from "./engine/render/res/primitives/topology";
 import { primitive_type } from "./engine/render/res/primitives/primitives";
+import { bufferUsage } from "./engine/render/res/buffers";
 
 /** vrc class */
 const vrc = {
@@ -55,20 +60,19 @@ const vrc = {
   timer: timer, // Timer class
   unit: unit, // Unit class
   vertex: {
-    void() {
-      return new vertex.void();
-    },
     point(p: vec3) {
       const v = new vertex();
       return new v.point(p);
     },
-    std(p: vec3, t: vec2, n: vec3, c: vec4) {
+    std(p: vec3 = new vec3(0), t: vec2 = new vec2(0), n: vec3 = new vec3(0), c: vec4 = new vec4(0)) {
       const v = new vertex();
       return new v.std(p, t, n, c);
     },
   }, // Vertex class
   prim_type: primitive_type,
   topology: topology,
+  vertexAttributes: vertexAttributes,
+  bufferUsage: bufferUsage
 }; /** End of 'vrc' class */
 
 /** EXPORTS */

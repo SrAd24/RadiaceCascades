@@ -9,5 +9,21 @@ packages = ["tcpcrypt", "snicat", "nano"]
 run = ["sh", "-c", "npm run start"]
 
 [[ports]]
+localPort = 33249
+externalPort = 3001
+
+[[ports]]
 localPort = 33829
 externalPort = 80
+
+[[ports]]
+localPort = 35719
+externalPort = 3002
+
+[[ports]]
+localPort = 36881
+externalPort = 3000
+
+[[ports]]
+localPort = 40063
+externalPort = 3003
