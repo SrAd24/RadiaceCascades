@@ -9,8 +9,7 @@ namespace VRC {
 
 // Делаем доступным глобально только после импорта этого модуля
 declare global {
-  var VRC: typeof VRC;
-  var std: typeof stdVertex;
+  let std: typeof stdVertex;
 }
 
 // Устанавливаем глобальные переменные
@@ -18,12 +17,10 @@ declare global {
 (globalThis as any).std = stdVertex;
 
 // Экспортируем для TypeScript
-export { VRC, std: stdVertex as std };
+export { VRC, std };
 
-// Дополнительная типизация для модулей, которые импортируют этот файл
 declare module "*" {
   global {
     var std: typeof stdVertex;
-    var VRC: typeof VRC;
   }
 }
