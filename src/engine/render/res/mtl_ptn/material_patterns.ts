@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 14.06.2025
+ * LAST UPDATE : 17.06.2025
  */
 
 /** IMPORTS */
@@ -14,8 +14,8 @@ import { group } from "../groups/groups";
 /** Material pattern interface */
 interface material_pattern_descriptor {
   shaderName: string;
-  topology: string;
-  vertexAttributes: object;
+  topology: GPUPrimitiveTopology;
+  vertexAttributes: GPUVertexBufferLayout;
   bindings?: group;
 } /** End of 'bindGroup' interface */
 
@@ -25,21 +25,28 @@ class material_pattern {
   private shaderName!: string;
   private pipelinelayout!: GPUPipelineLayout;
   private patternDescriptor!: GPURenderPipelineDescriptor;
-  public pipeline!: GPURenderPipeline; // WebGPU pipeline
 
   /** #protected parameters */
+  /**
+   * @info Render getter function
+   * @returns render
+   */
   protected get render(): render {
     return DIContainer.currentRender;
   } /** End of 'render' function */
 
+  /** #public parameters */
+  public pipeline!: GPURenderPipeline;
+  public group!: group;
+
   /**
    * @info Create material pattern function
-   * @param Material pattern descriptor
+   * @param descriptor: material_pattern_descriptor
    * @returns none
    */
   public async create(descriptor: material_pattern_descriptor): Promise<any> {
     this.shaderName =
-      "src/engine/render/res/shds/" +
+      "bin/shds/" +
       descriptor.shaderName +
       "/" +
       descriptor.shaderName +
@@ -47,16 +54,24 @@ class material_pattern {
     const shaderModule = this.render.device.createShaderModule({
       code: await fetch(this.shaderName).then((res) => res.text()),
     });
+    if (descriptor.bindings) {
+      this.pipelinelayout = this.render.device.createPipelineLayout({
+        bindGroupLayouts: [
+          this.render.globalGroup.bindGroupLayout,
+          descriptor.bindings.bindGroupLayout,
+        ],
+      });
+      this.group = descriptor.bindings;
+    } else
+      this.pipelinelayout = this.render.device.createPipelineLayout({
+        bindGroupLayouts: [this.render.globalGroup.bindGroupLayout],
+      });
 
-    this.pipelinelayout = this.render.device.createPipelineLayout({
-      bindGroupLayouts: [this.render.globalGroup.bindGroupLayout],
-    })
-  
     this.patternDescriptor = {
       vertex: {
         module: shaderModule,
         entryPoint: "vertex_main",
-        buffers: [descriptor.vertexAttributes as GPUVertexBufferLayout],
+        buffers: [descriptor.vertexAttributes],
       },
       fragment: {
         module: shaderModule,
@@ -73,7 +88,7 @@ class material_pattern {
         alphaToCoverageEnabled: false,
       },
       primitive: {
-        topology: descriptor.topology as GPUPrimitiveTopology,
+        topology: descriptor.topology,
       },
       layout: this.pipelinelayout,
       depthStencil: {
@@ -88,46 +103,16 @@ class material_pattern {
   } /** End of 'create' function */
 
   /**
-   * @info update material pattern function
-   * @param shaderName: String
+   * @info Update material pattern function
    * @returns none
    */
-  public async udpate() {
+  public async update() {
     const shaderModule = this.render.device.createShaderModule({
       code: await fetch(this.shaderName).then((res) => res.text()),
     });
 
-    this.patternDescriptor = {
-      vertex: {
-        module: shaderModule,
-        entryPoint: "vertex_main",
-        buffers: this.patternDescriptor.vertex.buffers,
-      },
-      fragment: {
-        module: shaderModule,
-        entryPoint: "fragment_main",
-        targets: [
-          {
-            format: this.render.defSwapchainTextureFormat,
-          },
-        ],
-      },
-      multisample: {
-        count: 4,
-        mask: 0xffffffff,
-        alphaToCoverageEnabled: false,
-      },
-      primitive: {
-        topology: this.patternDescriptor.primitive?.topology,
-      },
-      layout: this.patternDescriptor.layout,
-      depthStencil: {
-        format: this.render.defDepthTextureFormat,
-        depthWriteEnabled:
-          this.patternDescriptor.depthStencil?.depthWriteEnabled,
-        depthCompare: "less",
-      },
-    };
+    this.patternDescriptor.vertex.module = shaderModule;
+    this.patternDescriptor.fragment!.module = shaderModule;
     this.pipeline = this.render.device.createRenderPipeline(
       this.patternDescriptor,
     );
@@ -154,6 +139,5 @@ class material_pattern_manager {
 /** EXPORTS */
 export { material_pattern };
 export { material_pattern_manager };
-export { material_pattern_descriptor };
 
 /** END OF 'material_patterns.ts' FILE */

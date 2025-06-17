@@ -43,6 +43,5 @@
   },
   "esbuild": {
     "resolveExtensions": [".ts", ".json"]
-  },
-  "sideEffects": ["./test.ts"]
+  }
 }

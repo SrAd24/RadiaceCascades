@@ -4,21 +4,39 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 13.06.2025
+ * LAST UPDATE : 17.06.2025
  */
 
-/** IMPORTS */
-import { vec2 } from "math/mth_vec2";
-import { vec3 } from "math/mth_vec3";
-import { vec4 } from "math/mth_vec4";
+/** Point vertex class */
+class point {
+  public p = new vec3(0, 0, 0);
+  public constructor(p: vec3) {
+    this.p = p;
+    return this;
+  }
+} /** End of point vertex class */
 
-/** Attributes object */
-const vertexAttributes = {
-  point: {
-    arrayStride: 12,
-    attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }],
-  },
-  std: {
+/** Std vertex class */
+class std {
+  /** #public parameters */
+  public p: vec3;
+  public t: vec2;
+  public n: vec3;
+  public c: vec4;
+  public constructor(
+    p: vec3 = new vec3(0, 0, 0),
+    t: vec2 = new vec2(0, 0),
+    n: vec3 = new vec3(0, 0, 0),
+    c: vec4 = new vec4(0, 0, 0, 0),
+  ) {
+    this.p = p;
+    this.t = t;
+    this.n = n;
+    this.c = c;
+    return this;
+  }
+
+  static attributes = {
     arrayStride: 48,
     attributes: [
       { format: "float32x3", offset: 0, shaderLocation: 0 },
@@ -30,61 +48,25 @@ const vertexAttributes = {
         shaderLocation: 3,
       },
     ],
-  },
-}; /** End of 'vertexAttributesType' object */
+  };
 
-class stdVertex {
-  public p = new vec3(0, 0, 0);
-  public t = new vec2(0, 0);
-  public n = new vec3(0, 0, 0);
-  public c = new vec4(0, 0, 0, 0);
-  constructor(x: number, y: number) {
-    this.p.x = x;
-    this.p.y = y;
+  public toFloatArray(): number[] {
+    return [
+      this.p.x,
+      this.p.y,
+      this.p.z,
+      this.t.x,
+      this.t.y,
+      this.n.x,
+      this.n.y,
+      this.n.z,
+      this.c.x,
+      this.c.y,
+      this.c.z,
+      this.c.w,
+    ];
   }
 }
-
-/** Vertex object */
-class vertex {
-  /** Point vertex class variable */
-  public point = class {
-    public p = new vec3(0, 0, 0);
-    public constructor(p: vec3) {
-      this.p = p;
-      return this;
-    }
-  }; /** End of point vertex class */
-  /** Std vertex class variable */
-  public std = class {
-    public p = new vec3(0, 0, 0);
-    public t = new vec2(0, 0);
-    public n = new vec3(0, 0, 0);
-    public c = new vec4(0, 0, 0, 0);
-    public constructor(p: vec3, t: vec2, n: vec3, c: vec4) {
-      this.p = p;
-      this.t = t;
-      this.n = n;
-      this.c = c;
-      return this;
-    }
-    public toFloatArray(): number[] {
-      return [
-        this.p.x,
-        this.p.y,
-        this.p.z,
-        this.t.x,
-        this.t.y,
-        this.n.x,
-        this.n.y,
-        this.n.z,
-        this.c.x,
-        this.c.y,
-        this.c.z,
-        this.c.w,
-      ];
-    }
-  }; /** End of std vertex class */
-} /** End of vertex object */
 
 /** Topology class */
 class topology<vertType> {
@@ -113,21 +95,6 @@ class topology<vertType> {
         vData = new Float32Array(
           this.vertexes.flatMap((v) => (v as any).toFloatArray()),
         );
-        // let cnt = 0;
-        // for (let j = 0; j < this.vertexes.length; j++) {
-        //   vData[cnt++] = (this.vertexes[j] as any).p.x;
-        //   vData[cnt++] = (this.vertexes[j] as any).p.y;
-        //   vData[cnt++] = (this.vertexes[j] as any).p.z;
-        //   vData[cnt++] = (this.vertexes[j] as any).t.x;
-        //   vData[cnt++] = (this.vertexes[j] as any).t.y;
-        //   vData[cnt++] = (this.vertexes[j] as any).n.x;
-        //   vData[cnt++] = (this.vertexes[j] as any).n.y;
-        //   vData[cnt++] = (this.vertexes[j] as any).n.z;
-        //   vData[cnt++] = (this.vertexes[j] as any).c.x;
-        //   vData[cnt++] = (this.vertexes[j] as any).c.y;
-        //   vData[cnt++] = (this.vertexes[j] as any).c.z;
-        //   vData[cnt++] = (this.vertexes[j] as any).c.w;
-        // }
       } else if ("p" in this.vertexes[0]) {
         let cnt = 0;
         for (let j = 0; j < this.vertexes.length; j++) {
@@ -181,9 +148,8 @@ class topology<vertType> {
 } /** End of topology class */
 
 /** EXPORTS */
-export { vertex };
-export { stdVertex };
+export { point };
+export { std };
 export { topology };
-export { vertexAttributes };
 
 /** END OF 'topology.ts' FILE */

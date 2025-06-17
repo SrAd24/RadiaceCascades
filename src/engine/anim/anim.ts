@@ -11,8 +11,7 @@
 import { dict } from "./units/dictionary";
 import { render } from "../render/render";
 import { unit } from "./units/units";
-import { input } from "../input/input";
-import { timer } from "../input/timer";
+import "vrc.ts";
 
 /** Animation class */
 class anim extends render {

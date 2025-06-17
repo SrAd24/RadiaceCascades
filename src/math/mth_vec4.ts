@@ -7,11 +7,8 @@
  * LAST UPDATE : 02.06.2025
  */
 
-/** IMPORTS */
-import { vec } from "./mth_vec.js";
-
 /** Vector 4d class */
-class vec4 implements vec {
+class vec4 {
   /** #public parameters */
   /** vector coordinates */
   public x: number;

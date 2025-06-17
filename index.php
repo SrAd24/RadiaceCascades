@@ -12,11 +12,11 @@
     </canvas>
     <script type="module">
       import { uni_test } from './js/samples/uni_test.mjs';
+      //import { uni_tex } from './js/samples/uni_tex.mjs';
       import { uni_control } from './js/samples/uni_control.mjs';
     </script>
   
     <script type="module">
-      import { frame } from "./js/engine/frame/frame.mjs";
       import { anim } from './js/engine/anim/anim.mjs';
 
       let animation = new anim();

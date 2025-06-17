@@ -1,6 +1,7 @@
 {
   "entry": ["./src/**/*.ts"],
   "outDir": "js",
+  "clean": true,
   "target": "node16",
   "platform": "node",
   "format": ["esm"],

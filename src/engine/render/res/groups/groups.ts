@@ -9,43 +9,42 @@
 
 /** IMPORTS */
 import { DIContainer, render } from "../../render";
-import { buffer } from "../buffers";
-
-/** Visibility flags */
-export enum visibilityFlags {
-  frag = Number(GPUShaderStage.FRAGMENT),
-  vert = Number(GPUShaderStage.VERTEX),
-  compute = Number(GPUShaderStage.COMPUTE),
-} /** End of 'visibilityFlags' enum */
+import { buffer } from "../buffers/buffers";
+import { texture } from "../textures/textures";
 
 /** Bind group interface */
 interface group_descriptor {
   groupIndex: number;
   bindings: Array<{
     binding: number;
-    visibility: visibilityFlags;
+    visibility: GPUShaderStageFlags;
+    texture?: texture;
     buffer?: buffer;
   }>;
-} /** End of 'bindGroup' interface */
+} /** End of 'group_descriptor' interface */
 
 /** Group class */
 class group {
-  /** #public parameters */
-  public bindGroupLayout!: GPUBindGroupLayout; // Bind group layout
-  public bindGroup!: GPUBindGroup; // Bind group
-
   /** #protected parameters */
+  /**
+   * @info Render getter function
+   * @returns render
+   */
   protected get render(): render {
     return DIContainer.currentRender;
   } /** End of 'render' function */
 
   /** #public parameters */
+  public bindGroupLayout!: GPUBindGroupLayout; // Bind group layout
+  public bindGroup!: GPUBindGroup; // Bind group
+
   /**
    * @info Create group function
    * @param Group parameters
    * @returns none
    */
   public async create(groupParams: group_descriptor) {
+    // Create bind group layout
     const bindGroupLayoutDescriptor: GPUBindGroupLayoutDescriptor = {
       entries: [],
     };
@@ -58,6 +57,12 @@ class group {
           binding: groupParams.bindings[i].binding,
           visibility: groupParams.bindings[i].visibility,
           buffer: { type: groupParams.bindings[i].buffer!.bufferType },
+        });
+      } else if (1) {
+        entriesLayout.push({
+          binding: groupParams.bindings[i].binding,
+          visibility: groupParams.bindings[i].visibility,
+          storageTexture: { format: "r32float", access: "read-write" },
         });
       }
     }
@@ -77,6 +82,11 @@ class group {
         entries.push({
           binding: groupParams.bindings[i].binding,
           resource: { buffer: groupParams.bindings[i].buffer!.buffer },
+        });
+      } else {
+        entries.push({
+          binding: groupParams.bindings[i].binding,
+          resource: groupParams.bindings[i].texture!.view,
         });
       }
     }

@@ -7,11 +7,6 @@
  * LAST UPDATE : 02.06.2025
  */
 
-/** IMPORTS */
-import { mth } from "./mth_def.js";
-import { vec3 } from "./mth_vec3.js";
-import { vec4 } from "./mth_vec4.js";
-
 /** Matrix 4x4 class */
 class mat4 {
   /** #public parameters */
@@ -54,7 +49,7 @@ class mat4 {
     m13: number,
     m14: number,
     m15: number,
-    m16: number
+    m16: number,
   ) {
     (this.m[0][0] = m1),
       (this.m[0][1] = m2),
@@ -104,7 +99,7 @@ class mat4 {
       translateVector.x,
       translateVector.y,
       translateVector.z,
-      1
+      1,
     );
   } /** End of 'translate' function */
 
@@ -130,7 +125,7 @@ class mat4 {
       0,
       0,
       0,
-      1
+      1,
     );
   } /** End of 'scale' function */
 
@@ -140,7 +135,7 @@ class mat4 {
    * @return result matrix
    */
   public static rotateX(angle: number): mat4 {
-    let an: number = mth.d2R(angle);
+    let an: number = d2R(angle);
     let c: number = Math.cos(an);
     let s: number = Math.sin(an);
 
@@ -153,7 +148,7 @@ class mat4 {
    * @return result matrix
    */
   public static rotateY(angle: number): mat4 {
-    let an: number = mth.d2R(angle);
+    let an: number = d2R(angle);
     let c: number = Math.cos(an);
     let s: number = Math.sin(an);
 
@@ -172,7 +167,7 @@ class mat4 {
     let ty: vec3 = new vec3(
       V.x * M[0][0] + V.y * M[1][0] + V.z * M[2][0] + M[3][0],
       V.x * M[0][1] + V.y * M[1][1] + V.z * M[2][1] + M[3][1],
-      V.x * M[0][2] + V.y * M[1][2] + V.z * M[2][2] + M[3][2]
+      V.x * M[0][2] + V.y * M[1][2] + V.z * M[2][2] + M[3][2],
     );
 
     return ty;
@@ -184,7 +179,7 @@ class mat4 {
    * @return result matrix
    */
   public static rotateZ(angle: number): mat4 {
-    let an: number = mth.d2R(angle);
+    let an: number = d2R(angle);
     let c: number = Math.cos(an);
     let s: number = Math.sin(an);
 
@@ -198,7 +193,7 @@ class mat4 {
    * @returns result matrix
    */
   public static rotate(angle: number, rotateVector: vec3): mat4 {
-    let a = mth.d2R(angle);
+    let a = d2R(angle);
     let s = Math.sin(a);
     let c = Math.cos(a);
     let v = rotateVector.normilize();
@@ -219,7 +214,7 @@ class mat4 {
       0,
       0,
       0,
-      1
+      1,
     );
   } /* End of 'rotate' function */
 
@@ -296,7 +291,7 @@ class mat4 {
       this.m[3][0] * matrix.m[0][3] +
         this.m[3][1] * matrix.m[1][3] +
         this.m[3][2] * matrix.m[2][3] +
-        this.m[3][3] * matrix.m[3][3]
+        this.m[3][3] * matrix.m[3][3],
     );
   } /** End of 'mul' function */
 
@@ -321,7 +316,7 @@ class mat4 {
       this.m[0][3],
       this.m[1][3],
       this.m[2][3],
-      this.m[3][3]
+      this.m[3][3],
     );
   } /* End of 'Transponce' function */
 
@@ -347,7 +342,7 @@ class mat4 {
     A23: number,
     A31: number,
     A32: number,
-    A33: number
+    A33: number,
   ): number {
     return (
       A11 * A22 * A33 +
@@ -375,7 +370,7 @@ class mat4 {
           this.m[2][3],
           this.m[3][1],
           this.m[3][2],
-          this.m[3][3]
+          this.m[3][3],
         ) +
       -this.m[0][1] *
         mat4.determ3x3(
@@ -387,7 +382,7 @@ class mat4 {
           this.m[2][3],
           this.m[3][0],
           this.m[3][2],
-          this.m[3][3]
+          this.m[3][3],
         ) +
       +this.m[0][2] *
         mat4.determ3x3(
@@ -399,7 +394,7 @@ class mat4 {
           this.m[2][3],
           this.m[3][0],
           this.m[3][1],
-          this.m[3][3]
+          this.m[3][3],
         ) +
       -this.m[0][3] *
         mat4.determ3x3(
@@ -411,7 +406,7 @@ class mat4 {
           this.m[2][2],
           this.m[3][0],
           this.m[3][1],
-          this.m[3][2]
+          this.m[3][2],
         )
     );
   } /** End of 'determ4x4' function */
@@ -444,7 +439,7 @@ class mat4 {
       -loc.dot(right),
       -loc.dot(up),
       loc.dot(dir),
-      1
+      1,
     );
   } /* End of 'view' function */
 
@@ -464,7 +459,7 @@ class mat4 {
     b: number,
     t: number,
     n: number,
-    f: number
+    f: number,
   ): mat4 {
     return new mat4(
       (2 * n) / (r - l),
@@ -482,7 +477,7 @@ class mat4 {
       0,
       0,
       (-2 * n * f) / (f - n),
-      0
+      0,
     );
   } /* End of 'Frustum' function */
 } /** End of 'mat4' class */

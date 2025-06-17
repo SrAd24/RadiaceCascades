@@ -4,23 +4,20 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 06.06.2025
+ * LAST UPDATE : 17.06.2025
  */
-
-/** IMPORTS */
-import * as mth from "./mth";
 
 /** Camera class */
 class camera {
   /** #public parameters */
-  public loc: mth.vec3 = new mth.vec3(0, 0, -5);
-  public at: mth.vec3 = new mth.vec3(0, 0, 0);
-  public up: mth.vec3 = new mth.vec3(0, 1, 0);
-  public right: mth.vec3 = new mth.vec3(1, 0, 0);
-  public dir: mth.vec3 = new mth.vec3(0, 0, 1);
-  public view: mth.mat4 = mth.mat4.identity();
-  public proj: mth.mat4 = mth.mat4.identity();
-  public vp: mth.mat4 = mth.mat4.identity();
+  public loc: vec3 = new vec3(0, 0, -5);
+  public at: vec3 = new vec3(0, 0, 0);
+  public up: vec3 = new vec3(0, 1, 0);
+  public right: vec3 = new vec3(1, 0, 0);
+  public dir: vec3 = new vec3(0, 0, 1);
+  public view: mat4 = mat4.identity();
+  public proj: mat4 = mat4.identity();
+  public vp: mat4 = mat4.identity();
   public projDist: number = 1;
   public projFar: number = 1000;
   public projSize: number = 0.1;
@@ -42,6 +39,8 @@ class camera {
 
   /**
    * @info Class constructor
+   * @param frameW: number
+   * @param frameH: number
    */
   public constructor(frameW: number, frameH: number) {
     this.frameW = frameW;
@@ -59,7 +58,7 @@ class camera {
     if (this.frameW > this.frameH) wp *= this.frameW / this.frameH;
     else hp *= this.frameH / this.frameW;
 
-    this.proj = mth.mat4.Frustum(
+    this.proj = mat4.Frustum(
       -wp / 2,
       wp / 2,
       -hp / 2,
@@ -80,8 +79,8 @@ class camera {
     this.plen = this.dist * this.sinT;
     this.cosP = (this.loc.z - this.at.z) / this.plen;
     this.sinP = (this.loc.x - this.at.x) / this.plen;
-    this.azimuth = mth.mth.r2D(Math.atan2(this.sinP, this.cosP));
-    this.elevator = mth.mth.r2D(Math.atan2(this.sinT, this.cosT));
+    this.azimuth = r2D(Math.atan2(this.sinP, this.cosP));
+    this.elevator = r2D(Math.atan2(this.sinT, this.cosT));
     this.deltaAzimuth = 0;
     this.deltaElevator = 0;
     this.deltaDist = 0;
@@ -92,7 +91,7 @@ class camera {
    * @returns none
    */
   public setDefault(): void {
-    this.set(new mth.vec3(5), new mth.vec3(0, 0, 0));
+    this.set(new vec3(5), new vec3(0, 0, 0));
   } /** End of 'setDefault' function */
 
   /**
@@ -103,26 +102,26 @@ class camera {
    * @returns none
    */
   public set(
-    loc: mth.vec3,
-    at: mth.vec3,
-    up: mth.vec3 = new mth.vec3(0, 1, 0),
+    loc: vec3,
+    at: vec3,
+    up: vec3 = new vec3(0, 1, 0),
   ): void {
     this.loc = loc;
     this.at = at;
     this.up = up;
-    this.view = mth.mat4.view(loc, at, up);
+    this.view = mat4.view(loc, at, up);
     this.setProj();
-    this.right = new mth.vec3(
+    this.right = new vec3(
       this.view.m[0][0],
       this.view.m[1][0],
       this.view.m[2][0],
     );
-    this.up = new mth.vec3(
+    this.up = new vec3(
       this.view.m[0][1],
       this.view.m[1][1],
       this.view.m[2][1],
     );
-    this.dir = new mth.vec3(
+    this.dir = new vec3(
       this.view.m[0][2],
       this.view.m[1][2],
       this.view.m[2][2],
@@ -135,8 +134,8 @@ class camera {
    * @info Mouse parallel function
    * @returns none
    */
-  public mouseParallel(input: any): void {
-    let dv: mth.vec3;
+  public mouseParallel(): void {
+    let dv: vec3;
     let sx: number;
     let sy: number;
 
@@ -146,11 +145,17 @@ class camera {
     else this.wp *= this.frameH / this.frameW;
 
     sx =
-      (((-input.mouseDX * this.wp) / this.frameW) * this.dist) / this.projSize / 2;
+      (((-input.mouseDX * this.wp) / this.frameW) * this.dist) /
+      this.projSize /
+      2;
     sy =
-      (((input.mouseDY * this.hp) / this.frameH) * this.dist) / this.projSize / 2;
+      (((input.mouseDY * this.hp) / this.frameH) * this.dist) /
+      this.projSize /
+      2;
 
-    dv = this.right.mulNum(sx).add(this.up.mulNum(sy));
+    dv = this.right
+      .mulNum(sx)
+      .add(this.up.mulNum(sy).mulNum(1 + Number(input.isLctrl) * 3));
 
     dv.mulNum(0.5);
     this.at = this.at.add(dv);

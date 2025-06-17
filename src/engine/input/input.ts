@@ -19,6 +19,7 @@ class _input {
   public mouseWheel: number = 0;
   public isCLick: boolean = false;
   public isCLickR: boolean = false;
+  public isLctrl: boolean = false;
   public canvasID: any;
   public bodyID: any;
   public isControl: boolean = false;
@@ -48,6 +49,10 @@ class _input {
       if (event.keyCode == 16) {
         this.isControl = true;
       }
+      if (event.keyCode == 17) {
+        this.isLctrl = true;
+      }
+
       if (event.keyCode == 37) {
         this.arrows.left = true;
       } else if (event.keyCode == 38) {
@@ -73,6 +78,9 @@ class _input {
     document.addEventListener("keyup", (event: any) => {
       if (event.keyCode == 16) {
         this.isControl = false;
+      }
+      if (event.keyCode == 17) {
+        this.isLctrl = false;
       }
       if (event.keyCode == 37) {
         this.arrows.left = false;

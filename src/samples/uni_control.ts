@@ -1,105 +1,100 @@
-/* FILE NAME   : test_unit.ts
+/* FILE NAME   : uni_control.ts
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 05.06.2025
+ * LAST UPDATE : 16.06.2025
  */
 
 /** IMPORTS */
-import { render } from "engine/render/render";
-import { vrc } from "vrc";
+import { anim, unit } from "engine/anim/anim";
 
 /** Unit control class */
-class _uni_control extends vrc.unit {
+class _uni_control extends unit {
   /** #public parameters */
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  public async init(render: any): Promise<any> {} /** End of 'init' function */
+  public async init(ani: anim): Promise<any> {} /** End of 'init' function */
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  public async response(render: render): Promise<any> {
-    // let x = new std(1, 2);
-    // console.log(x);
-
-    if (vrc.input.isControl) {
+  public async response(ani: anim): Promise<any> {
+    if (input.isControl) {
       /* Handle camera orienntation */
-      render.cam.setOrientation();
+      ani.cam.setOrientation();
 
-      render.cam.azimuth +=
-        (vrc.input.isCLick == true ? 1 : 0) *
-          vrc.timer.globalDeltaTime *
+      ani.cam.azimuth +=
+        (input.isCLick == true ? 1 : 0) *
+          timer.globalDeltaTime *
           3 *
-          (-5.0 * vrc.input.mouseDX) +
-        (vrc.input.arrows.left ? 1 : 0) * -0.5 +
-        (vrc.input.arrows.right ? 1 : 0) * 0.5;
+          (-5.0 * input.mouseDX) +
+        ((input.arrows.left ? 1 : 0) * -0.5 +
+          (input.arrows.right ? 1 : 0) * 0.5) *
+          (1 + Number(input.isLctrl) * 5);
 
-      render.cam.elevator +=
-        (vrc.input.isCLick == true ? 1 : 0) *
-          vrc.timer.globalDeltaTime *
+      ani.cam.elevator +=
+        (input.isCLick == true ? 1 : 0) *
+          timer.globalDeltaTime *
           2 *
-          (5.0 * vrc.input.mouseDY) +
-        (vrc.input.arrows.up ? 1 : 0) * -0.5 +
-        (vrc.input.arrows.down ? 1 : 0) * 0.5;
+          (5.0 * input.mouseDY) +
+        ((input.arrows.up ? 1 : 0) * -0.5 + (input.arrows.down ? 1 : 0) * 0.5) *
+          (1 + Number(input.isLctrl) * 5);
 
-      if (render.cam.elevator < 0.08) render.cam.elevator = 0.08;
-      else if (render.cam.elevator > 178.9) render.cam.elevator = 178.9;
+      if (ani.cam.elevator < 0.08) ani.cam.elevator = 0.08;
+      else if (ani.cam.elevator > 178.9) ani.cam.elevator = 178.9;
 
-      render.cam.dist += -(0.007 * vrc.input.mouseDZ);
-      if (render.cam.dist < 0.1) render.cam.dist = 0.1;
+      ani.cam.dist +=
+        -(0.007 * input.mouseDZ) * (1 + Number(input.isLctrl) * 5);
+      if (ani.cam.dist < 0.1) ani.cam.dist = 0.1;
 
-      /* Setup result camera */
       /* Setting new position of attached point */
-      render.cam.set(
-        vrc.mat4
-          .rotateX(render.cam.elevator)
-          .mul(vrc.mat4.rotateY(render.cam.azimuth))
-          .mul(vrc.mat4.translate(render.cam.at))
-          .TransformPoint(vrc.vec3(0, render.cam.dist, 0)),
-        render.cam.at,
-        vrc.vec3(0, 1, 0),
+      ani.cam.set(
+        mat4
+          .rotateX(ani.cam.elevator)
+          .mul(mat4.rotateY(ani.cam.azimuth))
+          .mul(mat4.translate(ani.cam.at))
+          .TransformPoint(new vec3(0, ani.cam.dist, 0)),
+        ani.cam.at,
+        new vec3(0, 1, 0),
       );
-      //render.cam.set(render.cam.loc, render.cam.at, render.cam.up);
-      if (vrc.input.isCLickR) {
-        render.cam.mouseParallel(vrc.input);
-        render.cam.set(render.cam.loc, render.cam.at);
+      if (input.isCLickR) {
+        ani.cam.mouseParallel(input);
+        ani.cam.set(ani.cam.loc, ani.cam.at);
       }
     }
 
-    vrc.input.mouseDX = vrc.input.mouseDY = vrc.input.mouseDZ = 0;
-  } /** End of 'init' function */
+    input.mouseDX = input.mouseDY = input.mouseDZ = 0;
+  } /** End of 'responce' function */
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
   public async render(
-    render: any,
-  ): Promise<any> {} /** End of 'init' function */
+    ani: anim,
+  ): Promise<any> {} /** End of 'render' function */
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
   public async destroy(
-    render: any,
-  ): Promise<any> {} /** End of 'init' function */
+    ani: anim,
+  ): Promise<any> {} /** End of 'destroy' function */
 } /** End of '_uni_control' class */
 
-// Test unit
 const uni_control: _uni_control = new _uni_control();
 
 /** EXPORTS */
 export { uni_control };
 
-/** END OF 'test_unit.ts' FILE */
+/** END OF 'uni_control.ts' FILE */

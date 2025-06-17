@@ -11,13 +11,10 @@
 import { core } from "./core/core";
 import { group, group_manager } from "./res/groups/groups";
 import { material_pattern_manager } from "./res/mtl_ptn/material_patterns";
-import { buffer_manager } from "./res/buffers";
-import { primitive_manager } from "./res/primitives/primitives";
-///import { vertexAttributesType } from "./res/mtl_ptn/material_patterns";
-import { buffer } from "./res/buffers";
-import * as mth from "../../math/mth";
-import { primitive } from "./res/primitives/primitives";
-import { timer } from "../input/timer";
+import { buffer_manager } from "./res/buffers/buffers";
+import { texture_manager } from "./res/textures/textures";
+import { primitive, primitive_manager } from "./res/primitives/primitives";
+import { model, model_manager } from "./res/models/models";
 
 /** DIContainer class */
 class DIContainer {
@@ -26,28 +23,15 @@ class DIContainer {
 
 /** Render class */
 class render extends core {
-  // private group_manager: group_manager;
-  // private material_pattern_manager: material_pattern_manager;
-  // private buffer_manager: material_pattern_manager;
-  private commandEncoder: any;
+  private commandEncoder!: GPUCommandEncoder;
   private passEncoder: any;
-  // private buffers: buffer;
   private mBuf: any;
   private depthTexture: any;
   private msaaTexture: any;
   private msaaTextureView: any;
   private depthTextureView: any;
   public globalGroup!: group;
-  public cam: mth.camera = new mth.camera(0, 0);
-
-  /** #public parameters */
-  /**
-   * @info Returning device function
-   * @returns device
-   */
-  public getRender(): any {
-    return this;
-  } /** End of 'getDevice' function */
+  public cam: typeof camera = new camera(0, 0);
 
   public constructor() {
     super();
@@ -58,6 +42,8 @@ class render extends core {
       material_pattern_manager.prototype,
       buffer_manager.prototype,
       primitive_manager.prototype,
+      texture_manager.prototype,
+      model_manager.prototype,
     ];
 
     const methodNames = resources
@@ -79,32 +65,25 @@ class render extends core {
     }
   }
 
-  // public async createShaders(shdName: string): Promise<any> {
-  //   return await this.material_patterns.createMaterialPattern(shdName);
-  // }
-
-  // public async createPrimitive(
-  //   mtl_ptn: material_pattern,
-  //   vData: Float32Array,
-  //   iData: Float32Array = new Float32Array(),
-  // ): Promise<any> {
-  //   return await this.primitives.createPrimitive(mtl_ptn, vData, iData);
-  // }
-
-  public async draw(prim: primitive, world: mth.mat4 = mth.mat4.identity()) {
+  public async draw(prim: primitive, world: typeof mat4 = mat4.identity()) {
     await this.passEncoder.setPipeline(prim.mtl_ptn.pipeline);
     await this.passEncoder.setVertexBuffer(0, prim.vBuf.buffer);
-
     await this.passEncoder.setBindGroup(0, this.globalGroup.bindGroup);
+    if (prim.mtl_ptn.group)
+      await this.passEncoder.setBindGroup(1, prim.mtl_ptn.group.bindGroup);
 
     let M = new Float32Array(this.cam.vp.m.flat().concat(world.m.flat()));
     await this.mBuf.update(M);
 
     if (prim.numOfI > 0) {
       await this.passEncoder.setIndexBuffer(prim.iBuf.buffer, "uint32");
-
       await this.passEncoder.drawIndexed(prim.numOfI, 1, 0, 0, 0);
     } else await this.passEncoder.draw(prim.numOfV);
+  }
+
+  public async drawModel(prim: model, world: typeof mat4 = mat4.identity()) {
+    for (let i = 0; i < prim.prims.length; i++)
+      await this.draw(prim.prims[i], world);
   }
 
   /** #public parameters */
@@ -113,11 +92,10 @@ class render extends core {
    * @returns none
    */
   public async initialization(canvas: Element) {
-    // Создаем мультисэмпловую текстуру
     const c = canvas as HTMLCanvasElement;
     await this.webGPUInit(canvas);
-    this.cam = new mth.camera(c.width, c.height);
-    this.cam.set(new mth.vec3(0, 8, 30), new mth.vec3(0, 5, 0));
+    this.cam = new camera(c.width, c.height);
+    this.cam.set(new vec3(5), new vec3(0));
 
     const depthTextureDesc: GPUTextureDescriptor = {
       size: [this.context.canvas.width, this.context.canvas.height],
@@ -134,18 +112,6 @@ class render extends core {
       format: navigator.gpu.getPreferredCanvasFormat(),
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
-
-    this.globalGroup = await this.createBindGroup({
-      groupIndex: 0,
-      bindings: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          buffer: this.mBuf,
-        },
-      ],
-    });
-
     this.depthTexture = this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
@@ -166,8 +132,8 @@ class render extends core {
         },
       ],
     });
-    console.log(this.globalGroup);
     this.msaaTextureView = this.msaaTexture.createView();
+    timer.initTimer();
 
     //this.globalGroup = this.createBuffer();
     console.log("Render initialization completed successfully!");
@@ -178,7 +144,7 @@ class render extends core {
    * @returns none
    */
   public async renderStart(): Promise<any> {
-    const renderPassDescriptor = {
+    const renderPassDescriptor: GPURenderPassDescriptor = {
       colorAttachments: [
         {
           view: this.msaaTextureView,
@@ -206,7 +172,7 @@ class render extends core {
    * @info Render function
    * @returns none
    */
-  public async renderEnd(): Promise<any> {
+  public async renderEnd() {
     this.passEncoder.end();
 
     this.queue.submit([this.commandEncoder.finish()]);

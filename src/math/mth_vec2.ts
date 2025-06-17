@@ -7,11 +7,8 @@
  * LAST UPDATE : 02.06.2025
  */
 
-/** IMPORTS */
-import { vec } from "./mth_vec.js";
-
 /** Vector 2d class */
-class vec2 implements vec {
+class vec2 {
   /** #public parameters */
   public x: number = 0;
   public y: number = 0;

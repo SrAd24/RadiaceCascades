@@ -8,6 +8,7 @@
  */
 
 /** IMPORTS */
+import { anim } from "../anim";
 import { dict } from "./dictionary";
 
 /** Units abstract class */
@@ -21,31 +22,31 @@ abstract class unit {
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  abstract init(render: any): Promise<any>;
+  abstract init(ani: anim): Promise<any>;
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  abstract render(render: any): Promise<any>;
+  abstract render(ani: anim): Promise<any>;
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  abstract response(render: any): Promise<any>;
+  abstract response(ani: anim): Promise<any>;
 
   /**
    * @info Init function
-   * @param render: any
+   * @param ani: anim
    * @returns none
    */
-  abstract destroy(render: any): Promise<any>;
+  abstract destroy(ani: anim): Promise<any>;
 } /** End of 'unit' abstract class */
 
 /** EXPORTS */
