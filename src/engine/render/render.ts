@@ -33,10 +33,17 @@ class render extends core {
   public globalGroup!: group;
   public cam: typeof camera = new camera(0, 0);
 
+  /**
+   * @info Render constructor
+   * @returns none
+   */
   public constructor() {
+    /* Call parent constructor */
     super();
+    /* Set current render instance in DI container */
     DIContainer.currentRender = this;
 
+    /* Define resource manager prototypes for method injection */
     const resources = [
       group_manager.prototype,
       material_pattern_manager.prototype,
@@ -46,6 +53,7 @@ class render extends core {
       model_manager.prototype,
     ];
 
+    /* Extract all 'create' methods from resource managers */
     const methodNames = resources
       .map((proto) =>
         Object.getOwnPropertyNames(proto).filter(
@@ -55,6 +63,8 @@ class render extends core {
         ),
       )
       .reduce((acc, methods) => acc.concat(methods), []);
+    
+    /* Bind resource manager methods to render instance */
     for (const methodName of methodNames) {
       for (const proto of resources) {
         if ((proto as any)[methodName]) {
@@ -63,23 +73,36 @@ class render extends core {
         }
       }
     }
-  }
+  } /** End of 'constructor' function */
 
+  /**
+   * @info Draw primitive function
+   * @param prim: primitive
+   * @param world: world matrix
+   * @returns none
+   */
   public async draw(prim: primitive, world: typeof mat4 = mat4.identity()) {
+    /* Set rendering pipeline for this primitive */
     await this.passEncoder.setPipeline(prim.mtl_ptn.pipeline);
+    /* Bind vertex buffer to pipeline */
     await this.passEncoder.setVertexBuffer(0, prim.vBuf.buffer);
+    /* Set global uniforms (camera matrices) */
     await this.passEncoder.setBindGroup(0, this.globalGroup.bindGroup);
+    /* Set material-specific resources if available */
     if (prim.mtl_ptn.group)
       await this.passEncoder.setBindGroup(1, prim.mtl_ptn.group.bindGroup);
 
+    /* Combine view-projection and world matrices for shader */
     let M = new Float32Array(this.cam.vp.m.flat().concat(world.m.flat()));
     await this.mBuf.update(M);
 
+    /* Draw using indices if available, otherwise draw vertices directly */
     if (prim.numOfI > 0) {
+      /* Set index buffer and draw indexed */
       await this.passEncoder.setIndexBuffer(prim.iBuf.buffer, "uint32");
       await this.passEncoder.drawIndexed(prim.numOfI, 1, 0, 0, 0);
     } else await this.passEncoder.draw(prim.numOfV);
-  }
+  } /** End of 'draw' function */
 
   
 
@@ -152,44 +175,55 @@ class render extends core {
   } /** End of 'initialization' function */
 
   /**
-   * @info Render function
+   * @info Start render pass function
    * @returns none
    */
   public async renderStart(): Promise<any> {
+    /* Configure render pass with MSAA and depth testing */
     const renderPassDescriptor: GPURenderPassDescriptor = {
       colorAttachments: [
         {
-          view: this.msaaTextureView,
-          resolveTarget: this.context.getCurrentTexture().createView(),
-          clearValue: [0.0, 0.0, 0.0, 1.0],
+          view: this.msaaTextureView, /* Render to MSAA texture */
+          resolveTarget: this.context.getCurrentTexture().createView(), /* Resolve to canvas */
+          clearValue: [0.0, 0.0, 0.0, 1.0], /* Clear to black */
           loadOp: "clear",
           storeOp: "store",
         },
       ],
       depthStencilAttachment: {
         view: this.depthTextureView,
-        depthClearValue: 1,
+        depthClearValue: 1, /* Clear depth to far plane */
         depthLoadOp: "clear",
         depthStoreOp: "store",
       },
     };
 
+    /* Create command encoder for this frame */
     this.commandEncoder = this.device.createCommandEncoder();
 
+    /* Begin render pass with configured descriptor */
     this.passEncoder =
       this.commandEncoder.beginRenderPass(renderPassDescriptor);
   } /** End of 'renderStart' function */
 
   /**
-   * @info Render function
+   * @info End render pass function
    * @returns none
    */
   public async renderEnd() {
+    /* End current render pass */
     this.passEncoder.end();
 
+    /* Submit command buffer to GPU queue */
     this.queue.submit([this.commandEncoder.finish()]);
-  } /** End of 'render' function */
+  } /** End of 'renderEnd' function */
 
+  /**
+   * @info Draw model function
+   * @param prim: model
+   * @param world: world matrix
+   * @returns none
+   */
   public async drawModel(prim: model, world: typeof mat4 = mat4.identity()) {
     /* Iterate through all primitives in model */
     for (let i = 0; i < prim.prims.length; i++)
