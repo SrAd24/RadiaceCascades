@@ -81,10 +81,7 @@ class render extends core {
     } else await this.passEncoder.draw(prim.numOfV);
   }
 
-  public async drawModel(prim: model, world: typeof mat4 = mat4.identity()) {
-    for (let i = 0; i < prim.prims.length; i++)
-      await this.draw(prim.prims[i], world);
-  }
+  
 
   /** #public parameters */
   /**
@@ -92,50 +89,65 @@ class render extends core {
    * @returns none
    */
   public async initialization(canvas: Element) {
+    /* Cast canvas element to HTML canvas type */
     const c = canvas as HTMLCanvasElement;
+
+    /* Initialize WebGPU context and device */
     await this.webGPUInit(canvas);
+
+    /* Setup camera with canvas dimensions */
     this.cam = new camera(c.width, c.height);
+    /* Position camera at distance 5 looking at origin */
     this.cam.set(new vec3(5), new vec3(0));
 
+    /* Configure depth texture for 3D rendering */
     const depthTextureDesc: GPUTextureDescriptor = {
       size: [this.context.canvas.width, this.context.canvas.height],
       mipLevelCount: 1,
-      sampleCount: 4,
+      sampleCount: 4, /* 4x MSAA */
       dimension: "2d",
       format: "depth32float",
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     };
 
+    /* Create MSAA texture for anti-aliasing */
     this.msaaTexture = this.device.createTexture({
       size: [this.context.canvas.width, this.context.canvas.height],
-      sampleCount: 4,
+      sampleCount: 4, /* 4x multisampling */
       format: navigator.gpu.getPreferredCanvasFormat(),
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
+
+    /* Create depth texture and view for depth testing */
     this.depthTexture = this.device.createTexture(depthTextureDesc);
     this.depthTextureView = await this.depthTexture.createView();
 
+    /* Create buffer for matrix data (VP + World matrices) */
     this.mBuf = await this.createBuffer({
-      size: 128,
+      size: 128, /* Size for two 4x4 matrices */
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       type: "read-only-storage",
     });
     console.log(this.mBuf);
 
+    /* Create global bind group for shader uniforms */
     this.globalGroup = await this.createBindGroup({
       groupIndex: 0,
       bindings: [
         {
           binding: 0,
-          visibility: GPUShaderStage.VERTEX,
+          visibility: GPUShaderStage.VERTEX, /* Available in vertex shader */
           buffer: this.mBuf,
         },
       ],
     });
+
+    /* Create view for MSAA texture */
     this.msaaTextureView = this.msaaTexture.createView();
+
+    /* Initialize global timer system */
     timer.initTimer();
 
-    //this.globalGroup = this.createBuffer();
     console.log("Render initialization completed successfully!");
   } /** End of 'initialization' function */
 
@@ -177,6 +189,13 @@ class render extends core {
 
     this.queue.submit([this.commandEncoder.finish()]);
   } /** End of 'render' function */
+
+  public async drawModel(prim: model, world: typeof mat4 = mat4.identity()) {
+    /* Iterate through all primitives in model */
+    for (let i = 0; i < prim.prims.length; i++)
+      /* Draw each primitive with the same world transform */
+      await this.draw(prim.prims[i], world);
+  } /** End of 'drawModel' function */
 } /** End of 'Render' class */
 
 /** EXPORTS */
