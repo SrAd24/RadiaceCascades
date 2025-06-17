@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 06.06.2025
+ * LAST UPDATE : 17.06.2025
  */
 
 /** IMPORTS */
@@ -24,6 +24,7 @@ class DIContainer {
 /** Render class */
 class render extends core {
   private commandEncoder!: GPUCommandEncoder;
+
   private passEncoder: any;
   private mBuf: any;
   private depthTexture: any;
@@ -104,8 +105,6 @@ class render extends core {
     } else await this.passEncoder.draw(prim.numOfV);
   } /** End of 'draw' function */
 
-  
-
   /** #public parameters */
   /**
    * @info Initialize render function
@@ -129,7 +128,7 @@ class render extends core {
       mipLevelCount: 1,
       sampleCount: 4, /* 4x MSAA */
       dimension: "2d",
-      format: "depth32float",
+      format: "depth24plus",
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     };
 

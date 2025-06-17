@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 07.06.2025
+ * LAST UPDATE : 10.06.2025
  */
 
 /** Input class */
@@ -132,11 +132,14 @@ class _input {
       const rect = this.canvasID.getBoundingClientRect();
 
       if (
+        true
+        /*
         event.clientX - rect.left > 0 &&
         event.clientX - rect.left < this.canvasID.width &&
         event.clientY - rect.top > 0 &&
         event.clientY - rect.top < this.canvasID.height &&
-        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick))
+        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick)
+        )*/
       ) {
         this.mouseDX = event.clientX - this.mouseX;
         this.mouseDY = event.clientY - this.mouseY;
