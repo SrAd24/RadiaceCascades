@@ -40,41 +40,78 @@ class material_pattern {
   public group!: group;
 
   /**
+   * @info Preprocess shader function
+   * @param mainPath: string
+   * @returns shader module
+   */
+  private async preprocessShader(mainPath: string): Promise<GPUShaderModule> {
+    const shaderPath = 'bin/shaders/' + mainPath;
+    const includePath = 'bin/shaders/includes/';
+
+    const mainShaderResponse = await fetch(`${shaderPath}`);
+    if (!mainShaderResponse.ok) {
+      throw new Error(`Failed to load shader: ${shaderPath}`);
+    }
+    
+    let shaderCode = await mainShaderResponse.text();
+    
+    const includeRegex = /^#include\s+"([^"]+\.wgsl)"/gm;
+    const includeMatches = [...shaderCode.matchAll(includeRegex)];
+    
+    const includeMap = new Map();
+    
+    for (const [_, includeFile] of includeMatches) {
+      const includeResponse = await fetch(`${includePath + includeFile}`);
+      if (!includeResponse.ok) {
+        throw new Error(`Failed to load included shader: ${includePath + includeFile}`);
+      }
+      const content = await includeResponse.text();
+      includeMap.set(includePath + includeFile, content);
+    }
+    
+    shaderCode = shaderCode.replace(includeRegex, (_, includeFile) => {
+      return includeMap.get(includePath + includeFile);
+    });
+    
+    return this.render.device.createShaderModule({
+      code: shaderCode,
+      label: `Processed shader: ${shaderPath}`
+    });
+  }/** End of 'preprocessShader' function */
+  
+  /**
    * @info Create material pattern function
    * @param descriptor: material_pattern_descriptor
    * @returns none
    */
   public async create(descriptor: material_pattern_descriptor): Promise<any> {
-    this.shaderName =
-      "bin/shds/" +
-      descriptor.shaderName +
-      "/" +
-      descriptor.shaderName +
-      ".wgsl";
-    const shaderModule = this.render.device.createShaderModule({
-      code: await fetch(this.shaderName).then((res) => res.text()),
-    });
+    const vertexModule = await this.preprocessShader(descriptor.shaderName +'/vert.wgsl');
+
+    const fragmentModule = await this.preprocessShader(descriptor.shaderName +'/frag.wgsl');
+
     if (descriptor.bindings) {
       this.pipelinelayout = this.render.device.createPipelineLayout({
         bindGroupLayouts: [
           this.render.globalGroup.bindGroupLayout,
           descriptor.bindings.bindGroupLayout,
+          this.render.mtlLayout,
+          this.render.samplerGroup.bindGroupLayout
         ],
       });
       this.group = descriptor.bindings;
     } else
       this.pipelinelayout = this.render.device.createPipelineLayout({
-        bindGroupLayouts: [this.render.globalGroup.bindGroupLayout],
+        bindGroupLayouts: [this.render.globalGroup.bindGroupLayout, this.render.mtlLayout, this.render.samplerGroup.bindGroupLayout],
       });
 
     this.patternDescriptor = {
       vertex: {
-        module: shaderModule,
+        module: vertexModule,
         entryPoint: "vertex_main",
         buffers: [descriptor.vertexAttributes],
       },
       fragment: {
-        module: shaderModule,
+        module: fragmentModule,
         entryPoint: "fragment_main",
         targets: [
           {
@@ -97,7 +134,7 @@ class material_pattern {
         depthCompare: "less",
       },
     };
-    this.pipeline = this.render.device.createRenderPipeline(
+    this.pipeline = await this.render.device.createRenderPipelineAsync(
       this.patternDescriptor,
     );
   } /** End of 'create' function */
@@ -113,7 +150,7 @@ class material_pattern {
 
     this.patternDescriptor.vertex.module = shaderModule;
     this.patternDescriptor.fragment!.module = shaderModule;
-    this.pipeline = this.render.device.createRenderPipeline(
+    this.pipeline = await this.render.device.createRenderPipelineAsync(
       this.patternDescriptor,
     );
   } /** End of 'update' function */

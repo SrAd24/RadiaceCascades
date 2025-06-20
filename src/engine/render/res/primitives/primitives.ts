@@ -9,13 +9,14 @@
 
 /** IMPORTS */
 import { DIContainer, render } from "../../render";
-import { material_pattern } from "../mtl_ptn/material_patterns";
+import { material } from "../materials/materials";
 import { buffer } from "../buffers/buffers";
 
 /** Primitive interface */
 interface primitive_descriptor {
-  material_pattern: material_pattern;
+  material: material;
   topology: topology;
+  transform?: mat4;
 } /** End of 'primitive_descriptor' interface */
 
 /** Primitive class */
@@ -30,11 +31,15 @@ class primitive {
   } /** End of 'render' function */
 
   /** #public parameters */
-  public mtl_ptn!: material_pattern;
+  public mtl!: material;
   public iBuf!: buffer;
   public vBuf!: buffer;
   public numOfI: number = 0;
   public numOfV: number = 0;
+  public instanceCount: number = 0;
+  public instanceMatrices: mat4[] = [];
+  public transform: mat4;
+  public isTransformChanged: boolean = false;
 
   /**
    * @info Create primitve function
@@ -59,8 +64,30 @@ class primitive {
         usage: GPUBufferUsage.INDEX,
         data: idata,
       });
-    this.mtl_ptn = primParams.material_pattern;
+    this.instanceCount = 1;
+    this.mtl = primParams.material;
+    if (primParams.transform) this.setTransform(primParams.transform);
   } /** End of 'create' function */
+
+  public async setTransform(trans: mat4) {
+    this.transform = trans;
+    this.isTransformChanged = true;
+  }
+
+  /**
+   * @info Add instance matrices function
+   * @param matrix: mat4[] | mat4
+   * @returns none
+   */
+  public addInstance(matrix: mat4[] | mat4) {
+    if (Array.isArray(matrix)) {
+      this.instanceMatrices = this.instanceMatrices.concat(matrix);
+      this.instanceCount = this.instanceMatrices.length;
+    } else {
+      this.instanceMatrices.push(matrix);
+      this.instanceCount = this.instanceMatrices.length;
+    }
+  } /** End of 'addInstance' function */
 } /** End of 'primitive' class */
 
 /** Primitive manager class */

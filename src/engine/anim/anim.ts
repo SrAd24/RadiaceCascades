@@ -16,6 +16,7 @@ import "vrc.ts";
 /** Animation class */
 class anim extends render {
   public canvasId: Element | null = null;
+  createModel: any;
 
   /**
    * @info render initialize function
@@ -81,13 +82,15 @@ class anim extends render {
       await this.responseUnits();
 
       // Start rendering
-      await this.renderStart();
+      // await this.renderStart();
 
       // Render units
       await this.renderUnits();
 
+      await this.frameRendering();
+
       // Render end
-      await this.renderEnd();
+      // await this.renderEnd();
       window.requestAnimationFrame(draw);
     };
     await draw();

@@ -1,47 +1,7 @@
 {
-  "name": "radiacecascades",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "php": "php -S 0.0.0.0:3000",
-    "scss": "node-sass -watch scss -o css"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SrAd24/RadiaceCascades.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SrAd24/RadiaceCascades/issues"
-  },
-  "homepage": "https://github.com/SrAd24/RadiaceCascades#readme",
-  "description": "",
   "dependencies": {
-    "@types/react": "^19.1.6",
-    "express": "^5.1.0",
-    "filereader": "^0.10.3",
-    "node-sass": "^9.0.0",
-    "php": "^1.1.0",
-    "php-express": "^0.0.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-is": "^19.1.0",
-    "sass": "^1.89.1",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "webgpu": "^0.2.12",
-    "webpack": "^5.99.9"
-  },
-  "devDependencies": {
-    "@types/three": "^0.177.0",
-    "@vitejs/plugin-react": "^4.5.1",
     "@webgpu/types": "^0.1.61",
-    "vite": "^6.3.5"
-  },
-  "esbuild": {
-    "resolveExtensions": [".ts", ".json"]
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   }
 }

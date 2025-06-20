@@ -155,9 +155,9 @@ class camera {
 
     dv = this.right
       .mulNum(sx)
-      .add(this.up.mulNum(sy).mulNum(1 + Number(input.isLctrl) * 3));
+      .add(this.up.mulNum(sy));
 
-    dv.mulNum(0.5);
+    dv.mulNum(0.5 + Number(input.isLctrl) * 3);
     this.at = this.at.add(dv);
     this.loc = this.loc.add(dv);
   } /** End of 'mouseParallel' function */

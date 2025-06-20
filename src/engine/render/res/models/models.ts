@@ -9,6 +9,7 @@
 
 /** IMPORTS */
 import { DIContainer, render } from "../../render";
+import { material_pattern } from "../mtl_ptn/material_patterns";
 import { primitive } from "../primitives/primitives";
 
 /** Model class */
@@ -68,16 +69,24 @@ class model {
     let topo = new topology(vertices, indices);
     await topo.evalNormals();
     let mtl_ptn = await this.render.createMaterialPattern({
-      shaderName: "main",
+      shaderName: "model",
       vertexAttributes: std.attributes,
       topology: "triangle-list",
     });
+    let material = await this.render.createMaterial({
+      material_pattern: mtl_ptn,
+      albedo: new vec3(1, 1, 0),
+      roughness: 0.5,
+      metallic: 0.8,
+      emission: new vec3(0, 0, 0),
+    });
     this.prims = [
       await this.render.createPrimitive({
-        material_pattern: mtl_ptn,
+        material: material,
         topology: topo,
       }),
     ];
+    console.log(this.prims)
   } /** End of 'create' function */
 } /** End of 'model' class */
 

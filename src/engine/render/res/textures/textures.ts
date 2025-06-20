@@ -13,10 +13,11 @@ import { DIContainer, render } from "../../render";
 /** Texture interface */
 interface texture_descriptor {
   format: GPUTextureFormat;
-  usage: GPUTextureUsage;
+  usage: GPUTextureUsageFlags;
   size: { width: number; height: number };
   mipMaps?: boolean;
   sampleCount?: number;
+  access?: GPUStorageTextureAccess;
 } /** End of 'texture_descriptor' interface */
 
 /** Texture class */
@@ -38,6 +39,10 @@ class texture {
   public view!: GPUTextureView;
   public width: number = 0;
   public height: number = 0;
+  public isStorage: boolean = false;
+  public isSizeChanged: boolean = false;
+  public format!: GPUTextureFormat;
+  public access!: GPUStorageTextureAccess;
 
   /** #public parameters */
   /**
@@ -54,6 +59,49 @@ class texture {
     });
   } /** End of 'loadImage' function */
 
+  private getBytesPerPixel(format: GPUTextureFormat): number {
+    switch (format) {
+      // 8-bit per channel
+      case 'r8unorm': case 'r8snorm': 
+      case 'r8uint': case 'r8sint':
+        return 1;
+
+      // 16-bit per channel
+      case 'r16uint': case 'r16sint': case 'r16float':
+      case 'rg8unorm': case 'rg8snorm': 
+      case 'rg8uint': case 'rg8sint':
+      case 'depth16unorm':
+        return 2;
+
+      // 32-bit per channel
+      case 'r32uint': case 'r32sint': case 'r32float':
+      case 'rg16uint': case 'rg16sint': case 'rg16float':
+      case 'rgba8unorm': case 'rgba8snorm':
+      case 'rgba8uint': case 'rgba8sint':
+      case 'bgra8unorm': case 'bgra8unorm-srgb':
+      case 'depth24plus': case 'depth32float':
+        return 4;
+
+      // 64-bit
+      case 'rg32uint': case 'rg32sint': case 'rg32float':
+      case 'rgba16uint': case 'rgba16sint': case 'rgba16float':
+        return 8;
+
+      // 128-bit
+      case 'rgba32uint': case 'rgba32sint': case 'rgba32float':
+        return 16;
+
+      // Сжатые форматы
+      case 'bc1-rgba-unorm': case 'bc1-rgba-unorm-srgb':
+        return 0.5; // 0.5 байт/пиксель (8:1 сжатие)
+      case 'bc7-rgba-unorm': case 'bc7-rgba-unorm-srgb':
+        return 1; // 1 байт/пиксель (4:1 сжатие)
+
+      default:
+        throw new Error(`Unknown texture format: ${format}`);
+    }
+  }
+
   /** #public parameters */
   /**
    * @info Create group function
@@ -63,21 +111,27 @@ class texture {
   public async create(textureParams: texture_descriptor) {
     this.width = textureParams.size.width;
     this.height = textureParams.size.height;
+    this.format = textureParams.format;
+
+    let mipCount = 1;
+    if (textureParams.mipMaps == true)
+      mipCount = Math.floor(Math.log2(Math.max(this.width, this.height))) + 1;
 
     this.descriptor = {
       size: [this.width, this.height],
       format: textureParams.format,
       usage: textureParams.usage,
-      mipLevelCount:
-        textureParams?.mipMaps == true
-          ? Math.floor(Math.log2(Math.max(this.width, this.height))) + 1
-          : 1,
+      mipLevelCount: mipCount,
       sampleCount: textureParams.sampleCount,
       dimension: "2d",
     };
 
-    this.texture = this.render.device.createTexture(this.descriptor);
-    this.view = this.texture.createView();
+    this.isStorage = (this.descriptor.usage & GPUTextureUsage.STORAGE_BINDING) !== 0;
+    if (this.isStorage)
+      this.access = textureParams.access as GPUStorageTextureAccess;
+
+    this.texture = await this.render.device.createTexture(this.descriptor);
+    this.view = await this.texture.createView();
   } /** End of 'createBindGroup' function */
 
   /** #public parameters */
@@ -90,13 +144,11 @@ class texture {
     const image = await this.loadImage(imageName);
 
     if (this.width < image.width || this.height < image.height) {
-      this.texture.destroy();
-      this.descriptor.size = [
-        (this.width = image.width),
-        (this.height = image.height),
-      ];
-      this.texture = this.render.device.createTexture(this.descriptor);
-      this.view = this.texture.createView();
+      this.destroy();
+      this.isSizeChanged = true;
+      this.descriptor.size = [(this.width = image.width), (this.height = image.height)];
+      this.texture = await this.render.device.createTexture(this.descriptor);
+      this.view = await this.texture.createView();
     }
     this.render.device.queue.copyExternalImageToTexture(
       { source: image },
@@ -107,25 +159,22 @@ class texture {
 
   /** #public parameters */
   /**
-   * @info Update texture data by image name function
-   * @param image name
+   * @info Update texture by data function
+   * @param data: Float32Array | Uint32Array | Uint8Array
    * @returns none
    */
-  public async updateByData(imageName: string) {
-    const image = await this.loadImage(imageName);
-
-    if (this.width < image.width || this.height < image.height) {
-      this.destroy();
-      this.width = image.width;
-      this.height = image.height;
-      this.descriptor.size = [this.width, this.height];
-      this.texture = this.render.device.createTexture(this.descriptor);
-      this.view = this.texture.createView();
-    }
-    this.render.device.queue.copyExternalImageToTexture(
-      { source: image },
-      { texture: this.texture },
-      [image.width, image.height],
+  public async updateByData(data: Float32Array | Uint32Array | Uint8Array) {
+    const bytesPerPixel = this.getBytesPerPixel(this.descriptor.format);
+      
+    await this.render.queue.writeTexture(
+      {
+        texture: this.texture,
+      },
+      data as GPUAllowSharedBufferSource,
+      {
+        bytesPerRow: this.width * bytesPerPixel
+      },
+      [this.width, this.height]
     );
   } /** End of 'updateByData' function */
 
@@ -135,7 +184,7 @@ class texture {
    * @returns none
    */
   public async destroy() {
-    this.texture.destroy();
+    await this.texture.destroy();
   } /** End of 'destroy' function */
 } /** End of 'texture' class */
 

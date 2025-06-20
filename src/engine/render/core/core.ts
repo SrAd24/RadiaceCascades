@@ -14,7 +14,6 @@ class core {
   public device!: GPUDevice; // Device
   public queue!: GPUQueue; // Queue
   public context!: GPUCanvasContext; // Canvas context
-  public defTextureFormat!: GPUTextureFormat; // Texture format
   public defDepthTextureFormat!: GPUTextureFormat; // Texture format
   public defSwapchainTextureFormat!: GPUTextureFormat; // Texture format
 
@@ -23,9 +22,8 @@ class core {
    * @info Initialize webGPU function
    * @param Canvas elemant id
    */
-  public async webGPUInit(id: Element): Promise<any> {
+  public async webGPUInit(id: Element) {
     const canvas = id as HTMLCanvasElement;
-
     // check webGPU support
     if (!navigator.gpu) {
       alert("Web gpu not supported");
@@ -56,7 +54,6 @@ class core {
 
     // Set default texture formats
     this.defSwapchainTextureFormat = navigator.gpu.getPreferredCanvasFormat();
-    this.defTextureFormat = "rgba32float";
     this.defDepthTextureFormat = "depth32float";
 
     // Configure context
