@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 05.06.2025
+ * LAST UPDATE : 21.06.2025
  */
 
 /** IMPORTS */
@@ -15,27 +15,24 @@ import "vrc.ts";
 
 /** Animation class */
 class anim extends render {
+  /** #public parameters */
   public canvasId: Element | null = null;
-  createModel: any;
 
   /**
    * @info render initialize function
    * @param canvas: string
    * @returns none
    */
-  public async init(canvas: string): Promise<any> {
+  public async init(canvas: string) {
     // initialize render
     this.canvasId = document.querySelector("#" + canvas);
     if (this.canvasId == null) throw Error("Canvas is undefined");
 
     await this.initialization(this.canvasId);
 
-    // initialize units
-    console.log("Unit initialization started, unit cout: ", dict.units.length);
     for (let i = 0; i < dict.units.length; i++) {
       await dict.units[i].init(this);
     }
-    console.log("Unit initialization ended");
   } /** End of 'init' function */
 
   /**
@@ -75,8 +72,9 @@ class anim extends render {
    */
   public async mainloop() {
     const draw = async () => {
-      // Responce timer
-      await timer.responseTimer();
+      // Responce additional systems
+      timer.response();
+      input.response()
 
       // Responce units
       await this.responseUnits();

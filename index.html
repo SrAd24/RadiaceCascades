@@ -20,6 +20,13 @@
     <script type="module">
       import { anim } from './js/engine/anim/anim.mjs';
 
+      // Prevent browser zoom with Ctrl+/Ctrl-
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && (e.code === 'Minus' || e.code === 'Equal')) {
+          e.preventDefault();
+        }
+      });
+
       let animation = new anim();
       async function loop() {
         await animation.init('The_only_normal_group_for_the_entire_time_at_the_CGSG');

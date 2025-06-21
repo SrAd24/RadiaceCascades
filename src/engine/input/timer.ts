@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 07.06.2025
+ * LAST UPDATE : 21.06.2025
  */
 
 /** Timer class */
@@ -19,7 +19,7 @@ class _timer {
   /** #private parameters */
   /**
    * @info Get time function
-   * @returns none
+   * @returns current time in seconds
    */
   private getTime = () => {
     const date = new Date();
@@ -38,13 +38,20 @@ class _timer {
   public FPS: number = 30;
   public isPause: boolean = false;
 
+  /**
+   * @info Initialize timer function
+   * @returns none
+   */
   public initTimer = () => {
     this.globalTime = this.time = this.getTime();
     this.startTime = this.oldTime = this.oldTimeFPS = this.globalTime;
-  };
+  }; /** End of 'initTimer' function */
 
-  // Timer response method
-  public async responseTimer() {
+  /**
+   * @info Timer response function
+   * @returns none
+   */
+  public response() {
     let t = this.getTime();
     // Global time
     this.globalTime = t;
@@ -66,7 +73,7 @@ class _timer {
       this.FPS = Number(this.FPS.toFixed(3));
     }
     this.oldTime = t;
-  }
+  } /** End of 'response' function */
 } /** End of 'timer' class */
 
 /** Timer variable */

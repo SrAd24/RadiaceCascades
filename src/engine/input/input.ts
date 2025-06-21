@@ -9,153 +9,100 @@
 
 /** Input class */
 class _input {
-  /** #public parameters */
-  public mouseX: number = 0;
-  public mouseY: number = 0;
-  public mouseZ: number = 0;
-  public mouseDX: number = 0;
-  public mouseDY: number = 0;
-  public mouseDZ: number = 0;
-  public mouseWheel: number = 0;
-  public isCLick: boolean = false;
-  public isCLickR: boolean = false;
-  public isLctrl: boolean = false;
-  public canvasID: any;
-  public bodyID: any;
-  public isControl: boolean = false;
-  public arrows: any = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-  };
-  public wasd: any = {
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-  };
+  // Mouse position and movement
+  public mouseX: number = 0;        // Current mouse X position
+  public mouseY: number = 0;        // Current mouse Y position
+  public mouseDX: number = 0;       // Mouse X delta (movement)
+  public mouseDY: number = 0;       // Mouse Y delta (movement)
+  public mouseDZ: number = 0;       // Mouse wheel delta
+  
+  // Keyboard state tracking
+  private keysPressed = new Set<string>();      // Currently held keys
+  private keysJustPressed = new Set<string>();  // Keys pressed this frame
+  
+  // Mouse state tracking (0=left, 1=middle, 2=right)
+  private mousePressed = [false, false, false];     // Currently held buttons
+  private mouseJustPressed = [false, false, false]; // Buttons pressed this frame
+  
+  private canvasID: HTMLElement;
+  private bodyID: HTMLElement;
 
-  /**
-   * @info Class constructor
-   * @param canvasID: any
-   */
+  /** Constructor - sets up event listeners */
   public constructor() {
-    this.canvasID = document.querySelector(
-      "#The_only_normal_group_for_the_entire_time_at_the_CGSG",
-    );
-    this.bodyID = document.querySelector("#body");
-    document.addEventListener("keydown", (event: any) => {
-      if (event.keyCode == 16) {
-        this.isControl = true;
-      }
-      if (event.keyCode == 17) {
-        this.isLctrl = true;
-      }
-
-      if (event.keyCode == 37) {
-        this.arrows.left = true;
-      } else if (event.keyCode == 38) {
-        this.arrows.up = true;
-      } else if (event.keyCode == 39) {
-        this.arrows.right = true;
-      } else if (event.keyCode == 40) {
-        this.arrows.down = true;
-      }
-      if (event.keyCode == 87) {
-        this.wasd.w = true;
-      }
-      if (event.keyCode == 65) {
-        this.wasd.a = true;
-      }
-      if (event.keyCode == 68) {
-        this.wasd.d = true;
-      }
-      if (event.keyCode == 83) {
-        this.wasd.s = true;
+    this.canvasID = document.querySelector("#The_only_normal_group_for_the_entire_time_at_the_CGSG")!;
+    this.bodyID = document.querySelector("#body")!;
+    
+    // Keyboard events
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (!this.keysPressed.has(e.code)) {
+        this.keysJustPressed.add(e.code);  // Mark as just pressed
+        this.keysPressed.add(e.code);      // Mark as held
       }
     });
-    document.addEventListener("keyup", (event: any) => {
-      if (event.keyCode == 16) {
-        this.isControl = false;
-      }
-      if (event.keyCode == 17) {
-        this.isLctrl = false;
-      }
-      if (event.keyCode == 37) {
-        this.arrows.left = false;
-      } else if (event.keyCode == 38) {
-        this.arrows.up = false;
-      } else if (event.keyCode == 39) {
-        this.arrows.right = false;
-      } else if (event.keyCode == 40) {
-        this.arrows.down = false;
-      }
-      if (event.keyCode == 87) {
-        this.wasd.w = false;
-      }
-      if (event.keyCode == 65) {
-        this.wasd.a = false;
-      }
-      if (event.keyCode == 68) {
-        this.wasd.d = false;
-      }
-      if (event.keyCode == 83) {
-        this.wasd.s = false;
-      }
+    
+    document.addEventListener("keyup", (e: KeyboardEvent) => {
+      this.keysPressed.delete(e.code);     // Remove from held keys
     });
-    this.canvasID.addEventListener("contextmenu", (event: any) => {
-      event.preventDefault();
+    
+    // Mouse button events
+    this.bodyID.addEventListener("mousedown", (e: MouseEvent) => {
+      if (!this.mousePressed[e.button]) {
+        this.mouseJustPressed[e.button] = true;  // Mark as just pressed
+        this.mousePressed[e.button] = true;      // Mark as held
+      }
+      this.mouseX = e.clientX;
+      this.mouseY = e.clientY;
     });
-    this.bodyID.addEventListener("mousedown", (event: any) => {
+    
+    this.bodyID.addEventListener("mouseup", (e: MouseEvent) => {
+      this.mousePressed[e.button] = false;       // Remove from held buttons
+    });
+    
+    // Mouse movement
+    this.bodyID.addEventListener("mousemove", (e: MouseEvent) => {
+      this.mouseDX = e.clientX - this.mouseX;    // Calculate delta
+      this.mouseDY = e.clientY - this.mouseY;
+      this.mouseX = e.clientX;                   // Update position
+      this.mouseY = e.clientY;
+    });
+    
+    // Mouse wheel
+    this.canvasID.addEventListener("wheel", (e: WheelEvent) => {
+      e.preventDefault();
+      this.mouseDZ = e.deltaY;
+    });
+    
+    // Prevent context menu and reset on mouse leave
+    this.canvasID.addEventListener("contextmenu", (e: Event) => e.preventDefault());
+    this.canvasID.addEventListener("mouseleave", () => {
+      this.mousePressed.fill(false);
       this.mouseDX = this.mouseDY = 0;
-      if (event.button === 0) this.isCLick = true;
-      else if (event.button === 2) this.isCLickR = true;
-      this.mouseX = event.clientX;
-      this.mouseY = event.clientY;
     });
-    this.bodyID.addEventListener("mouseup", (event: any) => {
-      if (event.button === 0) this.isCLick = false;
-      if (event.button === 2) this.isCLickR = false;
-    });
-    this.canvasID.addEventListener("wheel", (event: WheelEvent) => {
-      event.preventDefault();
-      this.mouseDZ = event.deltaY;
-    });
-    this.canvasID.addEventListener("mouseleave", (event: any) => {
-      this.isCLick = false;
-      this.isCLickR = false;
-      this.mouseDX = 0;
-      this.mouseDY = 0;
-    });
-    this.bodyID.addEventListener("mousemove", (event: any) => {
-      const rect = this.canvasID.getBoundingClientRect();
+  }
 
-      if (
-        true
-        /*
-        event.clientX - rect.left > 0 &&
-        event.clientX - rect.left < this.canvasID.width &&
-        event.clientY - rect.top > 0 &&
-        event.clientY - rect.top < this.canvasID.height &&
-        ((this.isCLick && !this.isCLickR) || (this.isCLickR && !this.isCLick)
-        )*/
-      ) {
-        this.mouseDX = event.clientX - this.mouseX;
-        this.mouseDY = event.clientY - this.mouseY;
-        this.mouseX = event.clientX;
-        this.mouseY = event.clientY;
-      }
-    });
-  } /** End of constructor */
-
-  /**
-   * @info Response function
-   * @returns none
-   */
-  public async response(): Promise<any> {
-    this.mouseDX = this.mouseDY = 0;
-  } /** End of 'response' function */
+  /** Check if key is currently held down */
+  public isKeyPressed(key: string): boolean { return this.keysPressed.has(key); }
+  
+  /** Check if key was just pressed this frame */
+  public isKeyJustPressed(key: string): boolean { return this.keysJustPressed.has(key); }
+  
+  /** Check if mouse button is currently held down */
+  public isMousePressed(btn = 0): boolean { return this.mousePressed[btn]; }
+  
+  /** Check if mouse button was just pressed this frame */
+  public isMouseJustPressed(btn = 0): boolean { return this.mouseJustPressed[btn]; }
+  
+  // Convenience getters
+  public get leftClick(): boolean { return this.mousePressed[0]; }
+  public get rightClick(): boolean { return this.mousePressed[2]; }
+  public get leftClickJust(): boolean { return this.mouseJustPressed[0]; }
+  
+  /** Call at end of each frame to reset "just pressed" states */
+  public async response(): Promise<void> {
+    this.keysJustPressed.clear();           // Clear just pressed keys
+    this.mouseJustPressed.fill(false);     // Clear just pressed buttons
+    this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
+  }
 } /** End of '_input' class */
 
 /** Input variable */
