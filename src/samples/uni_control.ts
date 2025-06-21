@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 16.06.2025
+ * LAST UPDATE : 10.06.2025
  */
 
 /** IMPORTS */
@@ -12,6 +12,7 @@ import { anim, unit } from "engine/anim/anim";
 
 /** Unit control class */
 class _uni_control extends unit {
+  /** #priva
   /** #public parameters */
   /**
    * @info Init function
@@ -21,7 +22,7 @@ class _uni_control extends unit {
   public async init(ani: anim): Promise<any> {} /** End of 'init' function */
 
   /**
-   * @info Init function
+   * @info Response function
    * @param ani: anim
    * @returns none
    */
@@ -35,6 +36,7 @@ class _uni_control extends unit {
     const hasDistanceInput = input.isKeyPressed("Minus") || input.isKeyPressed("Equal");
     
     if (isShift && (hasMouseMovement || hasArrowInput || hasDistanceInput || input.leftClick || input.rightClick)) {
+      input.isChanged = true;
       ani.cam.setOrientation();
 
       ani.cam.azimuth +=
@@ -60,7 +62,7 @@ class _uni_control extends unit {
       ani.cam.dist +=
         -(0.007 * input.mouseDZ) * (1 + Number(isCtrl) * 4) +
         ((input.isKeyPressed("Minus") ? 1 : 0) * 0.1 + (input.isKeyPressed("Equal") ? 1 : 0) * -0.1) *
-          (1 + Number(isCtrl) * 4);
+          (1 + Number(isCtrl) * 3);
       if (ani.cam.dist < 0.1) ani.cam.dist = 0.1;
 
       ani.cam.set(
@@ -77,25 +79,21 @@ class _uni_control extends unit {
         ani.cam.set(ani.cam.loc, ani.cam.at);
       }
     }
-  } /** End of 'responce' function */
+  } /** End of 'response' function */
 
   /**
-   * @info Init function
+   * @info Render function
    * @param ani: anim
    * @returns none
    */
-  public async render(
-    ani: anim,
-  ): Promise<any> {} /** End of 'render' function */
+  public async render(ani: anim): Promise<any> {} /** End of 'render' function */
 
   /**
-   * @info Init function
+   * @info Destroy function
    * @param ani: anim
    * @returns none
    */
-  public async destroy(
-    ani: anim,
-  ): Promise<any> {} /** End of 'destroy' function */
+  public async destroy(ani: anim): Promise<any> {} /** End of 'destroy' function */
 } /** End of '_uni_control' class */
 
 const uni_control: _uni_control = new _uni_control();

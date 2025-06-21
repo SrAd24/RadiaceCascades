@@ -382,7 +382,7 @@ class render extends core {
    * @info Start render pass function
    * @returns none
   */
- public async renderStart(): Promise<any> {
+  public async renderStart(): Promise<any> {
    /* Configure render pass with MSAA and depth testing */
    const renderPassDescriptor: GPURenderPassDescriptor = {
      colorAttachments: [
@@ -402,21 +402,23 @@ class render extends core {
       },
     };
 
-    /* Update camera buffer efficiently */
-    if (!this.cameraData) this.cameraData = new Float32Array(64 + 64 + 64 + 16 * 5);
-    
-    let offset = 0;
-    this.cameraData.set(this.cam.view.m.flat(), offset); offset += 16;
-    this.cameraData.set(this.cam.proj.m.flat(), offset); offset += 16;
-    this.cameraData.set(this.cam.vp.m.flat(), offset); offset += 16;
-    this.cameraData.set([this.cam.loc.x, this.cam.loc.y, this.cam.loc.z, this.cam.frameW], offset); offset += 4;
-    this.cameraData.set([this.cam.at.x, this.cam.at.y, this.cam.at.z, this.cam.frameH], offset); offset += 4;
-    this.cameraData.set([this.cam.dir.x, this.cam.dir.y, this.cam.dir.z, this.cam.projDist], offset); offset += 4;
-    this.cameraData.set([this.cam.right.x, this.cam.right.y, this.cam.right.z, this.cam.wp], offset); offset += 4;
-    this.cameraData.set([this.cam.up.x, this.cam.up.y, this.cam.up.z, this.cam.hp], offset);
-    
-    await this.cameraBuffer.update(this.cameraData);
-
+   /* Update camera buffer efficiently */
+    if (input.isChanged) {
+      if (!this.cameraData) this.cameraData = new Float32Array(64 + 64 + 64 + 16 * 5);
+      
+      let offset = 0;
+      this.cameraData.set(this.cam.view.m.flat(), offset); offset += 16;
+      this.cameraData.set(this.cam.proj.m.flat(), offset); offset += 16;
+      this.cameraData.set(this.cam.vp.m.flat(), offset); offset += 16;
+      this.cameraData.set([this.cam.loc.x, this.cam.loc.y, this.cam.loc.z, this.cam.frameW], offset); offset += 4;
+      this.cameraData.set([this.cam.at.x, this.cam.at.y, this.cam.at.z, this.cam.frameH], offset); offset += 4;
+      this.cameraData.set([this.cam.dir.x, this.cam.dir.y, this.cam.dir.z, this.cam.projDist], offset); offset += 4;
+      this.cameraData.set([this.cam.right.x, this.cam.right.y, this.cam.right.z, this.cam.wp], offset); offset += 4;
+      this.cameraData.set([this.cam.up.x, this.cam.up.y, this.cam.up.z, this.cam.hp], offset);
+      
+      await this.cameraBuffer.update(this.cameraData);
+      input.isChanged = false;                 // Reset change flag
+    }
     /* Create command encoder for this frame */
     this.commandEncoder = this.device.createCommandEncoder();
 

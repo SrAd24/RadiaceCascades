@@ -24,6 +24,9 @@ class _input {
   private mousePressed = [false, false, false];     // Currently held buttons
   private mouseJustPressed = [false, false, false]; // Buttons pressed this frame
   
+  // Input change tracking
+  public isChanged: boolean = true;                 // Input state changed this frame
+  
   private canvasID: HTMLElement;
   private bodyID: HTMLElement;
 
@@ -64,6 +67,7 @@ class _input {
       this.mouseDY = e.clientY - this.mouseY;
       this.mouseX = e.clientX;                   // Update position
       this.mouseY = e.clientY;
+      if (this.mouseDX !== 0 || this.mouseDY !== 0) this.isChanged = true;
     });
     
     // Mouse wheel
@@ -101,7 +105,13 @@ class _input {
   public async response(): Promise<void> {
     this.keysJustPressed.clear();           // Clear just pressed keys
     this.mouseJustPressed.fill(false);     // Clear just pressed buttons
-    this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
+    
+    // Don't reset deltas if Alt is pressed
+    const isAlt = this.isKeyPressed("AltLeft") || this.isKeyPressed("AltRight");
+    if (!isAlt) {
+      this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
+    }
+    
   }
 } /** End of '_input' class */
 
