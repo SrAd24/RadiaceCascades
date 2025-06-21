@@ -15,9 +15,11 @@ interface texture_descriptor {
   format: GPUTextureFormat;
   usage: GPUTextureUsageFlags;
   size: { width: number; height: number };
+  layerCount?: number;
   mipMaps?: boolean;
   sampleCount?: number;
   access?: GPUStorageTextureAccess;
+  viewDimension?: GPUTextureViewDimension;
 } /** End of 'texture_descriptor' interface */
 
 /** Texture class */
@@ -42,6 +44,7 @@ class texture {
   public isStorage: boolean = false;
   public isSizeChanged: boolean = false;
   public format!: GPUTextureFormat;
+  public viewDimension!: GPUTextureViewDimension;
   public access!: GPUStorageTextureAccess;
 
   /** #public parameters */
@@ -116,22 +119,26 @@ class texture {
     let mipCount = 1;
     if (textureParams.mipMaps == true)
       mipCount = Math.floor(Math.log2(Math.max(this.width, this.height))) + 1;
-
+    let layerCount = 1;
+    if (textureParams.layerCount)
+      layerCount = textureParams.layerCount;
     this.descriptor = {
-      size: [this.width, this.height],
+      size: [this.width, this.height, layerCount],
       format: textureParams.format,
       usage: textureParams.usage,
       mipLevelCount: mipCount,
       sampleCount: textureParams.sampleCount,
-      dimension: "2d",
     };
 
     this.isStorage = (this.descriptor.usage & GPUTextureUsage.STORAGE_BINDING) !== 0;
     if (this.isStorage)
       this.access = textureParams.access as GPUStorageTextureAccess;
 
-    this.texture = await this.render.device.createTexture(this.descriptor);
-    this.view = await this.texture.createView();
+    this.texture = this.render.device.createTexture(this.descriptor);
+    if (textureParams.viewDimension)
+      this.viewDimension = textureParams.viewDimension, this.view = this.texture.createView({dimension: textureParams.viewDimension});
+    else 
+      this.view = this.texture.createView();
   } /** End of 'createBindGroup' function */
 
   /** #public parameters */

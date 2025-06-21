@@ -75,7 +75,7 @@ class compute {
     shaderCode = shaderCode.replace(includeRegex, (_, includeFile) => {
       return includeMap.get(includePath + includeFile);
     });
-    
+
     const shaderModule = this.render.device.createShaderModule({
       code: shaderCode,
       label: `Processed shader: ${shaderPath}`
@@ -97,7 +97,7 @@ class compute {
 
     for (let i = 0; i < this.bindGroups.length; i++)
       for (let j = 0; j < this.bindGroups[i].length; j++)
-      layouts.push(this.bindGroups[i][j].bindGroupLayout);
+        layouts.push(this.bindGroups[i][j].bindGroupLayout);
 
     layouts = [...new Set(layouts)];
     let pipelineLayout = this.render.device.createPipelineLayout({
@@ -134,7 +134,7 @@ class compute {
    */
   public dispatch(workGroupCountX: number, workGroupCountY: number, indices: number[]) {
     for (let i = 0; i < indices.length; i++)
-      this.computeEncoder.setBindGroup(this.bindGroups[i][indices[i]].index, this.bindGroups[i][indices[i]].bindGroup);
+      this.computeEncoder.setBindGroup(i, this.bindGroups[i][indices[i]].bindGroup);
       
     this.computeEncoder.dispatchWorkgroups(workGroupCountX, workGroupCountY);
   } /** End of 'dispatch' function */

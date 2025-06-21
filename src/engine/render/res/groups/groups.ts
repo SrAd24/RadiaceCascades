@@ -16,6 +16,7 @@ import { texture } from "../textures/textures";
 /** Bind group interface */
 interface group_descriptor {
   groupIndex: number;
+  layout?: GPUBindGroupLayout;
   bindings: Array<{
     binding: number;
     visibility: GPUShaderStageFlags;
@@ -69,6 +70,7 @@ class group {
    * @returns none
    */
   public async create(groupParams: group_descriptor) {
+    if (!groupParams.layout) {
     // Create bind group layout
     const bindGroupLayoutDescriptor: GPUBindGroupLayoutDescriptor = {
       entries: [],
@@ -80,7 +82,6 @@ class group {
     const entriesLayout: GPUBindGroupLayoutEntry[] = [];
 
     for (let i = 0; i < groupParams.bindings.length; i++) {
-      this.numOfLayouts++;
       if (groupParams.bindings[i].buffer) {
         entriesLayout.push({
           binding: groupParams.bindings[i].binding,
@@ -97,7 +98,7 @@ class group {
         entriesLayout.push({
           binding: groupParams.bindings[i].binding,
           visibility: groupParams.bindings[i].visibility,
-          storageTexture: { format: groupParams.bindings[i].texture!.format, access: groupParams.bindings[i].texture!.access },
+          storageTexture: { format: groupParams.bindings[i].texture!.format, access: groupParams.bindings[i].texture!.access, viewDimension: groupParams.bindings[i].texture!.viewDimension },
         });
       } else if (!groupParams.bindings[i].texture?.isStorage) {
         entriesLayout.push({
@@ -107,11 +108,15 @@ class group {
         });
       } 
     }
+    
 
     bindGroupLayoutDescriptor.entries = entriesLayout;
     this.bindGroupLayout = this.render.device.createBindGroupLayout(
       bindGroupLayoutDescriptor,
     );
+  }
+  else 
+    this.bindGroupLayout = groupParams.layout;
 
     const bindGroupDescriptor: GPUBindGroupDescriptor = {
       layout: this.bindGroupLayout,
@@ -152,7 +157,6 @@ class group {
         });
       }
     }
-    console.log(this.objects)
     bindGroupDescriptor.entries = entries;
     
     this.bindGroup = this.render.device.createBindGroup(bindGroupDescriptor);

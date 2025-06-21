@@ -32,7 +32,7 @@ interface drawingPrim {
 class render extends core {
   /** #private parameters */
   // Render parameters
-  private commandEncoder!: GPUCommandEncoder; // Command encoder
+  public commandEncoder!: GPUCommandEncoder; // Command encoder
   private passEncoder!: GPURenderPassEncoder; // Pass encoder
   private depthTexture!: texture; // Depth texture 
   private msaaTexture!: texture; // Msaa texture for rendering
