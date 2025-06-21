@@ -1,0 +1,10 @@
+{
+  "entry": ["./src/**/*.ts"],
+  "outDir": "js",
+  "clean": true,
+  "target": "es2020",
+  "platform": "browser",
+  "format": ["esm"],
+  "sourcemap": false,
+  "external": ["three"]
+}

@@ -1,0 +1,19 @@
+/* TODO #7 @CGSG220AI3 make comments, make compiler on server */
+body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 2fr 1fr;
+  background-color: #101010;
+  row-gap: 20px;
+  column-gap: 20px;
+  justify-items: center;
+  justify-content: space-around;
+  align-items: center;
+  grid-template-areas: "header header header header" "body body body body" "footer footer footer footer";
+}
+body canvas {
+  grid-area: body;
+  background: #101010;
+}
+
+/*# sourceMappingURL=style.css.map */

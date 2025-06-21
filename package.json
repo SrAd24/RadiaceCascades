@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@types/three": "^0.177.0",
+    "@webgpu/types": "^0.1.61",
+    "three": "^0.177.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}
