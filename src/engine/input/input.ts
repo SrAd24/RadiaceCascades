@@ -16,6 +16,11 @@ class _input {
   public mouseDY: number = 0;       // Mouse Y delta (movement)
   public mouseDZ: number = 0;       // Mouse wheel delta
   
+  // Accumulated mouse movement for smooth input
+  private accumulatedDX: number = 0;
+  private accumulatedDY: number = 0;
+  private accumulatedDZ: number = 0;
+  
   // Keyboard state tracking
   private keysPressed = new Set<string>();      // Currently held keys
   private keysJustPressed = new Set<string>();  // Keys pressed this frame
@@ -63,24 +68,34 @@ class _input {
     
     // Mouse movement
     this.bodyID.addEventListener("mousemove", (e: MouseEvent) => {
-      this.mouseDX = e.clientX - this.mouseX;    // Calculate delta
-      this.mouseDY = e.clientY - this.mouseY;
+      const deltaX = e.clientX - this.mouseX;    // Calculate delta
+      const deltaY = e.clientY - this.mouseY;
+      
+      this.accumulatedDX += deltaX;              // Accumulate movement
+      this.accumulatedDY += deltaY;
+      
       this.mouseX = e.clientX;                   // Update position
       this.mouseY = e.clientY;
-      if (this.mouseDX !== 0 || this.mouseDY !== 0) this.isChanged = true;
+      if (deltaX !== 0 || deltaY !== 0) this.isChanged = true;
     });
     
-    // Mouse wheel
+    // Mouse wheel - prevent page zoom everywhere
+    document.addEventListener("wheel", (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault(); // Prevent zoom
+      }
+    }, { passive: false });
+    
     this.canvasID.addEventListener("wheel", (e: WheelEvent) => {
       e.preventDefault();
-      this.mouseDZ = e.deltaY;
+      this.accumulatedDZ += e.deltaY;
     });
     
     // Prevent context menu and reset on mouse leave
     this.canvasID.addEventListener("contextmenu", (e: Event) => e.preventDefault());
     this.canvasID.addEventListener("mouseleave", () => {
       this.mousePressed.fill(false);
-      this.mouseDX = this.mouseDY = 0;
+      this.accumulatedDX = this.accumulatedDY = 0;
     });
   }
 
@@ -106,10 +121,13 @@ class _input {
     this.keysJustPressed.clear();           // Clear just pressed keys
     this.mouseJustPressed.fill(false);     // Clear just pressed buttons
     
-    // Don't reset deltas if Alt is pressed
-    const isAlt = this.isKeyPressed("AltLeft") || this.isKeyPressed("AltRight");
-    this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
+    // Transfer accumulated movement to current deltas
+    this.mouseDX = this.accumulatedDX;
+    this.mouseDY = this.accumulatedDY;
+    this.mouseDZ = this.accumulatedDZ;
     
+    // Reset accumulated movement
+    this.accumulatedDX = this.accumulatedDY = this.accumulatedDZ = 0;
   }
 } /** End of '_input' class */
 

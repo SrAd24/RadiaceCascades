@@ -65,11 +65,12 @@ fn GeometrySmith(N: vec3f, V: vec3f, L: vec3f, roughness: f32) -> f32 {
  * @param data: vertexOut
  */
 fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
-  // Sample textures
   var albedo: vec3f = textureSample(albedo, linearSampler, data.texcoord).rgb;
+  //albedo = unpackVec4FromVec2(albedo.xy).xyz; // sRGB to linear
   albedo = pow(albedo, vec3f(2.2)); // sRGB to linear
   // var alpha = textureSample(emissive, linearSampler, data.texcoord).a; // sRGB to linear
-  
+  // var a = packUnorm2x16(vec2f(1, 1));
+   
   var roughness: f32 = textureSample(roughness, linearSampler, data.texcoord).g;
   var metallic: f32 = textureSample(metallic, linearSampler, data.texcoord).b;
   
@@ -121,10 +122,11 @@ fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
   // Add ambient lighting\
   let ao = max(textureSample(ao, linearSampler, data.texcoord).r, 0.1);
   // Применить AO к ambient освещению:
-  let ambient = vec3f(0.05) * albedo * ao; //* max(ao, 0.1);
+  let ambient = vec3f(0.05) * albedo; //* max(ao, 0.1);
   // let ambient = vec3f(0.05) * albedo;
   let finalColor = Lo + ambient;
   
   // Gamma correction
-  return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), 1.0);
+  // return vec4f(pow(finalColor, vec3f(1 / 2.2)), 1.0);//vec3f(roughness), 1.0);//
+  return vec4f(pow(finalColor, vec3f(1 / 2.2)), 1.0);//vec3f(roughness), 1.0);//
 }

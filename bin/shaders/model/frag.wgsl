@@ -12,6 +12,16 @@
 /** Fragment shader **/
 const PI: f32 = 3.14159265359;
 
+// Распаковка vec4f из одного u32 (по 8 бит на компонент)
+fn unpackVec4FromUint(packed: u32) -> vec4f {
+  let x = f32(packed & 0xFFu) / 255.0;
+  let y = f32((packed >> 8u) & 0xFFu) / 255.0;
+  let z = f32((packed >> 16u) & 0xFFu) / 255.0;
+  let w = f32((packed >> 24u) & 0xFFu) / 255.0;
+  
+  return vec4f(x, y, z, w);
+}
+
 fn fresnelSchlick(cosTheta: f32, F0: vec3f) -> vec3f {
   return F0 + (vec3f(1.0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 4.0);
 }
@@ -114,7 +124,7 @@ fn fragment_main(data: vertexOut) -> @location(0) vec4f {
   let ao = max(textureSample(ao, linearSampler, data.texcoord).r, 0.1);
   
   // Применить AO к ambient освещению:
-  let ambient = vec3f(0.05) * Alb * ao;
+  let ambient = vec3f(0.05) * Alb;
   // let ambient = vec3f(0.05) * albedo;
   let finalColor = Lo + ambient;
   

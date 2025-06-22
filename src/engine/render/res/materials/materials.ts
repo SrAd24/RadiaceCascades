@@ -78,37 +78,37 @@ class material {
 
     this.albedo = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.roughness = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.metallic = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.emissive = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.normalMap = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.ambientOcclusion = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba16float",
+      format: "rgba8unorm",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });

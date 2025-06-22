@@ -293,7 +293,7 @@ class render extends core {
     
     this.mipMapGroupLayout = this.device.createBindGroupLayout({
       entries: [
-        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: { } },
         { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ],
     });
@@ -312,7 +312,7 @@ class render extends core {
       fragment: {
         module: fragmentShader,
         entryPoint: 'fragment_main',
-        targets: [{ format: 'rgba16float' }],
+        targets: [{ format: 'rgba8unorm' }],
       },
       primitive: { topology: 'triangle-list' },
     });
@@ -374,7 +374,7 @@ class render extends core {
 
       let w: mat4;
       if (prim.isTransformChanged == true)
-        w = prim.transform.mul(world), prim.isTransformChanged = false;
+        w = prim.transform.mul(world);
       else
         w = world;
 

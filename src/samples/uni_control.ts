@@ -27,12 +27,26 @@ class _uni_control extends unit {
   private targetElevator: number = 90;
   private targetDist: number = 5;
   private targetAt: vec3 = new vec3(0, 0, 0);
-  private smoothFactor: number = 0.1;
+  private smoothFactor: number = 0.08;
   
   // First person camera smoothing
   private fpTargetYaw: number = -90;
   private fpTargetPitch: number = 0;
-  private fpSmoothFactor: number = 0.15;
+  private fpSmoothFactor: number = 0.25;
+  
+  // Saved 3rd person camera state
+  private saved3rdPersonLoc: vec3 = new vec3(0, 0, 0);
+  private saved3rdPersonAt: vec3 = new vec3(0, 0, 0);
+  private saved3rdPersonAzimuth: number = 0;
+  private saved3rdPersonElevator: number = 90;
+  private saved3rdPersonDist: number = 5;
+  
+  // Smooth transition back to 3rd person
+  private isTransitioningTo3rd: boolean = false;
+  private transitionStartTime: number = 0;
+  private transitionDuration: number = 1.5; // seconds
+  private transitionStartLoc: vec3 = new vec3(0, 0, 0);
+  private transitionStartAt: vec3 = new vec3(0, 0, 0);
   
   /** #public parameters */
   /**
@@ -58,6 +72,14 @@ class _uni_control extends unit {
     if (input.isKeyJustPressed("KeyF")) {
       this.isFirstPerson = !this.isFirstPerson;
       if (this.isFirstPerson) {
+        // Save current 3rd person camera state
+        ani.cam.setOrientation();
+        this.saved3rdPersonLoc = ani.cam.loc;
+        this.saved3rdPersonAt = ani.cam.at;
+        this.saved3rdPersonAzimuth = ani.cam.azimuth;
+        this.saved3rdPersonElevator = ani.cam.elevator;
+        this.saved3rdPersonDist = ani.cam.dist;
+        
         // Initialize first person camera from current view direction
         this.fpPosition = ani.cam.loc;
         
@@ -78,8 +100,19 @@ class _uni_control extends unit {
           this.updateCameraVectors();
         }
       } else {
-        // When switching back to 3rd person, keep current camera state
-        ani.cam.setOrientation();
+        // When switching back to 3rd person, start smooth transition
+        this.isTransitioningTo3rd = true;
+        this.transitionStartTime = timer.globalTime;
+        
+        // Save current first person camera state as transition start
+        this.transitionStartLoc = ani.cam.loc;
+        this.transitionStartAt = ani.cam.at;
+        
+        // Set targets to saved values
+        this.targetAt = this.saved3rdPersonAt;
+        this.targetAzimuth = this.saved3rdPersonAzimuth;
+        this.targetElevator = this.saved3rdPersonElevator;
+        this.targetDist = this.saved3rdPersonDist;
       }
     }
     
@@ -91,8 +124,8 @@ class _uni_control extends unit {
     if (this.isFirstPerson) {
       // Update mouse look only when left click is held
       if (input.leftClick && (input.mouseDX !== 0 || input.mouseDY !== 0)) {
-        this.fpTargetYaw += input.mouseDX * 0.4;
-        this.fpTargetPitch -= input.mouseDY * 0.4;
+        this.fpTargetYaw += input.mouseDX * 0.15;
+        this.fpTargetPitch -= input.mouseDY * 0.15;
         this.fpTargetPitch = Math.max(-89, Math.min(89, this.fpTargetPitch));
       }
       
@@ -125,12 +158,9 @@ class _uni_control extends unit {
     } else {
       // Third person camera with smooth interpolation
       if (isShift && (hasMouseMovement || hasArrowInput || hasDistanceInput || input.leftClick || input.rightClick)) {
-        ani.cam.setOrientation();
-        
-        // Always sync target values with current camera state
-        if (Math.abs(this.targetAzimuth - ani.cam.azimuth) > 180 || 
-            Math.abs(this.targetElevator - ani.cam.elevator) > 90 ||
-            this.targetDist < 0.1) {
+        // Ensure target values are initialized
+        if (this.targetDist === 0 || isNaN(this.targetAzimuth)) {
+          ani.cam.setOrientation();
           this.targetAzimuth = ani.cam.azimuth;
           this.targetElevator = ani.cam.elevator;
           this.targetDist = ani.cam.dist;
@@ -141,8 +171,8 @@ class _uni_control extends unit {
         this.targetAzimuth += 
           ((input.leftClick ? 1 : 0) *
             timer.globalDeltaTime *
-            3 *
-            (-5.0 * input.mouseDX) +
+            1.5 *
+            (-2.0 * input.mouseDX) +
           ((input.isKeyPressed("ArrowLeft") ? 1 : 0) * -0.5 +
             (input.isKeyPressed("ArrowRight") ? 1 : 0) * 0.5)) *
             (1 + Number(isCtrl) * 3);
@@ -150,8 +180,8 @@ class _uni_control extends unit {
         this.targetElevator += 
           ((input.leftClick ? 1 : 0) *
             timer.globalDeltaTime *
-            2 *
-            (5.0 * input.mouseDY) +
+            1.0 *
+            (2.0 * input.mouseDY) +
           ((input.isKeyPressed("ArrowUp") ? 1 : 0) * -0.5 + (input.isKeyPressed("ArrowDown") ? 1 : 0) * 0.5)) *
             (1 + Number(isCtrl) * 3);
 
@@ -166,34 +196,74 @@ class _uni_control extends unit {
         
         if (input.rightClick) {
           // Update target at position for panning
-          const panSpeed = 0.5 + Number(isCtrl) * 3;
-          const rightVec = ani.cam.right.mulNum(-input.mouseDX * panSpeed * 0.01);
-          const upVec = ani.cam.up.mulNum(input.mouseDY * panSpeed * 0.01);
+          const panSpeed = 0.3 + Number(isCtrl) * 2;
+          const rightVec = ani.cam.right.mulNum(-input.mouseDX * panSpeed * 0.005);
+          const upVec = ani.cam.up.mulNum(input.mouseDY * panSpeed * 0.005);
           this.targetAt = this.targetAt.add(rightVec).add(upVec);
         }
       }
 
       
       // Always interpolate towards target values for smooth movement
-      const deltaTime = timer.globalDeltaTime;
-      const lerpFactor = Math.min(1.0, this.smoothFactor * deltaTime * 60); // 60fps normalized
-      
-      // Smooth interpolation
-      ani.cam.azimuth += (this.targetAzimuth - ani.cam.azimuth) * lerpFactor;
-      ani.cam.elevator += (this.targetElevator - ani.cam.elevator) * lerpFactor;
-      ani.cam.dist += (this.targetDist - ani.cam.dist) * lerpFactor;
-      ani.cam.at = ani.cam.at.add(this.targetAt.sub(ani.cam.at).mulNum(lerpFactor));
-      
-      // Update camera position
-      ani.cam.set(
-        mat4
-          .rotateX(ani.cam.elevator)
-          .mul(mat4.rotateY(ani.cam.azimuth))
-          .mul(mat4.translate(ani.cam.at))
-          .TransformPoint(new vec3(0, ani.cam.dist, 0)),
-        ani.cam.at,
-        new vec3(0, 1, 0),
-      );
+      if (this.targetDist > 0 && !isNaN(this.targetAzimuth)) {
+        const deltaTime = timer.globalDeltaTime;
+        let lerpFactor;
+        
+        // Use different approach during transition
+        if (this.isTransitioningTo3rd) {
+          const elapsed = timer.globalTime - this.transitionStartTime;
+          const progress = Math.min(elapsed / this.transitionDuration, 1.0);
+          
+          // Smooth easing function (ease-out)
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          
+          // Calculate target 3rd person position
+          const target3rdLoc = mat4
+            .rotateX(this.saved3rdPersonElevator)
+            .mul(mat4.rotateY(this.saved3rdPersonAzimuth))
+            .mul(mat4.translate(this.saved3rdPersonAt))
+            .TransformPoint(new vec3(0, this.saved3rdPersonDist, 0));
+          
+          // Interpolate between current position and target
+          const currentLoc = this.transitionStartLoc.add(
+            target3rdLoc.sub(this.transitionStartLoc).mulNum(easedProgress)
+          );
+          const currentAt = this.transitionStartAt.add(
+            this.saved3rdPersonAt.sub(this.transitionStartAt).mulNum(easedProgress)
+          );
+          
+          // Set camera directly during transition
+          ani.cam.set(currentLoc, currentAt, new vec3(0, 1, 0));
+          
+          if (progress >= 1.0) {
+            this.isTransitioningTo3rd = false;
+            // Set final values for normal operation
+            ani.cam.azimuth = this.saved3rdPersonAzimuth;
+            ani.cam.elevator = this.saved3rdPersonElevator;
+            ani.cam.dist = this.saved3rdPersonDist;
+            ani.cam.at = this.saved3rdPersonAt;
+          }
+        } else {
+          lerpFactor = Math.min(1.0, this.smoothFactor * deltaTime * 60); // Normal speed
+          
+          // Smooth interpolation
+          ani.cam.azimuth += (this.targetAzimuth - ani.cam.azimuth) * lerpFactor;
+          ani.cam.elevator += (this.targetElevator - ani.cam.elevator) * lerpFactor;
+          ani.cam.dist += (this.targetDist - ani.cam.dist) * lerpFactor;
+          ani.cam.at = ani.cam.at.add(this.targetAt.sub(ani.cam.at).mulNum(lerpFactor));
+          
+          // Update camera position
+          ani.cam.set(
+            mat4
+              .rotateX(ani.cam.elevator)
+              .mul(mat4.rotateY(ani.cam.azimuth))
+              .mul(mat4.translate(ani.cam.at))
+              .TransformPoint(new vec3(0, ani.cam.dist, 0)),
+            ani.cam.at,
+            new vec3(0, 1, 0),
+          );
+        }
+      }
     }
   } /** End of 'response' function */
 

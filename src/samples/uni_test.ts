@@ -91,7 +91,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async render(ani: anim): Promise<any> {
-    await ani.drawModel(this.mdl, mat4.rotateX(90).mul(mat4.rotateY(timer.time * 30).mul(mat4.scale(new vec3(0.2)).mul(mat4.translate(new vec3(0, -30, 0))))));
+    await ani.drawModel(this.mdl, mat4.rotateX(90).mul(mat4.rotateY(timer.time * 10).mul(mat4.scale(new vec3(0.2)))));
 
   } /** End of 'render' function */
 

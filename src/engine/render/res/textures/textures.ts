@@ -158,7 +158,7 @@ class texture {
       this.texture = this.render.device.createTexture(this.descriptor);
       this.view = this.texture.createView();
     }
-    this.render.device.queue.copyExternalImageToTexture(
+    this.render.queue.copyExternalImageToTexture(
       { source: image },
       { texture: this.texture },
       [image.width, image.height],
@@ -173,14 +173,33 @@ class texture {
    */
   public async updateByData(data: Float32Array | Uint32Array | Uint8Array) {
     const bytesPerPixel = this.getBytesPerPixel(this.descriptor.format);
-      
-    await this.render.queue.writeTexture(
+    
+    // Ensure data is in correct format for the texture
+    let srcData: ArrayBufferView;
+    if (this.descriptor.format.includes('float')) {
+      // For float formats, ensure we use Float32Array
+      if (!(data instanceof Float32Array)) {
+        srcData = new Float32Array(data);
+      } else {
+        srcData = data;
+      }
+    } else if (this.descriptor.format.includes('unorm') || this.descriptor.format.includes('snorm')) {
+      srcData = new Uint32Array([data[0] * 255, data[1] * 255, data[2] * 255, data[3] * 255]);
+    } else {
+      srcData = data;
+    }
+    
+    console.log(data)
+    console.log('Writing texture data:', srcData, 'Format:', this.descriptor.format);
+
+    this.render.queue.writeTexture(
       {
         texture: this.texture,
       },
-      data as GPUAllowSharedBufferSource,
+      srcData.buffer,
       {
-        bytesPerRow: this.width * bytesPerPixel
+        bytesPerRow: this.width * bytesPerPixel,
+        rowsPerImage: this.height
       },
       [this.width, this.height]
     );

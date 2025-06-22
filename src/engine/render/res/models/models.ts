@@ -52,6 +52,41 @@ class model {
     
     const meshes: any[] = [];
     
+    // Parse nodes and their transforms
+    const nodeTransforms = new Map<number, mat4>();
+    if (gltf.nodes) {
+      for (let i = 0; i < gltf.nodes.length; i++) {
+        const node = gltf.nodes[i];
+        let transform = mat4.identity();
+        
+        if (node.matrix) {
+          // GLTF matrices are stored in column-major order, need to transpose
+          transform = new mat4(
+            node.matrix[0], node.matrix[4], node.matrix[8], node.matrix[12],
+            node.matrix[1], node.matrix[5], node.matrix[9], node.matrix[13],
+            node.matrix[2], node.matrix[6], node.matrix[10], node.matrix[14],
+            node.matrix[3], node.matrix[7], node.matrix[11], node.matrix[15]
+          );
+        } else {
+          // Build from TRS
+          if (node.translation) {
+            transform = transform.mul(mat4.translate(new vec3(node.translation[0], node.translation[1], node.translation[2])));
+          }
+          if (node.rotation) {
+            // Convert quaternion to matrix (GLTF quaternions are [x, y, z, w])
+            const q = node.rotation;
+            const rotMat = mat4.rotateQuaternion(q[0], q[1], q[2], q[3]);
+            transform = transform.mul(rotMat);
+          }
+          if (node.scale) {
+            transform = transform.mul(mat4.scale(new vec3(node.scale[0], node.scale[1], node.scale[2])));
+          }
+        }
+        
+        nodeTransforms.set(i, transform);
+      }
+    }
+    
     for (const mesh of gltf.meshes || []) {
       for (const primitive of mesh.primitives || []) {
         const vertices: any[] = [];
@@ -114,11 +149,24 @@ class model {
           }
         }
         
+        // Find which node uses this mesh
+        let meshTransform = mat4.identity();
+        if (gltf.nodes) {
+          for (let nodeIndex = 0; nodeIndex < gltf.nodes.length; nodeIndex++) {
+            const node = gltf.nodes[nodeIndex];
+            if (node.mesh === gltf.meshes.indexOf(mesh)) {
+              meshTransform = nodeTransforms.get(nodeIndex) || mat4.identity();
+              break;
+            }
+          }
+        }
+        
         meshes.push({
           vertices,
           indices,
           materialIndex: primitive.material || 0,
-          hasNormalMap: primitive.material !== undefined && gltf.materials?.[primitive.material]?.normalTexture !== undefined
+          hasNormalMap: primitive.material !== undefined && gltf.materials?.[primitive.material]?.normalTexture !== undefined,
+          transform: meshTransform
         });
       }
     }
@@ -218,13 +266,20 @@ class model {
     for (const meshData of parsedData.meshes) {
       const hasNormalMap = meshData.hasNormalMap || false;
       const vertices: (std | std_ext)[] = [];
+      const transform = meshData.transform || mat4.identity();
+      if (meshData.transform)
+        console.log(meshData.transform)
       
       for (const vertex of meshData.vertices) {
+        // Use original position without transformation for now
+        const originalPos = new vec3(vertex.position[0], vertex.position[1], vertex.position[2]);
+        // const transformedPos = transform.TransformPoint(originalPos);
+        
         let v: std | std_ext;
         if (hasNormalMap) {
-          v = new std_ext(new vec3(vertex.position[0], vertex.position[1], vertex.position[2]));
+          v = new std_ext(originalPos);
         } else {
-          v = new std(new vec3(vertex.position[0], vertex.position[1], vertex.position[2]));
+          v = new std(originalPos);
         }
         v.t = new vec2(vertex.texCoord[0], vertex.texCoord[1]);
         vertices.push(v);
@@ -333,6 +388,7 @@ class model {
           normalMap: normalTexture,
           ao: aoTexture,
         });
+        console.log(albedoTexture || new vec3(baseColor[0], baseColor[1], baseColor[2]) )
         
         materials.push(material);
         console.log(`Created material with textures: albedo=${!!albedoTexture}, normal=${!!normalTexture}`);
