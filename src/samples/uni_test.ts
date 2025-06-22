@@ -78,8 +78,11 @@ class _uni_test extends unit {
     //   topology: topo,
     // });
 
-    this.mdl = await ani.createModel("cow.obj");
-    this.t = 15;
+    this.mdl = await ani.createModel({
+        name: "girl",
+        format: "gltf"
+    });
+    console.log(this.mdl)
   } /** End of 'init' function */
 
   /**
@@ -88,7 +91,7 @@ class _uni_test extends unit {
    * @returns none
    */
   public async render(ani: anim): Promise<any> {
-    await ani.drawModel(this.mdl);
+    await ani.drawModel(this.mdl, mat4.rotateX(90).mul(mat4.rotateY(timer.time * 30).mul(mat4.scale(new vec3(0.2)).mul(mat4.translate(new vec3(0, -30, 0))))));
 
   } /** End of 'render' function */
 
@@ -101,19 +104,19 @@ class _uni_test extends unit {
     // await ani.drawModel(this.mdl, mat4.translate(new vec3(0, 0, 0).mulNum(3)));
     // await ani.drawModel(this.mdl, mat4.translate(new vec3(1)));
 
-    let slider = document.getElementById('mySlider');
-    let valueDisplay = document.getElementById('sliderValue');
-    if (slider && valueDisplay)
-    {
-      slider.addEventListener('input', (e) => {
-        valueDisplay.textContent = e.target.value;
-        this.t = e.target.value;
-      });
-    }
-    for (let i = 0; i < this.t; i++)
-      for (let j = 0; j < this.t; j++)
-        for (let k = 0; k < this.t; k++)
-          this.mdl.prims[0].addInstance(mat4.rotateY(timer.time * 30).mul(mat4.translate(new vec3(i, j, k).mulNum(20))));
+    // let slider = document.getElementById('mySlider');
+    // let valueDisplay = document.getElementById('sliderValue');
+    // if (slider && valueDisplay)
+    // {
+    //   slider.addEventListener('input', (e) => {
+    //     valueDisplay.textContent = e.target.value;
+    //     this.t = e.target.value;
+    //   });
+    // }
+    // for (let i = -this.t / 2; i < this.t / 2; i++)
+    //   for (let j = -this.t / 2; j < this.t / 2; j++)
+    //     for (let k = -this.t / 2; k < this.t / 2; k++)
+    //       this.mdl.prims[0].addInstance(mat4.rotateY(timer.time * 30).mul(mat4.translate(new vec3(i, j, k).mulNum(20))));
     
 
   } /** End of 'response' function */

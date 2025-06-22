@@ -108,9 +108,7 @@ class _input {
     
     // Don't reset deltas if Alt is pressed
     const isAlt = this.isKeyPressed("AltLeft") || this.isKeyPressed("AltRight");
-    if (!isAlt) {
-      this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
-    }
+    this.mouseDX = this.mouseDY = this.mouseDZ = 0;  // Reset deltas
     
   }
 } /** End of '_input' class */

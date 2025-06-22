@@ -1,11 +1,11 @@
-/* FILE NAME   : vert.wgsl
- * PURPOSE     : Cascade radiance implementation project.
- * PROGRAMMER  : CGSG'SrAd'2024.
- *               Timofey Hudyakov (TH4),
- *               Rybinskiy Gleb (GR1),
- *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 17.06.2025
- */
+// /* FILE NAME   : vert.wgsl
+//  * PURPOSE     : Cascade radiance implementation project.
+//  * PROGRAMMER  : CGSG'SrAd'2024.
+//  *               Timofey Hudyakov (TH4),
+//  *               Rybinskiy Gleb (GR1),
+//  *               Ilyasov Alexander (AI3).
+//  * LAST UPDATE : 17.06.2025
+//  */
 
 #include "prim.wgsl"
 
@@ -92,9 +92,10 @@ fn pbr(Pos: vec3f, V: vec3f, L: vec3f, N: vec3f, Alb: vec3f, Rou: f32, Met: f32,
 fn fragment_main(data: vertexOut) -> @location(0) vec4f {
   var Alb: vec3f = textureSample(albedo, linearSampler, data.texcoord).rgb;
   Alb = pow(Alb, vec3f(2.2));
+  var alpha = textureSample(emissive, linearSampler, data.texcoord).a; // sRGB to linear
 
-  var Rou: f32 = textureSample(roughness, linearSampler, data.texcoord).r;
-  var Met: f32 = textureSample(metallic, linearSampler, data.texcoord).r;
+  var Rou: f32 = textureSample(roughness, linearSampler, data.texcoord).g;
+  var Met: f32 = textureSample(metallic, linearSampler, data.texcoord).b;
   
   // point components
   var Pos = data.position;
@@ -109,5 +110,17 @@ fn fragment_main(data: vertexOut) -> @location(0) vec4f {
 
   var color = Lo;
 
-  return vec4f(pow(color, vec3f(1 / 2.2)), 1.0);
-} /** End of 'fragment_main' function*/
+  // Add ambient lighting\
+  let ao = max(textureSample(ao, linearSampler, data.texcoord).r, 0.1);
+  
+  // Применить AO к ambient освещению:
+  let ambient = vec3f(0.05) * Alb * ao;
+  // let ambient = vec3f(0.05) * albedo;
+  let finalColor = Lo + ambient;
+  
+  // Gamma correction
+  return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), 1.0);
+
+  // Gamma correction
+  //return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), 1.0);
+}

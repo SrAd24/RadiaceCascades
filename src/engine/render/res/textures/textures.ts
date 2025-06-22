@@ -154,8 +154,9 @@ class texture {
       this.destroy();
       this.isSizeChanged = true;
       this.descriptor.size = [(this.width = image.width), (this.height = image.height)];
-      this.texture = await this.render.device.createTexture(this.descriptor);
-      this.view = await this.texture.createView();
+      this.descriptor.mipLevelCount = Math.floor(Math.log2(Math.max(this.width, this.height))) + 1;
+      this.texture = this.render.device.createTexture(this.descriptor);
+      this.view = this.texture.createView();
     }
     this.render.device.queue.copyExternalImageToTexture(
       { source: image },

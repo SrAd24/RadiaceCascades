@@ -219,6 +219,36 @@ class mat4 {
   } /* End of 'rotate' function */
 
   /**
+   * @info Rotate matrix by quaternion function
+   * @param x: number - quaternion x component
+   * @param y: number - quaternion y component
+   * @param z: number - quaternion z component
+   * @param w: number - quaternion w component
+   * @returns result matrix
+   */
+  public static rotateQuaternion(x: number, y: number, z: number, w: number): mat4 {
+    const x2 = x * 2;
+    const y2 = y * 2;
+    const z2 = z * 2;
+    const xx = x * x2;
+    const xy = x * y2;
+    const xz = x * z2;
+    const yy = y * y2;
+    const yz = y * z2;
+    const zz = z * z2;
+    const wx = w * x2;
+    const wy = w * y2;
+    const wz = w * z2;
+
+    return new mat4(
+      1 - (yy + zz), xy + wz, xz - wy, 0,
+      xy - wz, 1 - (xx + zz), yz + wx, 0,
+      xz + wy, yz - wx, 1 - (xx + yy), 0,
+      0, 0, 0, 1
+    );
+  } /* End of 'rotateQuaternion' function */
+
+  /**
    * @info Matrix multipling function
    * @param matrix: mat4
    * @returns result matrix

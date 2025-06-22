@@ -155,7 +155,7 @@ class camera {
 
     dv = this.right
       .mulNum(sx)
-      .add(this.up.mulNum(sy));
+      .add(this.up.mulNum(sy * (1 + input.isKeyPressed("ControlLeft") * 3)));
 
     dv.mulNum(0.5 + Number(input.isKeyPressed("ControlLeft") || input.isKeyPressed("ControlRight")) * 3);
     this.at = this.at.add(dv);

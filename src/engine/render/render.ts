@@ -61,6 +61,8 @@ class render extends core {
   public mtlLayout!: GPUBindGroupLayout; // Layout for materials
   public globalGroup!: group; // Global bind group with matrices, camera 
   public cam: camera = new camera(0, 0); // Render camera
+  public mipMapPipeline!: GPURenderPipeline;
+  public mipMapGroupLayout!: GPUBindGroupLayout;
 
   /**
    * @info Render constructor
@@ -227,31 +229,37 @@ class render extends core {
           // Albedo
           binding: 0,
           visibility: GPUShaderStage.FRAGMENT,
-          texture: { sampleType: 'unfilterable-float' }
+          texture: { sampleType: 'float' }
         },
         {
           // Roughness
           binding: 1,
           visibility: GPUShaderStage.FRAGMENT,
-          texture: { sampleType: 'unfilterable-float' }
+          texture: { sampleType: 'float' }
         },
         {
           // Metallic
           binding: 2,
           visibility: GPUShaderStage.FRAGMENT,
-          texture: { sampleType: 'unfilterable-float' }
+          texture: { sampleType: 'float' }
         },
         {
           // Normal map
           binding: 3,
           visibility: GPUShaderStage.FRAGMENT,
-          texture: { sampleType: 'unfilterable-float' }
+          texture: { sampleType: 'float' }
         },
         {
           // Emsission
           binding: 4,
           visibility: GPUShaderStage.FRAGMENT,
-          texture: { sampleType: 'unfilterable-float' }
+          texture: { sampleType: 'float' }
+        },
+        {
+          // AO texture
+          binding: 5,
+          visibility: GPUShaderStage.FRAGMENT,
+          texture: { sampleType: 'float' }
         },
       ],
     });
@@ -265,19 +273,48 @@ class render extends core {
           visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
           sampler: {
             sampler: this.device.createSampler({
-              magFilter: 'nearest',
-              minFilter: 'nearest',
-              mipmapFilter: 'nearest',
+              magFilter: 'linear',
+              minFilter: 'linear',
+              mipmapFilter: 'linear',
               addressModeU: 'repeat',
               addressModeV: 'repeat',
               addressModeW: 'repeat',
               lodMinClamp: 0,
               lodMaxClamp: 32,
             }),
-            type: 'non-filtering',
+            type: 'filtering',
           },
         },
       ],
+    });
+
+    const vertexShader = this.device.createShaderModule({ code: await (await fetch('bin/shaders/downsample/vert.wgsl')).text() });
+    const fragmentShader = this.device.createShaderModule({ code: await (await fetch('bin/shaders/downsample/frag.wgsl')).text() });
+    
+    this.mipMapGroupLayout = this.device.createBindGroupLayout({
+      entries: [
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
+      ],
+    });
+    console.log(this.mipMapGroupLayout)
+    
+    const pipelineLayout = this.device.createPipelineLayout({
+      bindGroupLayouts: [this.mipMapGroupLayout],
+    });
+    
+    this.mipMapPipeline = this.device.createRenderPipeline({
+      layout: pipelineLayout,
+      vertex: {
+        module: vertexShader,
+        entryPoint: 'vertex_main',
+      },
+      fragment: {
+        module: fragmentShader,
+        entryPoint: 'fragment_main',
+        targets: [{ format: 'rgba16float' }],
+      },
+      primitive: { topology: 'triangle-list' },
     });
 
     this.nextPrimIndex = 0;
@@ -389,7 +426,7 @@ class render extends core {
        {
          view: this.msaaTexture.view, /* Render to MSAA texture */
          resolveTarget: this.context.getCurrentTexture().createView(), /* Resolve to canvas */
-         clearValue: [0.0, 0.0, 0.0, 1.0], /* Clear to black */
+         clearValue: [0.0, 0.0, 0.0, 1.0],//[0.98, 0.68, 0.85, 1.0], /* Clear to black */
          loadOp: "clear",
          storeOp: "store",
         },
@@ -403,7 +440,6 @@ class render extends core {
     };
 
    /* Update camera buffer efficiently */
-    if (input.isChanged) {
       if (!this.cameraData) this.cameraData = new Float32Array(64 + 64 + 64 + 16 * 5);
       
       let offset = 0;
@@ -417,8 +453,6 @@ class render extends core {
       this.cameraData.set([this.cam.up.x, this.cam.up.y, this.cam.up.z, this.cam.hp], offset);
       
       await this.cameraBuffer.update(this.cameraData);
-      input.isChanged = false;                 // Reset change flag
-    }
     /* Create command encoder for this frame */
     this.commandEncoder = this.device.createCommandEncoder();
 

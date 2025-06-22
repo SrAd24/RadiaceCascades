@@ -4,7 +4,7 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 10.06.2025
+ * LAST UPDATE : 22.06.2025
  */
 
 /** IMPORTS */
@@ -21,6 +21,18 @@ class _uni_control extends unit {
   private fpUp: vec3 = new vec3(0, 1, 0);
   private fpRight: vec3 = new vec3(1, 0, 0);
   private fpWorldUp: vec3 = new vec3(0, 1, 0);
+  
+  // Smooth camera interpolation for 3rd person
+  private targetAzimuth: number = 0;
+  private targetElevator: number = 90;
+  private targetDist: number = 5;
+  private targetAt: vec3 = new vec3(0, 0, 0);
+  private smoothFactor: number = 0.1;
+  
+  // First person camera smoothing
+  private fpTargetYaw: number = -90;
+  private fpTargetPitch: number = 0;
+  private fpSmoothFactor: number = 0.15;
   
   /** #public parameters */
   /**
@@ -39,6 +51,9 @@ class _uni_control extends unit {
     const isShift = input.isKeyPressed("ShiftLeft") || input.isKeyPressed("ShiftRight");
     const isCtrl = input.isKeyPressed("ControlLeft") || input.isKeyPressed("ControlRight");
     
+    if (input.isKeyJustPressed("Space"))
+      timer.isPause = !timer.isPause;
+
     // Toggle camera mode with F
     if (input.isKeyJustPressed("KeyF")) {
       this.isFirstPerson = !this.isFirstPerson;
@@ -56,8 +71,15 @@ class _uni_control extends unit {
           this.fpYaw = Math.atan2(dir.z, dir.x) * 180 / Math.PI;
           this.fpPitch = Math.asin(dir.y) * 180 / Math.PI;
           
+          // Initialize target angles
+          this.fpTargetYaw = this.fpYaw;
+          this.fpTargetPitch = this.fpPitch;
+          
           this.updateCameraVectors();
         }
+      } else {
+        // When switching back to 3rd person, keep current camera state
+        ani.cam.setOrientation();
       }
     }
     
@@ -67,41 +89,56 @@ class _uni_control extends unit {
     const hasDistanceInput = input.isKeyPressed("Minus") || input.isKeyPressed("Equal");
     
     if (this.isFirstPerson) {
-      input.isChanged = true;
-      // Update mouse look (6x sensitivity)
-      if (input.leftClick) {
-        this.fpYaw += input.mouseDX * 0.6;
-        this.fpPitch -= input.mouseDY * 0.6;
-        this.fpPitch = Math.max(-89, Math.min(89, this.fpPitch));
-        
-        // Update camera vectors
-        this.updateCameraVectors();
+      // Update mouse look only when left click is held
+      if (input.leftClick && (input.mouseDX !== 0 || input.mouseDY !== 0)) {
+        this.fpTargetYaw += input.mouseDX * 0.4;
+        this.fpTargetPitch -= input.mouseDY * 0.4;
+        this.fpTargetPitch = Math.max(-89, Math.min(89, this.fpTargetPitch));
       }
+      
+      // Smooth interpolation for first person camera
+      const fpLerpFactor = Math.min(1.0, this.fpSmoothFactor * timer.globalDeltaTime * 60);
+      this.fpYaw += (this.fpTargetYaw - this.fpYaw) * fpLerpFactor;
+      this.fpPitch += (this.fpTargetPitch - this.fpPitch) * fpLerpFactor;
+      
+      // Update camera vectors
+      this.updateCameraVectors();
       
       // Handle movement (2x speed, 4x with Shift)
       const baseSpeed = 0.1;
       const speed = baseSpeed * (isShift ? 4 : 1);
       let velocity = new vec3(0, 0, 0);
+      let hasMovement = false;
       
-      if (input.isKeyPressed("KeyW")) velocity = velocity.add(this.fpFront);
-      if (input.isKeyPressed("KeyS")) velocity = velocity.sub(this.fpFront);
-      if (input.isKeyPressed("KeyA")) velocity = velocity.sub(this.fpRight);
-      if (input.isKeyPressed("KeyD")) velocity = velocity.add(this.fpRight);
+      if (input.isKeyPressed("KeyW")) { velocity = velocity.add(this.fpFront); hasMovement = true; }
+      if (input.isKeyPressed("KeyS")) { velocity = velocity.sub(this.fpFront); hasMovement = true; }
+      if (input.isKeyPressed("KeyA")) { velocity = velocity.sub(this.fpRight); hasMovement = true; }
+      if (input.isKeyPressed("KeyD")) { velocity = velocity.add(this.fpRight); hasMovement = true; }
       
       // Apply movement
-      if (velocity.length() > 0) {
+      if (hasMovement) {
         this.fpPosition = this.fpPosition.add(velocity.mulNum(speed));
       }
       
-      // Update camera
+      // Always update camera in first person mode
       ani.cam.set(this.fpPosition, this.fpPosition.add(this.fpFront), this.fpUp);
     } else {
-      // Third person camera (original code)
+      // Third person camera with smooth interpolation
       if (isShift && (hasMouseMovement || hasArrowInput || hasDistanceInput || input.leftClick || input.rightClick)) {
-
         ani.cam.setOrientation();
-        input.isChanged = true;
-        ani.cam.azimuth +=
+        
+        // Always sync target values with current camera state
+        if (Math.abs(this.targetAzimuth - ani.cam.azimuth) > 180 || 
+            Math.abs(this.targetElevator - ani.cam.elevator) > 90 ||
+            this.targetDist < 0.1) {
+          this.targetAzimuth = ani.cam.azimuth;
+          this.targetElevator = ani.cam.elevator;
+          this.targetDist = ani.cam.dist;
+          this.targetAt = ani.cam.at;
+        }
+        
+        // Update target values based on input
+        this.targetAzimuth += 
           ((input.leftClick ? 1 : 0) *
             timer.globalDeltaTime *
             3 *
@@ -110,7 +147,7 @@ class _uni_control extends unit {
             (input.isKeyPressed("ArrowRight") ? 1 : 0) * 0.5)) *
             (1 + Number(isCtrl) * 3);
 
-        ani.cam.elevator +=
+        this.targetElevator += 
           ((input.leftClick ? 1 : 0) *
             timer.globalDeltaTime *
             2 *
@@ -118,29 +155,45 @@ class _uni_control extends unit {
           ((input.isKeyPressed("ArrowUp") ? 1 : 0) * -0.5 + (input.isKeyPressed("ArrowDown") ? 1 : 0) * 0.5)) *
             (1 + Number(isCtrl) * 3);
 
-        if (ani.cam.elevator < 0.08) ani.cam.elevator = 0.08;
-        else if (ani.cam.elevator > 178.9) ani.cam.elevator = 178.9;
+        if (this.targetElevator < 0.08) this.targetElevator = 0.08;
+        else if (this.targetElevator > 178.9) this.targetElevator = 178.9;
 
-        ani.cam.dist +=
+        this.targetDist += 
           -(0.007 * input.mouseDZ) * (1 + Number(isCtrl) * 4) +
           ((input.isKeyPressed("Minus") ? 1 : 0) * 0.1 + (input.isKeyPressed("Equal") ? 1 : 0) * -0.1) *
             (1 + Number(isCtrl) * 3);
-        if (ani.cam.dist < 0.1) ani.cam.dist = 0.1;
-
-        ani.cam.set(
-          mat4
-            .rotateX(ani.cam.elevator)
-            .mul(mat4.rotateY(ani.cam.azimuth))
-            .mul(mat4.translate(ani.cam.at))
-            .TransformPoint(new vec3(0, ani.cam.dist, 0)),
-          ani.cam.at,
-          new vec3(0, 1, 0),
-        );
+        if (this.targetDist < 0.1) this.targetDist = 0.1;
+        
         if (input.rightClick) {
-          ani.cam.mouseParallel();
-          ani.cam.set(ani.cam.loc, ani.cam.at);
+          // Update target at position for panning
+          const panSpeed = 0.5 + Number(isCtrl) * 3;
+          const rightVec = ani.cam.right.mulNum(-input.mouseDX * panSpeed * 0.01);
+          const upVec = ani.cam.up.mulNum(input.mouseDY * panSpeed * 0.01);
+          this.targetAt = this.targetAt.add(rightVec).add(upVec);
         }
       }
+
+      
+      // Always interpolate towards target values for smooth movement
+      const deltaTime = timer.globalDeltaTime;
+      const lerpFactor = Math.min(1.0, this.smoothFactor * deltaTime * 60); // 60fps normalized
+      
+      // Smooth interpolation
+      ani.cam.azimuth += (this.targetAzimuth - ani.cam.azimuth) * lerpFactor;
+      ani.cam.elevator += (this.targetElevator - ani.cam.elevator) * lerpFactor;
+      ani.cam.dist += (this.targetDist - ani.cam.dist) * lerpFactor;
+      ani.cam.at = ani.cam.at.add(this.targetAt.sub(ani.cam.at).mulNum(lerpFactor));
+      
+      // Update camera position
+      ani.cam.set(
+        mat4
+          .rotateX(ani.cam.elevator)
+          .mul(mat4.rotateY(ani.cam.azimuth))
+          .mul(mat4.translate(ani.cam.at))
+          .TransformPoint(new vec3(0, ani.cam.dist, 0)),
+        ani.cam.at,
+        new vec3(0, 1, 0),
+      );
     }
   } /** End of 'response' function */
 

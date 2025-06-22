@@ -35,4 +35,5 @@ struct camData {
 @group(1) @binding(2) var metallic: texture_2d<f32>;
 @group(1) @binding(3) var emissive: texture_2d<f32>;
 @group(1) @binding(4) var normalMap: texture_2d<f32>;
+@group(1) @binding(5) var ao: texture_2d<f32>;
 @group(2) @binding(0) var linearSampler: sampler;

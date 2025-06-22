@@ -17,6 +17,8 @@ interface material_pattern_descriptor {
   topology: GPUPrimitiveTopology;
   vertexAttributes: GPUVertexBufferLayout;
   bindings?: group;
+  alphaMode?: 'OPAQUE' | 'MASK' | 'BLEND';
+  alphaCutoff?: number;
 } /** End of 'bindGroup' interface */
 
 /** Material pattern class */
@@ -116,21 +118,35 @@ class material_pattern {
         targets: [
           {
             format: this.render.defSwapchainTextureFormat,
+            blend: descriptor.alphaMode === 'BLEND' ? {
+              color: {
+                srcFactor: 'src-alpha',
+                dstFactor: 'one-minus-src-alpha',
+                operation: 'add'
+              },
+              alpha: {
+                srcFactor: 'one',
+                dstFactor: 'one-minus-src-alpha',
+                operation: 'add'
+              }
+            } : undefined,
           },
         ],
       },
       multisample: {
         count: 4,
         mask: 0xffffffff,
-        alphaToCoverageEnabled: false,
+        alphaToCoverageEnabled: true,
       },
       primitive: {
         topology: descriptor.topology,
+        cullMode: 'none',  
+        frontFace: 'ccw'  
       },
       layout: this.pipelinelayout,
       depthStencil: {
         format: this.render.defDepthTextureFormat,
-        depthWriteEnabled: true,
+        depthWriteEnabled: descriptor.alphaMode !== 'BLEND',
         depthCompare: "less",
       },
     };
