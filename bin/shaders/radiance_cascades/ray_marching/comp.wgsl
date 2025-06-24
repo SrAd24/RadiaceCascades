@@ -1,10 +1,10 @@
-/* FILE NAME   : ray_marching.wgsl
+/* FILE NAME   : comp.wgsl
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 10.06.2025
+ * LAST UPDATE : 22.06.2025
  */
 
 /** Number PI */
@@ -99,6 +99,6 @@ struct indexData {
   textureStore(resultTexture, global_id.xy, 4 * u32(cascadeIndex) + 1, vec4f(color.y, 0, 0, 0));
   textureStore(resultTexture, global_id.xy, 4 * u32(cascadeIndex) + 2, vec4f(color.z, 0, 0, 0));
   textureStore(resultTexture, global_id.xy, 4 * u32(cascadeIndex) + 3, vec4f(flag, 0, 0, 0));
-} /** End of 'main' function */
+} /** End of 'compute_main' function */
 
-/** END OF 'ray_marching.wgsl' FILE */
+/** END OF 'comp.wgsl' FILE */

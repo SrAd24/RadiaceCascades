@@ -297,7 +297,6 @@ class render extends core {
         { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ],
     });
-    console.log(this.mipMapGroupLayout)
     
     const pipelineLayout = this.device.createPipelineLayout({
       bindGroupLayouts: [this.mipMapGroupLayout],
@@ -312,7 +311,7 @@ class render extends core {
       fragment: {
         module: fragmentShader,
         entryPoint: 'fragment_main',
-        targets: [{ format: 'rgba8unorm' }],
+        targets: [{ format: 'rgba16float' }],
       },
       primitive: { topology: 'triangle-list' },
     });
@@ -334,6 +333,9 @@ class render extends core {
     /* Get primitive and index */
     const prim = drawPrim.prim;
     const index = drawPrim.index;
+
+    if (prim.mtl.pattern.group)
+      this.passEncoder.setBindGroup(3, prim.mtl.pattern.group.bindGroup);
     
     /* Material apply */
     prim.mtl.set(this.passEncoder);
@@ -490,6 +492,7 @@ class render extends core {
     
     /* Submit command buffer to GPU queue */
     this.queue.submit([this.commandEncoder.finish()]);
+    //await this.queue.onSubmittedWorkDone();
   } /** End of 'renderEnd' function */
 
   /**

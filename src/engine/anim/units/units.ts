@@ -17,7 +17,7 @@ abstract class unit {
    * @info Class constructor
    */
   public constructor() {
-    dict.add(this);
+    // dict.add(this);
   } /** End of constructor */
 
   /**

@@ -1,10 +1,10 @@
-/* FILE NAME   : input.wgsl
+/* FILE NAME   : comp.wgsl
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 10.06.2025
+ * LAST UPDATE : 22.06.2025
  */
 
 /** Structure with global data */
@@ -55,8 +55,8 @@ fn compute_main(@builtin(global_invocation_id) global_id: vec3u) {
     return;
   }
 
-  // var currentDistance: f32 = max(0, length(vec2f(global_id.xy) - vec2f(glbData.mousePosX * frameSize, glbData.mousePosY * frameSize)) - 2 * f32(glbData.brushSize));
-  var currentDistance: f32 = max(0, length(vec2f(global_id.xy) - vec2f(256, 256)) - 10);
+  var currentDistance: f32 = max(0, length(vec2f(global_id.xy) - vec2f(glbData.mousePosX * frameSize, glbData.mousePosY * frameSize)) - 2 * f32(glbData.brushSize));
+  // var currentDistance: f32 = max(0, length(vec2f(global_id.xy) - vec2f(256, 256)) - f32(glbData.brushSize));
 
   if (/*glbData.isFirst == 1 || */currentDistance <= textureLoad(distanceTexture, global_id.xy, arrayIndex).r) {
     textureStore(distanceTexture, global_id.xy, arrayIndex, vec4f(currentDistance, 0, 0, 0)); 
@@ -67,6 +67,6 @@ fn compute_main(@builtin(global_invocation_id) global_id: vec3u) {
       textureStore(baseColorTexture, global_id.xy, 4 * arrayIndex + 3, vec4f(1, 0, 0, 0)); 
     }
   }
-} /** End of 'main' function */
+} /** End of 'compute_main' function */
 
-/** END OF 'input.wgsl' FILE */
+/** END OF 'comp.wgsl' FILE */

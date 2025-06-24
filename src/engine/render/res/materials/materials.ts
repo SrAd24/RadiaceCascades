@@ -17,7 +17,7 @@ import { material_pattern } from "../mtl_ptn/material_patterns";
 interface material_descriptor {
   material_pattern: material_pattern;
   texturesDirName?: string;
-  albedo?: vec3 | string;
+  albedo?: vec4 | string;
   roughness?: number | string;
   metallic?: number | string;
   emissive?: vec3 | string;
@@ -29,9 +29,7 @@ interface material_descriptor {
 class material {
   /** #private parameters */
   private mtlGroup!: GPUBindGroup;
-  private pattern!: material_pattern;
-  private static downsamplePipeline?: GPURenderPipeline;
-  private static downsampleBindGroupLayout?: GPUBindGroupLayout;
+  public pattern!: material_pattern;
   
   /** #protected parameters */
   /**
@@ -56,7 +54,7 @@ class material {
    * @returns none
    */
   public async create(materialParams: material_descriptor) {
-    const defaultAlbedo = new vec3(1, 1, 1);
+    const defaultAlbedo = new vec4(1, 1, 1, 1);
     const defaultEmissive = new vec3(0, 0, 0);
     
     // Prepare data for value-based properties
@@ -65,6 +63,7 @@ class material {
       albedoData[0] = materialParams.albedo.x;
       albedoData[1] = materialParams.albedo.y;
       albedoData[2] = materialParams.albedo.z;
+      albedoData[3] = materialParams.albedo.w;
     }
 
     const roughnessData = new Float32Array([typeof materialParams.roughness === 'number' ? materialParams.roughness : 0.5, 0.0, 0.0, 0.0]);
@@ -78,37 +77,37 @@ class material {
 
     this.albedo = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.roughness = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.metallic = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.emissive = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.normalMap = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });
     this.ambientOcclusion = await this.render.createTexture({
       size: { width: 1, height: 1 },
-      format: "rgba8unorm",
+      format: "rgba16float",
       mipMaps: true,
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
     });

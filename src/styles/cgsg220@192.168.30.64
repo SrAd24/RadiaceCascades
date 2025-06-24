@@ -1,0 +1,65 @@
+/* TODO #7 @CGSG220AI3 make comments, make compiler on server */
+
+$r: red;
+$b: blue;
+
+body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 2fr 1fr;
+  background-color: #101010;
+  row-gap: 20px;
+  column-gap: 20px;
+  justify-items: center;
+  justify-content: space-around;
+  align-items: center;
+  grid-template-areas:
+    "header header header header"
+    "body body body body"
+    "footer footer footer footer";
+
+  canvas {
+    grid-area: body;
+    background: #101010;
+  }
+
+  #con_pick {
+	display: grid;
+	grid-template-column: 1fr 1fr;
+	  justify-items: center;
+	  justify-content: space-around;
+	  align-items: center;
+	grid-template-row: 1fr 1fr;
+	row-gap: 20px;
+	column-gap: 20px;
+	grid-area: footer;
+	grid-template-areas:
+		"header1 header1"
+		"body1 body1"
+		"footer1 footer1";
+
+	width: 20%;
+
+	#colorPicker {
+		grid-column: 2 / 3;
+		grid-row: 1 / 2;
+	}
+	#brushSize {
+		grid-column: 2 / 3;
+		grid-row: 3 / 4;
+		width: 100%;
+	}
+	#colorColorPicker {
+		grid-column: 1 / 2;
+		grid-row: 1 / 2;	
+		color: #efcca2;
+		text-shadow: 1px 1px 2px pink;
+	}
+	#brushBrushSize {	
+		grid-column: 1 / 2;
+		grid-row: 3 / 4;	
+		color: #efcca2;
+		text-shadow: 1px 1px 2px pink;
+	}
+  }
+}

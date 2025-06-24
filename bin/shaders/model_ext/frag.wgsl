@@ -65,11 +65,13 @@ fn GeometrySmith(N: vec3f, V: vec3f, L: vec3f, roughness: f32) -> f32 {
  * @param data: vertexOut
  */
 fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
-  var albedo: vec3f = textureSample(albedo, linearSampler, data.texcoord).rgb;
-  //albedo = unpackVec4FromVec2(albedo.xy).xyz; // sRGB to linear
+  let albedoSample = textureSample(albedo, linearSampler, data.texcoord);
+  var albedo: vec3f = albedoSample.rgb;
   albedo = pow(albedo, vec3f(2.2)); // sRGB to linear
-  // var alpha = textureSample(emissive, linearSampler, data.texcoord).a; // sRGB to linear
-  // var a = packUnorm2x16(vec2f(1, 1));
+  
+  // Alpha testing
+  let materialAlpha = textureSample(emissive, linearSampler, data.texcoord).a;
+  let alphaCutoff = albedoSample.a;
    
   var roughness: f32 = textureSample(roughness, linearSampler, data.texcoord).g;
   var metallic: f32 = textureSample(metallic, linearSampler, data.texcoord).b;
@@ -92,12 +94,7 @@ fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
   let V = normalize(worldPos - cam.locW.xyz);
   
   // Directional light
-  let lightDir = normalize(vec3f(0.5, 1.0, 0.3));
-  let lightColor = vec3f(1.0, 0.95, 0.8);
-  let lightIntensity = 3.0;
-  
-  // PBR calculation
-  let L = lightDir;
+  let L = normalize(vec3f(0.5, 1.0, 0.3));
   let H = normalize(-V + L);
   
   // Material properties
@@ -116,7 +113,7 @@ fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
   let specular = numerator / denominator;
   
   let NdotL = max(dot(worldNormal, L), 0.0);
-  let radiance = lightColor * lightIntensity;
+  let radiance = vec3f(3.0);
   let Lo = (kD * albedo / PI + specular) * radiance * NdotL;
   
   // Add ambient lighting\
@@ -127,6 +124,5 @@ fn fragment_main(data: vertexExtOut) -> @location(0) vec4f {
   let finalColor = Lo + ambient;
   
   // Gamma correction
-  // return vec4f(pow(finalColor, vec3f(1 / 2.2)), 1.0);//vec3f(roughness), 1.0);//
-  return vec4f(pow(finalColor, vec3f(1 / 2.2)), 1.0);//vec3f(roughness), 1.0);//
+  return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), albedoSample.a);
 }

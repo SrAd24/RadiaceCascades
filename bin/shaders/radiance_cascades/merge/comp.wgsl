@@ -1,10 +1,10 @@
-/* FILE NAME   : merge.wgsl
+/* FILE NAME   : comp.wgsl
  * PURPOSE     : Cascade radiance implementation project.
  * PROGRAMMER  : CGSG'SrAd'2024.
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 10.06.2025
+ * LAST UPDATE : 22.06.2025
  */
 
 /** Structure with global data */
@@ -282,6 +282,6 @@ fn compute_main(@builtin(global_invocation_id) global_id: vec3u) {
   } else {
     merge(f32(globalIndex), global_id.xy);
   }
-} /** End of 'main' function */
+} /** End of 'compute_main' function */
 
-/** END OF 'merge.wgsl' FILE */
+/** END OF 'comp.wgsl' FILE */

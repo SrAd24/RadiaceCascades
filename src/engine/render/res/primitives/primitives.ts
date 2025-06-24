@@ -31,6 +31,7 @@ class primitive {
   } /** End of 'render' function */
 
   /** #public parameters */
+  public topo!: topology;
   public mtl!: material;
   public iBuf!: buffer;
   public vBuf!: buffer;
@@ -49,6 +50,7 @@ class primitive {
   public async create(primParams: primitive_descriptor) {
     const vdata = primParams.topology.getVertexes();
     const idata = primParams.topology.getIndexes();
+    this.topo = primParams.topology;
 
     this.vBuf = await this.render.createBuffer({
       size: vdata.byteLength,
@@ -88,6 +90,19 @@ class primitive {
       this.instanceCount = this.instanceMatrices.length;
     }
   } /** End of 'addInstance' function */
+
+  /**
+   * @info Destroy primitive and free resources
+   * @returns none
+   */
+  public destroy() {
+    if (this.vBuf) {
+      this.vBuf.destroy();
+    }
+    if (this.iBuf) {
+      this.iBuf.destroy();
+    }
+  } /** End of 'destroy' function */
 } /** End of 'primitive' class */
 
 /** Primitive manager class */

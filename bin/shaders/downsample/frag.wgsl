@@ -4,37 +4,45 @@
  *               Timofey Hudyakov (TH4),
  *               Rybinskiy Gleb (GR1),
  *               Ilyasov Alexander (AI3).
- * LAST UPDATE : 17.06.2025
+ * LAST UPDATE : 23.06.2025
  */
 
-/** Vertex output */
+/** Vertex output structure */
 struct VertexOutput {
-  @builtin(position) position: vec4f,
-  @location(0) texcoord: vec2f,
-}
+  @builtin(position) position: vec4f,  // Clip space position
+  @location(0) texcoord: vec2f,        // Texture coordinates
+}; /** End of 'VertexOutput' structure */
 
 /** Texture and sampler bindings */
-@group(0) @binding(0) var sourceTexture: texture_2d<f32>;
-@group(0) @binding(1) var sourceSampler: sampler;
+@group(0) @binding(0) var sourceTexture: texture_2d<f32>;  // Source texture to downsample
+@group(0) @binding(1) var sourceSampler: sampler;          // Linear sampler for texture filtering
 
 @fragment
+
+/**
+ * @info Fragment main function for downsampling
+ * @param input: VertexOutput
+ * @return result color
+ */
 fn fragment_main(input: VertexOutput) -> @location(0) vec4f {
-  // Get texture dimensions
-  let texSize = textureDimensions(sourceTexture, 0);
-  let texelSize = 1.0 / vec2f(texSize);
+  // Get texture dimensions for texel size calculation
+  let texelSize: vec2f = 1.0 / vec2f(textureDimensions(sourceTexture, 0));  // Size of one texel in UV space
   
-  let uv = input.texcoord;
+  let uv: vec2f = input.texcoord;  // Current UV coordinates
   
-  // 2x2 box filter for downsampling
-  let offset = texelSize * 0.5;
+  // Calculate offset for 2x2 box filter sampling
+  let offset: vec2f = texelSize * 0.5;
   
-  let sample0 = textureSample(sourceTexture, sourceSampler, uv + vec2f(-offset.x, -offset.y));
-  let sample1 = textureSample(sourceTexture, sourceSampler, uv + vec2f( offset.x, -offset.y));
-  let sample2 = textureSample(sourceTexture, sourceSampler, uv + vec2f(-offset.x,  offset.y));
-  let sample3 = textureSample(sourceTexture, sourceSampler, uv + vec2f( offset.x,  offset.y));
+  // Sample 4 neighboring texels in 2x2 pattern
+  let sample0: vec4f = textureSample(sourceTexture, sourceSampler, uv + vec2f(-offset.x, -offset.y));  // Top-left
+  let sample1: vec4f = textureSample(sourceTexture, sourceSampler, uv + vec2f( offset.x, -offset.y));  // Top-right
+  let sample2: vec4f = textureSample(sourceTexture, sourceSampler, uv + vec2f(-offset.x,  offset.y));  // Bottom-left
+  let sample3: vec4f = textureSample(sourceTexture, sourceSampler, uv + vec2f( offset.x,  offset.y));  // Bottom-right
   
-  // Average the 4 samples
-  let result = (sample0 + sample1 + sample2 + sample3) * 0.25;
+  // Average the 4 samples to create downsampled result
+  let result: vec4f = (sample0 + sample1 + sample2 + sample3) * 0.25;
   
   return result;
-}
+} /** End of 'fragment_main' function */
+
+/** END OF 'frag.wgsl' FILE */

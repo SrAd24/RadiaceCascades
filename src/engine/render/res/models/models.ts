@@ -30,9 +30,24 @@ class model {
   protected get render(): render {
     return DIContainer.currentRender;
   } /** End of 'render' function */
+  public so = 0;
 
   /** #public parameters */
   public prims!: primitive[]; // Primitives array
+  private meshTransforms: mat4[] = []; // Store mesh transforms
+
+  /**
+   * @info Check if matrix is identity
+   * @param matrix: mat4
+   * @returns boolean
+   */
+  private isIdentityMatrix(matrix: mat4): boolean {
+    const m = matrix.m;
+    return m[0][0] === 1 && m[0][1] === 0 && m[0][2] === 0 && m[0][3] === 0 &&
+           m[1][0] === 0 && m[1][1] === 1 && m[1][2] === 0 && m[1][3] === 0 &&
+           m[2][0] === 0 && m[2][1] === 0 && m[2][2] === 1 && m[2][3] === 0 &&
+           m[3][0] === 0 && m[3][1] === 0 && m[3][2] === 0 && m[3][3] === 1;
+  }
 
   /**
    * @info Simple GLTF parser to avoid stack overflow
@@ -228,14 +243,14 @@ class model {
     let topo = new topology(vertices, indices);
     await topo.evalNormals();
     let mtl_ptn = await this.render.createMaterialPattern({
-      shaderName: "model",
+      shaderName: "model_obj",
       vertexAttributes: std.attributes,
       topology: "triangle-list",
     });
     let material = await this.render.createMaterial({
       material_pattern: mtl_ptn,
       albedo: new vec3(1, 1, 0),
-      roughness: 0.5,
+      roughness: 0.6,
       metallic: 0.8,
       emission: new vec3(0, 0, 0),
     });
@@ -253,27 +268,20 @@ class model {
    * @returns none
    */
   public async createGLTF(modelParams: model_descriptor) {
-    // Use simple parser to avoid stack overflow
     const parsedData = await this.parseGLTFSimple("bin/models/" + modelParams.name + "/scene.gltf", modelParams.name);
-    console.log(`Parsed ${parsedData.meshes.length} meshes`);
     
     const topologies: { topo: topology<std | std_ext>, materialIndex: number, hasNormalMap: boolean }[] = [];
-    
-    // Check if any mesh has normal maps
     const hasAnyNormalMap = parsedData.meshes.some(mesh => mesh.hasNormalMap);
     
     // Convert parsed data to topologies
-    for (const meshData of parsedData.meshes) {
+    for (let meshIndex = 0; meshIndex < parsedData.meshes.length; meshIndex++) {
+      const meshData = parsedData.meshes[meshIndex];
       const hasNormalMap = meshData.hasNormalMap || false;
       const vertices: (std | std_ext)[] = [];
       const transform = meshData.transform || mat4.identity();
-      if (meshData.transform)
-        console.log(meshData.transform)
       
       for (const vertex of meshData.vertices) {
-        // Use original position without transformation for now
         const originalPos = new vec3(vertex.position[0], vertex.position[1], vertex.position[2]);
-        // const transformedPos = transform.TransformPoint(originalPos);
         
         let v: std | std_ext;
         if (hasNormalMap) {
@@ -289,7 +297,6 @@ class model {
         const topo = new topology(vertices, meshData.indices);
 
         await topo.evalNormals();          
-        // Calculate tangents for normal mapping
         if (hasNormalMap) {
           await topo.evalTangents();
         } 
@@ -298,10 +305,9 @@ class model {
           materialIndex: meshData.materialIndex,
           hasNormalMap: hasNormalMap
         });
+        this.meshTransforms.push(transform);
       }
     }
-    
-    console.log("Created topologies:", topologies.length);
     
     // Create material patterns
     const materialPatterns = new Map<string, material_pattern>();
@@ -309,7 +315,10 @@ class model {
     
     if (parsedData.materials) {
       for (const gltfMaterial of parsedData.materials) {
-        const alphaMode = gltfMaterial.alphaMode || 'OPAQUE';
+        const pbr = gltfMaterial.pbrMetallicRoughness || {};
+        const baseColor = pbr.baseColorFactor || [1, 1, 1, 1];
+        const hasTransparency = baseColor[3] < 1.0 || gltfMaterial.alphaMode === 'BLEND' || gltfMaterial.alphaMode === 'MASK';
+        const alphaMode = hasTransparency ? (gltfMaterial.alphaMode || 'BLEND') : 'OPAQUE';
         neededAlphaModes.add(alphaMode);
       }
     }
@@ -363,8 +372,9 @@ class model {
         const roughness = pbr.roughnessFactor !== undefined ? pbr.roughnessFactor : 1.0;
         const emission = gltfMaterial.emissiveFactor || [0, 0, 0];
         const alphaMode = gltfMaterial.alphaMode || 'OPAQUE';
+        const alphaCutoff = gltfMaterial.alphaCutoff || 0.5;
         const hasNormalTexture = gltfMaterial.normalTexture !== undefined;
-        const alpha = baseColor[3] || 1.0; // Read alpha from baseColor
+        const alpha = baseColor[3] || 1.0;
         
         // Get texture paths
         const albedoTexture = getTexturePath(pbr.baseColorTexture);
@@ -379,19 +389,18 @@ class model {
         const roughnessTexture = getTexturePath(gltfMaterial.roughnessTexture) || metallicRoughnessTexture;
         const metallicTexture = getTexturePath(gltfMaterial.metallicTexture) || metallicRoughnessTexture;
         
+        const finalAlpha = alphaMode === 'MASK' ? alphaCutoff : alpha;
         const material = await this.render.createMaterial({
           material_pattern: pattern,
-          albedo: albedoTexture || new vec3(baseColor[0], baseColor[1], baseColor[2]),
+          albedo: albedoTexture ? albedoTexture : new vec4(baseColor[0], baseColor[1], baseColor[2], finalAlpha),
           roughness: roughnessTexture || roughness,
           metallic: metallicTexture || metallic,
-          emissive: emissiveTexture || new vec4(emission[0], emission[1], emission[2], alpha),
+          emissive: emissiveTexture || new vec4(emission[0], emission[1], emission[2], 1.0),
           normalMap: normalTexture,
           ao: aoTexture,
         });
-        console.log(albedoTexture || new vec3(baseColor[0], baseColor[1], baseColor[2]) )
         
         materials.push(material);
-        console.log(`Created material with textures: albedo=${!!albedoTexture}, normal=${!!normalTexture}`);
       }
     }
     
@@ -400,7 +409,7 @@ class model {
       const defaultPattern = materialPatterns.get('std_triangle-list_OPAQUE') || materialPatterns.values().next().value;
       const defaultMaterial = await this.render.createMaterial({
         material_pattern: defaultPattern,
-        albedo: new vec3(0.8, 0.8, 0.8),
+        albedo: new vec4(0.8, 0.8, 0.8, 1.0),
         roughness: 0.5,
         metallic: 0.2,
         emissive: new vec4(0, 0, 0, 1.0),
@@ -410,7 +419,8 @@ class model {
     
     // Create primitives
     this.prims = [];
-    for (const topoData of topologies) {
+    for (let i = 0; i < topologies.length; i++) {
+      const topoData = topologies[i];
       if (topoData.topo.vertexes.length > 0) {
         const material = materials[topoData.materialIndex] || materials[0];
         const primitive = await this.render.createPrimitive({
@@ -418,12 +428,19 @@ class model {
           topology: topoData.topo,
         });
         
+        // Apply transform if not identity
+        const transform = this.meshTransforms[i];
+        // if (transform && !this.isIdentityMatrix(transform)) {
+        //   primitive.transform = transform;
+        //   primitive.isTransformChanged = true;
+        // }
+        
         this.prims.push(primitive);
       }
     }
-    
-    console.log(`Created ${this.prims.length} primitives with ${materials.length} materials`);
   } /** End of 'createGLTF' function */
+
+
 
   /**
    * @info Create model function (auto-detect format)
@@ -443,6 +460,20 @@ class model {
         throw new Error(`Unsupported model format: ${modelParams.format}`);
     }
   } /** End of 'create' function */
+
+  /**
+   * @info Destroy model and free all resources
+   * @returns none
+   */
+  public destroy() {
+    if (this.prims) {
+      for (const prim of this.prims) {
+        prim.destroy();
+      }
+      this.prims = [];
+    }
+    this.meshTransforms = [];
+  } /** End of 'destroy' function */
 } /** End of 'model' class */
 
 /** Model manager class */

@@ -176,22 +176,39 @@ class texture {
     
     // Ensure data is in correct format for the texture
     let srcData: ArrayBufferView;
-    if (this.descriptor.format.includes('float')) {
-      // For float formats, ensure we use Float32Array
+    if (this.descriptor.format === 'rgba16float') {
+      // For rgba16float, convert Float32Array to Uint16Array with half-float encoding
+      if (data instanceof Float32Array) {
+        const uint16Data = new Uint16Array(data.length);
+        for (let i = 0; i < data.length; i++) {
+          uint16Data[i] = this.floatToHalf(data[i]);
+        }
+        srcData = uint16Data;
+      } else {
+        srcData = data;
+      }
+    } else if (this.descriptor.format.includes('float')) {
+      // For other float formats, use data as-is
       if (!(data instanceof Float32Array)) {
         srcData = new Float32Array(data);
       } else {
         srcData = data;
       }
-    } else if (this.descriptor.format.includes('unorm') || this.descriptor.format.includes('snorm')) {
-      srcData = new Uint32Array([data[0] * 255, data[1] * 255, data[2] * 255, data[3] * 255]);
+    } else if (this.descriptor.format.includes('unorm')) {
+      // For unorm formats, convert float [0,1] to uint8 [0,255]
+      if (data instanceof Float32Array) {
+        const uint8Data = new Uint8Array(data.length);
+        for (let i = 0; i < data.length; i++) {
+          uint8Data[i] = Math.round(Math.max(0, Math.min(1, data[i])) * 255);
+        }
+        srcData = uint8Data;
+      } else {
+        srcData = data;
+      }
     } else {
       srcData = data;
     }
     
-    console.log(data)
-    console.log('Writing texture data:', srcData, 'Format:', this.descriptor.format);
-
     this.render.queue.writeTexture(
       {
         texture: this.texture,
@@ -203,6 +220,37 @@ class texture {
       },
       [this.width, this.height]
     );
+  }
+
+  /**
+   * @info Convert float32 to half-float (float16)
+   * @param val: number
+   * @returns number
+   */
+  private floatToHalf(val: number): number {
+    const floatView = new Float32Array(1);
+    const int32View = new Int32Array(floatView.buffer);
+    floatView[0] = val;
+    const x = int32View[0];
+    
+    let bits = (x >> 16) & 0x8000; // sign bit
+    let m = (x >> 12) & 0x07ff; // mantissa
+    const e = (x >> 23) & 0xff; // exponent
+    
+    if (e < 103) return bits;
+    if (e > 142) {
+      bits |= 0x7c00;
+      bits |= ((e == 255) ? 0 : 1) && (x & 0x007fffff);
+      return bits;
+    }
+    if (e < 113) {
+      m |= 0x0800;
+      bits |= (m >> (114 - e)) + ((m >> (113 - e)) & 1);
+      return bits;
+    }
+    bits |= ((e - 112) << 10) | (m >> 1);
+    bits += m & 1;
+    return bits;
   } /** End of 'updateByData' function */
 
   /** #public parameters */

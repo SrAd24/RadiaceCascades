@@ -78,9 +78,25 @@ class buffer {
     this.isSizeChanged = true;
   } /** End of 'resize' function */
 
+  public gl: any;
+
+  public createWebGLBuffer() {
+    // 1. Create buffer
+    const buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+
+    // 2. Fill data
+    const v = new Float32Array([]);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, v, this.gl.STATIC_DRAW);
+
+    // 3. Setup attributes 
+    this.gl.enableVertexAttribArray(0);
+    this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, false, 0, 0);
+  }
+
   /**
    * @info Update buffer function
-   * @param data: Float32Array
+   * @param data: Float32Array  
    * @returns none
    */
   public async update(data: Float32Array) {

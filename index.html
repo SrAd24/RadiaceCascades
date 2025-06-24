@@ -10,15 +10,13 @@
     <canvas id = "The_only_normal_group_for_the_entire_time_at_the_CGSG" width = "1024" height = "800">
     </canvas>
     <script type="module">
-      import { uni_test } from './js/samples/uni_test.mjs';
-      import { uni_radiance_cascades } from './js/samples/uni_radiance_cascades.mjs';
-      import { uni_control } from './js/samples/uni_control.mjs';
     </script>
     
-    <input type="range" min="1" max="30" value="15" id="mySlider">
-    <p>Num: <span id="sliderValue">15</span></p>
     <script type="module">
+      import { uni_control } from './js/samples/uni_control.mjs';
       import { anim } from './js/engine/anim/anim.mjs';
+      import { dict } from './js/engine/anim/units/dictionary.mjs';
+      dict.add(uni_control)
 
       // Prevent browser zoom with Ctrl+/Ctrl-
       document.addEventListener('keydown', (e) => {

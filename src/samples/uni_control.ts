@@ -9,10 +9,27 @@
 
 /** IMPORTS */
 import { anim, unit } from "engine/anim/anim";
+import { dict } from "engine/anim/units/dictionary";
+import { uni_test } from "./uni_test";
+import { uni_radiance_cascades } from "./uni_radiance_cascades";
+import { uni_radiance_cascades_3d } from "./uni_radiance_cascades_3d";
+import { uni_tex } from "./uni_tex";
+import { uni_phys_sample } from "./uni_phys_sample";
+import "vrc.ts";
 
 /** Unit control class */
 class _uni_control extends unit {
   /** #private parameters */
+  private unitSelector: HTMLDivElement | null = null;
+  private ani: anim | null = null;
+  private availableUnits = [
+    { name: 'uni_test', displayName: '3D Model Viewer', active: false, unit: null as unit | null },
+    { name: 'uni_radiance_cascades', displayName: 'Radiance Cascades 2D', active: false, unit: null as unit | null },
+    { name: 'uni_radiance_cascades_3d', displayName: 'Radiance Cascades 3D', active: false, unit: null as unit | null },
+    { name: 'uni_tex', displayName: 'Texture Test', active: false, unit: null as unit | null },
+    { name: 'uni_phys_sample', displayName: 'Physics Simulation', active: false, unit: null as unit | null }
+  ];
+  private activeUnitInstances = new Map<string, unit>();
   private isFirstPerson: boolean = false;
   private fpYaw: number = -90;  // Start looking forward
   private fpPitch: number = 0;
@@ -54,7 +71,172 @@ class _uni_control extends unit {
    * @param ani: anim
    * @returns none
    */
-  public async init(ani: anim): Promise<any> {} /** End of 'init' function */
+  public async init(ani: anim): Promise<any> {
+    this.ani = ani;
+    this.createUnitSelector();
+    await this.updateActiveUnits();
+  } /** End of 'init' function */
+
+  private createUnitSelector() {
+    this.unitSelector = document.createElement('div');
+    this.unitSelector.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      padding: 16px;
+      background: rgba(0,0,0,0.9);
+      border-radius: 12px;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+      min-width: 200px;
+    `;
+    
+    const title = document.createElement('div');
+    title.textContent = 'ACTIVE UNITS';
+    title.style.cssText = 'font-weight: bold; margin-bottom: 12px; color: #667eea; text-align: center;';
+    this.unitSelector.appendChild(title);
+    
+    this.availableUnits.forEach((unit, index) => {
+      const unitDiv = document.createElement('div');
+      unitDiv.style.cssText = 'margin-bottom: 8px; display: flex; align-items: center; gap: 8px;';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = unit.active;
+      checkbox.style.cssText = 'accent-color: #667eea;';
+      checkbox.addEventListener('change', async () => {
+        this.availableUnits[index].active = checkbox.checked;
+        await this.updateActiveUnits();
+      });
+      
+      const label = document.createElement('label');
+      label.textContent = unit.displayName;
+      label.style.cssText = 'font-weight: 500; cursor: pointer;';
+      label.addEventListener('click', async () => {
+        checkbox.checked = !checkbox.checked;
+        this.availableUnits[index].active = checkbox.checked;
+        await this.updateActiveUnits();
+      });
+      
+      unitDiv.appendChild(checkbox);
+      unitDiv.appendChild(label);
+      this.unitSelector.appendChild(unitDiv);
+    });
+    
+    document.body.appendChild(this.unitSelector);
+  }
+  
+  private async updateActiveUnits() {
+    // Блокируем UI
+    this.setUIBlocked(true);
+    
+    try {
+      // Проверяем какие юниты нужно деактивировать
+      for (const unitInfo of this.availableUnits) {
+        const unitInstance = this.activeUnitInstances.get(unitInfo.name);
+        const wasActive = !!unitInstance;
+        const isActive = unitInfo.active;
+        
+        if (wasActive && !isActive && unitInstance) {
+          // Юнит был активен, но теперь деактивирован - вызываем destroy
+          if (typeof unitInstance.destroy === 'function') {
+            await unitInstance.destroy(this.ani!);
+          }
+          // Удаляем из dict
+          const index = dict.units.indexOf(unitInstance);
+          if (index > -1) dict.units.splice(index, 1);
+          
+          this.activeUnitInstances.delete(unitInfo.name);
+          console.log(`Destroyed unit: ${unitInfo.name}`);
+        }
+      }
+      
+      // Добавляем новые активные юниты
+      for (const unitInfo of this.availableUnits) {
+        const unitInstance = this.activeUnitInstances.get(unitInfo.name);
+        const wasActive = !!unitInstance;
+        const isActive = unitInfo.active;
+        
+        if (!wasActive && isActive) {
+          // Создаем новый экземпляр юнита
+          let newUnit: unit | null = null;
+          
+          switch (unitInfo.name) {
+            case 'uni_test':
+              newUnit = Object.create(uni_test);
+              break;
+            case 'uni_radiance_cascades':
+              newUnit = Object.create(uni_radiance_cascades);
+              break;
+            case 'uni_radiance_cascades_3d':
+              newUnit = Object.create(uni_radiance_cascades_3d);
+              break;
+            case 'uni_tex':
+              newUnit = Object.create(uni_tex);
+              break;
+            case 'uni_phys_sample':
+              newUnit = Object.create(uni_phys_sample);
+              break;
+          }
+          
+          if (newUnit) {
+            // Добавляем в dict
+            dict.units.push(newUnit);
+            this.activeUnitInstances.set(unitInfo.name, newUnit);
+            unitInfo.unit = newUnit;
+            
+            // Вызываем init
+            if (typeof newUnit.init === 'function') {
+              await newUnit.init(this.ani!);
+              console.log(`Initialized unit: ${unitInfo.name}`);
+            }
+          }
+        }
+      }
+      
+      console.log('Active units updated:', this.availableUnits.filter(u => u.active).map(u => u.name));
+    } finally {
+      // Разблокируем UI
+      this.setUIBlocked(false);
+    }
+  }
+  
+  private setUIBlocked(blocked: boolean) {
+    if (this.unitSelector) {
+      const overlay = document.getElementById('ui-block-overlay');
+      
+      if (blocked) {
+        if (!overlay) {
+          const blockOverlay = document.createElement('div');
+          blockOverlay.id = 'ui-block-overlay';
+          blockOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 18px;
+          `;
+          blockOverlay.textContent = 'Initializing...';
+          document.body.appendChild(blockOverlay);
+        }
+      } else {
+        if (overlay) {
+          overlay.remove();
+        }
+      }
+    }
+  }
 
   /**
    * @info Response function
@@ -62,6 +244,7 @@ class _uni_control extends unit {
    * @returns none
    */
   public async response(ani: anim): Promise<any> {
+    
     const isShift = input.isKeyPressed("ShiftLeft") || input.isKeyPressed("ShiftRight");
     const isCtrl = input.isKeyPressed("ControlLeft") || input.isKeyPressed("ControlRight");
     
@@ -313,7 +496,12 @@ class _uni_control extends unit {
    * @param ani: anim
    * @returns none
    */
-  public async destroy(ani: anim): Promise<any> {} /** End of 'destroy' function */
+  public async destroy(ani: anim): Promise<any> {
+    if (this.unitSelector) {
+      document.body.removeChild(this.unitSelector);
+      this.unitSelector = null;
+    }
+  } /** End of 'destroy' function */
 } /** End of '_uni_control' class */
 
 const uni_control: _uni_control = new _uni_control();

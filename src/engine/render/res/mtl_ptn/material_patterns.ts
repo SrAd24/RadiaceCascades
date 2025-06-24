@@ -95,9 +95,9 @@ class material_pattern {
       this.pipelinelayout = this.render.device.createPipelineLayout({
         bindGroupLayouts: [
           this.render.globalGroup.bindGroupLayout,
-          descriptor.bindings.bindGroupLayout,
           this.render.mtlLayout,
-          this.render.samplerGroup.bindGroupLayout
+          this.render.samplerGroup.bindGroupLayout,
+          descriptor.bindings.bindGroupLayout,
         ],
       });
       this.group = descriptor.bindings;
@@ -122,12 +122,12 @@ class material_pattern {
               color: {
                 srcFactor: 'src-alpha',
                 dstFactor: 'one-minus-src-alpha',
-                operation: 'add'
+                operation: 'add',
               },
               alpha: {
                 srcFactor: 'one',
                 dstFactor: 'one-minus-src-alpha',
-                operation: 'add'
+                operation: 'add',
               }
             } : undefined,
           },

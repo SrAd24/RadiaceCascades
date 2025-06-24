@@ -1,25 +1,749 @@
-/* TODO #7 @CGSG220AI3 make comments, make compiler on server */
+@import url('https://fonts.googleapis.com/css2?family=Iceland&display=swap');
 
-$r: red;
-$b: blue;
+button {
+    &:hover {
+        cursor: pointer;
+    }
+}
 
-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 2fr 1fr;
-  background-color: #101010;
-  row-gap: 20px;
-  column-gap: 20px;
-  justify-items: center;
-  justify-content: space-around;
-  align-items: center;
-  grid-template-areas:
-    "header header header header"
-    "body body body body"
-    "footer footer footer footer";
+* {
+    margin: 0;
+    padding: 0;
 
-  canvas {
-    grid-area: body;
-    background: #101010;
-  }
+    color: azure;
+    
+    font-family: "Iceland", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+
+    user-select: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+html {
+    background-color: #101010;
+}
+
+video {
+    position: absolute;
+
+    filter: blur(5px);
+
+    width: 100%;
+    height: 100%;
+
+    z-index: -1;
+}
+
+.con {
+    display: grid;   
+}
+
+#main_con {
+
+    grid-template-columns: repeat(4, 1fr);
+
+    justify-content: space-between;
+    align-content: space-between;
+
+    grid-template-rows: 10% 90%;
+
+    grid-template-areas:
+        "header header header header"
+        "body body body body";
+
+    header {
+        grid-area: header;       
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-areas: ". header header logo";
+
+
+        h1 {
+            font-size: 64px;
+
+            text-shadow: 2px 2px 3px bisque;
+
+            text-align: center;
+
+            grid-area: header;
+        }
+
+        a {
+            grid-area: logo;
+            position: fixed;
+            right: 60px;
+            top: 10px;
+
+            button {
+                width: 40px;
+                height: 40px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+
+                background-image: url('/bin/github.png');
+                background-size: cover;
+            }
+        }
+    }
+
+    main {
+        grid-area: body;
+
+        width: 99.5%;
+
+        display: flex;
+        flex-direction: row;
+
+        justify-self: normal;
+        align-self: normal;
+
+        justify-content: space-around;
+
+        canvas {
+            box-shadow: inset 1px 1px 1px azure, inset -1px -1px 1px azure;
+        }
+
+        #UI {
+            position: fixed;
+            left: 2%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+
+            display: flex;
+            flex-direction: row;
+            z-index: 1;
+            
+            // Add glow effect
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.3));
+        }
+
+        #Person {
+            position: fixed;
+            right: 1%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25%;
+
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+            z-index: 2;
+            
+            // Add glow effect
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.3));
+           
+            #Person_move {
+                grid-column: 1 / 2;
+
+                margin-top: 10%;
+            }
+        }
+    }
+
+    footer {
+       border: 1px red solid;
+       grid-area: footer;
+    }
+}
+
+#tp-fldv_b {
+    height:  90px;
+}
+
+.move {
+    &:hover {
+        &:hover {
+            cursor: grab;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    width: 20px;
+    height: 20px;   
+    margin-right: 5px;
+    margin-top: 3px;
+
+    background-color: gray;
+    justify-self: flex-end;
+}
+
+#save {
+    width: 500px;
+    height: 150px;
+
+    background-color: black;
+    opacity: 80%;
+
+    position: absolute;
+    left: 450px;
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    header {
+        width: 100%;
+        background-color: gray;
+
+        &:hover {
+            cursor: grab;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        display: flex;
+
+        #titleSave {
+            margin-left: 40%;
+            align-self: center;
+            width: 30%;
+
+        }
+
+        #save_close {
+            margin-left: 23%;
+            width: 6%;
+            height: 95%;
+        } 
+    }
+}
+
+#works {
+    width: 400px;
+    height: 600px;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    background-color: black;
+    opacity: 80%;
+
+    display: flex;
+    flex-direction: column;
+
+    header {
+        width: 100%;
+        background-color: gray;
+
+        &:hover {
+            cursor: grab;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        display: flex;
+
+        #titleWorks {
+            margin-left: 40%;
+            align-self: center;
+            width: 30%;
+
+        }
+
+        #work_close {
+            margin-left: 23%;
+        } 
+    }
+}
+
+#search {
+    width: 400px;
+    height: 600px;
+
+    position: absolute;
+    left: 500px;
+    top: 200px;
+
+    background-color: black;
+    opacity: 80%;
+
+    display: flex;
+    flex-direction: column;
+
+    header {
+        width: 100%;
+        background-color: gray;
+
+        &:hover {
+            cursor: grab;
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        display: flex;
+
+        #titleSearch {
+            margin-left: 40%;
+            align-self: center;
+            width: 30%;
+
+        }
+
+        #search_close {
+            margin-left: 23%;
+        } 
+    }
+}
+
+.close {
+    width: 7%;
+
+    background-image: url('/bin/close.png');
+    background-size: cover;
+    background-color: bisque;
+    opacity: 50%;
+
+    border-radius: 15px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+#log_con {
+    display: grid;
+
+    grid-template-areas:
+        "header header header header"
+        ". . . ."
+        ". body body ."
+        ". body body .";
+
+    gap: 10%;
+
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+
+
+    #log_pane {
+        box-shadow: 1px 1px 4px azure, -1px -1px 4px azure;
+        border-radius: 0 12px 0 0;
+
+        grid-area: body;
+
+        background-color: black;
+        opacity: 80%;
+
+        width: 85%;
+
+        margin-left: 5%;
+        margin-left: 5%;
+
+        padding: 0px 5%;
+
+        margin-top: 10%;
+        height: 90%;
+
+        justify-content: center;
+        align-content: center;
+
+        form {           
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: space-between;
+
+            div {
+                display: flex;
+
+                width: 100%;
+
+                justify-content: space-between;
+
+                font-size: 30px;
+
+                #login {
+                    border-radius: 0 12px 0 0;
+
+                }
+
+                input {
+                    width: 70%;
+
+
+                    opacity: 70%;
+                    background-color: gray;
+
+                    font-size: 24px;
+                }
+
+                &:nth-of-type(1) {
+                    margin-bottom: 4%;
+                }
+            }
+
+            div {
+                button {
+                    background-color: #111111;
+
+                    width: 10%;
+                    margin-left: 90%;
+                    margin-top: 1%;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+                width: 100%;
+            }
+        }
+
+    }
+
+     header {
+        grid-area: header;       
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-areas: ". header header logo";
+
+        div {
+            grid-area: header;
+
+            h1 {
+                font-size: 64px;
+
+                text-shadow: 2px 2px 3px bisque;
+
+                text-align: center;
+
+            }
+
+            div {
+                text-align: center;
+            }
+        }
+
+        #sign_up_reference {
+            position: absolute;
+            right: 150px;
+            top: 20px;
+
+            background-color: #333333;
+        }
+
+        a {
+            grid-area: logo;
+            position: fixed;
+            right: 60px;
+            top: 10px;
+
+            button {
+                width: 40px;
+                height: 40px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+
+                background-image: url('/bin/github.png');
+                background-size: cover;
+            }
+        }
+    }
+}
+
+// TWEAK PANE STYLES - MODERN DESIGN
+
+// Main container styling
+.tp-dfwv {
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(40, 40, 60, 0.95)) !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+    border-radius: 15px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+// Folder title styling
+.tp-fldv_t {
+    width: 100% !important;
+    text-align: center !important;
+    background: linear-gradient(90deg, #00d4ff, #0099cc) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    padding: 2px 0 !important;
+    height: 16px !important;
+    line-height: 1 !important;
+}
+
+// Labels
+.tp-lblv_l {
+    font-size: 14px;
+    color: #b0e0ff !important;
+    font-weight: 500;
+}
+
+.tp-lblv {
+    height: 45px !important;
+    margin: 12px 0 !important;
+}
+
+// Folder body
+.tp-fldv_b {
+    background: rgba(15, 15, 25, 0.6) !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    margin-top: 6px !important;
+    border: 1px solid rgba(100, 200, 255, 0.2) !important;
+    min-height: 400px !important;
+}
+
+// Tab styling
+.tp-tabv_t {
+    height: 40px !important;
+    font-size: 14px !important;
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.8), rgba(50, 50, 80, 0.8)) !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+    border-radius: 8px 8px 0 0 !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+    
+    &:hover {
+        background: linear-gradient(135deg, rgba(40, 40, 70, 0.9), rgba(60, 60, 100, 0.9)) !important;
+        transform: translateY(-2px) !important;
+    }
+}
+
+// Active tab
+.tp-tabv_t[aria-selected="true"] {
+    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+}
+
+// Sliders
+.tp-sglv_i {
+    font-size: 14px !important;
+    background: rgba(20, 20, 40, 0.8) !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+}
+
+// Buttons - Modern design
+.tp-btnv_t {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    font-size: 18px !important;
+    //padding: 10px 12px !important;
+    //min-height: 36px !important;
+    line-height: 1.2 !important;
+    //white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.8), rgba(0, 153, 204, 0.8)) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    box-shadow: 0 3px 10px rgba(0, 212, 255, 0.3) !important;
+    
+    &:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.9), rgba(0, 180, 255, 0.9)) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4) !important;
+    }
+    
+    &:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
+    }
+}
+
+// Special styling for different button types
+.tp-btnv_t:nth-child(1) {
+    background: linear-gradient(135deg, rgba(255, 100, 100, 0.8), rgba(255, 50, 50, 0.8)) !important;
+    box-shadow: 0 4px 15px rgba(255, 100, 100, 0.3) !important;
+    
+    &:hover {
+        background: linear-gradient(135deg, rgba(255, 120, 120, 0.9), rgba(255, 70, 70, 0.9)) !important;
+        box-shadow: 0 6px 20px rgba(255, 100, 100, 0.4) !important;
+    }
+}
+
+.tp-btnv_t:nth-child(2) {
+    background: linear-gradient(135deg, rgba(100, 255, 100, 0.8), rgba(50, 255, 50, 0.8)) !important;
+    box-shadow: 0 4px 15px rgba(100, 255, 100, 0.3) !important;
+    
+    &:hover {
+        background: linear-gradient(135deg, rgba(120, 255, 120, 0.9), rgba(70, 255, 70, 0.9)) !important;
+        box-shadow: 0 6px 20px rgba(100, 255, 100, 0.4) !important;
+    }
+}
+
+// Button container
+.tp-btnv {
+    width: 98% !important;
+    margin: 6px 1% !important;
+    min-height: 36px !important;
+}
+
+// Text inputs
+.tp-txtv {
+    margin-top: 5px;
+    font-size: 14px;
+    background: rgba(20, 20, 40, 0.8) !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+    padding: 8px !important;
+}
+
+// Color picker
+.tp-colv {
+    margin-right: 10%;
+}
+
+.tp-colv_h {
+    width: 180px;
+    font-size: 12px;
+    border-radius: 8px !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+}
+
+.tp-colv_t {
+    width: 100%;
+    
+    .tp-txtv {
+        font-size: 12px;
+    }
+}
+
+.tp-colpv {
+    width: 300px;
+    border-radius: 10px !important;
+    border: 1px solid rgba(100, 200, 255, 0.3) !important;
+}
+
+// Slider track styling
+.tp-sldv_t {
+    background: linear-gradient(90deg, rgba(0, 212, 255, 0.3), rgba(0, 153, 204, 0.3)) !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+}
+
+// Slider knob
+.tp-sldv_k {
+    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    cursor: grab !important;
+}
+
+.tp-sldv_k:active {
+    cursor: grabbing !important;
+}
+
+.tp-sldv {
+    cursor: pointer !important;
+}
+
+// Animation for smooth transitions
+.tp-dfwv * {
+    transition: all 0.2s ease !important;
+}
+
+// Specific tab height adjustments for Person panel
+#Person .tp-tabv_t[title="Search"], #Person .tp-tabv_t[title="Social"] {
+    height: 15px !important;
+    min-height: 15px !important;
+    max-height: 15px !important;
+    line-height: 15px !important;
+    font-size: 10px !important;
+    padding: 2px 8px !important;
+    margin: 0 !important;
+}
+
+#Person .tp-tabv_i[title="Search"], #Person .tp-tabv_i[title="Social"] {
+    height: 15px !important;
+    min-height: 15px !important;
+}
+
+// Avatar styling
+#photo {
+    width: 95% !important;
+    height: 400px !important;
+    border: 2px solid rgba(100, 200, 255, 0.5) !important;
+    border-radius: 15px !important;
+    margin: 10px 2.5% !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+#search_result {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: #101010;
+
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-areas: 
+    ". . . ."
+    ". photo name ."
+    ". photo id ."
+    ". . add_friend .";
+
+    gap: 50px;
+
+    #res_1 {
+        width: 100%;
+        height: 100%;
+        grid-area: photo;
+        box-shadow: inset 1px 1px 3px azure;
+    }
+    #res_2 {
+        width: 100%;
+        height: 100%;
+        grid-area: name;
+        font-size: 30px;
+
+        margin-top: calc(30% / 2);
+    }
+    #res_3 {
+        width: 100%;
+        height: 100%;
+        grid-area: id;
+        font-size: 30px;
+
+        margin-top: calc(30% / 2);
+    }
+    #res4 {
+        grid-area: id;
+        margin-right: 300px;
+    }
 }

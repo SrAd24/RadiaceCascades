@@ -100,23 +100,28 @@ fn pbr(Pos: vec3f, V: vec3f, L: vec3f, N: vec3f, Alb: vec3f, Rou: f32, Met: f32,
  * @param data: vertexOut
  */
 fn fragment_main(data: vertexOut) -> @location(0) vec4f {
-  var Alb: vec3f = textureSample(albedo, linearSampler, data.texcoord).rgb;
+  let albedoSample = textureSample(albedo, linearSampler, data.texcoord);
+  var Alb: vec3f = albedoSample.rgb;
   Alb = pow(Alb, vec3f(2.2));
-  var alpha = textureSample(emissive, linearSampler, data.texcoord).a; // sRGB to linear
+  
+  // Alpha testing
+  let materialAlpha = textureSample(emissive, linearSampler, data.texcoord).a;
+  let alphaCutoff = albedoSample.a;
 
   var Rou: f32 = textureSample(roughness, linearSampler, data.texcoord).g;
   var Met: f32 = textureSample(metallic, linearSampler, data.texcoord).b;
   
   // point components
   var Pos = data.position;
-  var Normal = data.normal;
+  var Normal = normalize(data.normal);
 
   var V = normalize(Pos - cam.locW.xyz);
   var N = Normal;
 
-  var L = normalize(vec3f(1, 1, 0.21));
+  // Directional light
+  var L = normalize(vec3f(0.5, 1.0, 0.3));
   
-  var Lo = pbr(Pos, V, L, N, Alb, Rou, Met, vec3f(1, 0.001, 0.00001), 1.0);
+  var Lo = pbr(Pos, V, L, N, Alb, Rou, Met, vec3f(1), 1.0) * 3.0;
 
   var color = Lo;
 
@@ -124,13 +129,10 @@ fn fragment_main(data: vertexOut) -> @location(0) vec4f {
   let ao = max(textureSample(ao, linearSampler, data.texcoord).r, 0.1);
   
   // Применить AO к ambient освещению:
-  let ambient = vec3f(0.05) * Alb;
+  let ambient = vec3f(0.05) * Alb * ao;
   // let ambient = vec3f(0.05) * albedo;
   let finalColor = Lo + ambient;
   
   // Gamma correction
-  return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), 1.0);
-
-  // Gamma correction
-  //return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), 1.0);
+  return vec4f(pow(finalColor, vec3f(1.0 / 2.2)), albedoSample.a);
 }

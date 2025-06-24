@@ -7,6 +7,11 @@
  * LAST UPDATE : 17.06.2025
  */
 
+/** IMPORTS */
+import { vec2 } from "../../../../math/mth_vec2";
+import { vec3 } from "../../../../math/mth_vec3";
+import { vec4 } from "../../../../math/mth_vec4";
+
 /** Point vertex class */
 class point {
   public p = new vec3(0, 0, 0);
