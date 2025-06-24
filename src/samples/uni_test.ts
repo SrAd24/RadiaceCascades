@@ -104,9 +104,7 @@ class _uni_test extends unit {
     const models = [
       { name: "girl", format: "gltf" },
       { name: "car", format: "gltf" },
-      { name: "car2", format: "gltf" },
       { name: "knight", format: "gltf" },
-      { name: "last", format: "gltf" },
       { name: "cow", format: "obj" },
       { name: "monkey", format: "obj" }
     ];
